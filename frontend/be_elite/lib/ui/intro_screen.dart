@@ -1,3 +1,4 @@
+import 'package:be_elite/ui/login_screen.dart';
 import 'package:flutter/material.dart';
 
 class IntroScreen extends StatelessWidget {
@@ -17,7 +18,7 @@ class IntroScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            const Text("BeElite", style: TextStyle(color: Colors.white)),
+            const Text("BeElite v1.0", style: TextStyle(color: Colors.white)),
             Expanded(
               child: Stack(
                 alignment: Alignment.center,
@@ -31,7 +32,10 @@ class IntroScreen extends StatelessWidget {
                           BoxShadow(color: Color(0xFFD6CD0B), blurRadius: 15)
                         ]),
                         child: FilledButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(context,
+                              MaterialPageRoute(builder: (context) => const LoginScreen()));
+                          },
                           style: FilledButton.styleFrom(
                               backgroundColor: const Color(0xFFD6CD0B),
                               fixedSize: const Size(200, 75),
