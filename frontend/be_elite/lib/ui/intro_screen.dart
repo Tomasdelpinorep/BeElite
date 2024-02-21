@@ -1,3 +1,4 @@
+import 'package:be_elite/styles/app_colors.dart';
 import 'package:be_elite/ui/login_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -11,7 +12,7 @@ class IntroScreen extends StatelessWidget {
         alignment: Alignment.center,
                 decoration: BoxDecoration(
                   gradient: RadialGradient(
-                    colors: [Colors.grey[800]!, Colors.black],
+                    colors: [Colors.grey[900]!, Colors.black],
                     radius: 0.5,
                   ),
                 ),
@@ -28,22 +29,22 @@ class IntroScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Container(
-                        decoration: const BoxDecoration(boxShadow: [
-                          BoxShadow(color: Color(0xFFD6CD0B), blurRadius: 15)
+                        decoration: BoxDecoration(boxShadow: [
+                          BoxShadow(color: AppColors.mainYellow, blurRadius: 5)
                         ]),
                         child: FilledButton(
                           onPressed: () {
                             Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => const LoginScreen()));
+                              MaterialPageRoute(builder: (context) => const LoginScreen(isCoach:false)));
                           },
                           style: FilledButton.styleFrom(
-                              backgroundColor: const Color(0xFFD6CD0B),
-                              fixedSize: const Size(200, 75),
+                              backgroundColor: AppColors.mainYellow,
+                              fixedSize: const Size(275, 75),
                               shape: const RoundedRectangleBorder(
                                   borderRadius:
                                       BorderRadius.all(Radius.elliptical(5, 5)))),
                           child: const Text(
-                            'Log In',
+                            "I'm an Athlete",
                             style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 30,
@@ -54,14 +55,13 @@ class IntroScreen extends StatelessWidget {
                       const SizedBox(
                         height: 50,
                       ),
-                      const Text(
-                        "Don't have a BeElite account?",
-                        style: TextStyle(color: Colors.grey),
-                      ),
                       OutlinedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) => const LoginScreen(isCoach: true)));
+                        },
                         style: OutlinedButton.styleFrom(
-                          fixedSize: const Size(200, 75),
+                          fixedSize: const Size(275, 75),
                           shape: const RoundedRectangleBorder(
                               borderRadius: BorderRadius.all(Radius.circular(5))),
                           side: const BorderSide(
@@ -70,7 +70,7 @@ class IntroScreen extends StatelessWidget {
                           ),
                         ),
                         child: const Text(
-                          'Sign up',
+                          "I'm a Coach",
                           style: TextStyle(
                               color: Colors.grey,
                               fontSize: 30,
