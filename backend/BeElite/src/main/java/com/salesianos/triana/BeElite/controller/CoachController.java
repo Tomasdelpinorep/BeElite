@@ -35,31 +35,4 @@ import org.springframework.web.bind.annotation.RestController;
 public class CoachController {
 
     private final CoachService coachService;
-    private final AuthenticationManager authManager;
-    private final JwtProvider jwtProvider;
-
-    @Operation(summary = "Register for coaches")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201 Created", description = "Register was successful", content = {
-                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = JwtUserResponse.class)), examples = {
-                            @ExampleObject(value = """
-                                                                        {
-                                                                            "id": "ba00362c-f808-4dfd-8d0c-386d6c1757a9",
-                                                                            "username": "tomasdelpinorep",
-                                                                            "email": "usuario@gmail.com",
-                                                                            "nombre": "Tomás del Pino",
-                                                                            "createdAt": "22/11/2023 10:27:44",
-                                                                            "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJiYTAwMzYyYy1mODA4LTRkZmQtOGQwYy0zODZkNmMxNzU3YTkiLCJpYXQiOjE3MDA2NDUyNjQsImV4cCI6MTcwMDczMTY2NH0.2a62n6XejYfeInr-00ywKVfm5me6armBPHA7ehLMwyelHvnLUWRLGmLv6CUN6nZd8QvKMlueIRQEezAqmftcPw"
-                                                                        }
-                                                                        """) }) }),
-            @ApiResponse(responseCode = "400 Bad Request", description = "Register was not successful", content = @Content),
-    })
-    @PostMapping("/auth/register")
-    public ResponseEntity<JwtUserResponse> createAthlete(@Valid @RequestBody AddUser addCoach) {
-        Coach coach = coachService.createCoach(addCoach);
-        Authentication authentication = authManager.authenticate(new UsernamePasswordAuthenticationToken(addCoach.username(), addCoach.password()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = jwtProvider.generateToken(authentication);
-        return ResponseEntity.status(HttpStatus.CREATED).body(JwtUserResponse.of(coach, token));
-    }
 }

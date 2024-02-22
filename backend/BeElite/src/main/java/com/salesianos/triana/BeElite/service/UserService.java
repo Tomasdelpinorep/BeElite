@@ -1,5 +1,7 @@
 package com.salesianos.triana.BeElite.service;
 
+import com.salesianos.triana.BeElite.dto.User.AddUser;
+import com.salesianos.triana.BeElite.model.Coach;
 import com.salesianos.triana.BeElite.model.Usuario;
 import com.salesianos.triana.BeElite.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,4 @@ public class UserService {
     public boolean userExists(String username) {
         return userRepository.existsByUsernameIgnoreCase(username);
     }
-
-
 }

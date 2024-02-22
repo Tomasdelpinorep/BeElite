@@ -3,6 +3,7 @@ package com.salesianos.triana.BeElite.dto.User;
 import com.salesianos.triana.BeElite.validation.annotation.UniqueUsername;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record AddUser(
@@ -22,6 +23,9 @@ public record AddUser(
         String email,
 
         @NotBlank(message = "Name cannot be blank.")
-        String name
+        String name,
+
+        @NotNull(message = "User must be either coach or athlete to register.")
+        boolean isCoach
 ) {
 }

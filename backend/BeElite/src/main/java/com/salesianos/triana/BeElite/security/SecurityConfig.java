@@ -87,13 +87,11 @@ public class SecurityConfig {
 
                         .authorizeHttpRequests((authz) -> authz
                                 .requestMatchers(
-                                        antMatcher("/use/**"),
-                                        antMatcher("/cost/**"),
-                                        antMatcher("/issues/**"),
-                                        antMatcher("/station/**"),
-                                        antMatcher("/user/**"),
-                                        antMatcher("/bikes/**")
-                                ).hasRole("USER")
+                                        antMatcher("/athlete/**")
+                                ).hasRole("ATHLETE")
+                                .requestMatchers(
+                                        antMatcher("/coach/**")
+                                ).hasRole("COACH")
                                 .requestMatchers(
                                         antMatcher("/admin/**"))
                                 .hasRole("ADMIN")

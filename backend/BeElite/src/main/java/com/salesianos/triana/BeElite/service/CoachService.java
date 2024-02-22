@@ -16,7 +16,6 @@ public class CoachService {
     private final PasswordEncoder passwordEncoder;
 
     public Coach createCoach(AddUser addUser) {
-
         Coach coach = new Coach();
         coach.setUsername(addUser.username());
         coach.setPassword(passwordEncoder.encode(addUser.password()));

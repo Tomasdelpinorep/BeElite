@@ -1,8 +1,7 @@
-import 'package:be_elite/bloc/login_bloc/login_bloc.dart';
+import 'package:be_elite/bloc/login/login_bloc.dart';
 import 'package:be_elite/repositories/auth/auth_repository.dart';
 import 'package:be_elite/repositories/auth/auth_repository_impl.dart';
 import 'package:be_elite/styles/app_colors.dart';
-import 'package:be_elite/ui/athlete/athlete_main_screen.dart';
 import 'package:be_elite/ui/register_screen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
-    authRepository = LoginRepositoryImpl();
+    authRepository = AuthRepositoryImpl();
     _loginBloc = LoginBloc(authRepository);
     super.initState();
   }
@@ -62,10 +61,12 @@ class _LoginScreenState extends State<LoginScreen> {
               },
               listener: (context, state) {
                 if (state is DoLoginSuccess) {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const AthleteMainScreen()));
+                  if (state.userLogin.role!.toUpperCase() == "ROLE_ATHLETE") {
+                    Navigator.pushReplacementNamed(context, '/athlete');
+                  } else if (state.userLogin.role!.toUpperCase() ==
+                      "ROLE_COACH") {
+                    Navigator.pushReplacementNamed(context, '/coach');
+                  }
                 }
               },
             ),
@@ -200,8 +201,11 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                Navigator.push(context, 
-                MaterialPageRoute(builder: (context) => RegisterScreen(isCoach: widget.isCoach)));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            RegisterScreen(isCoach: widget.isCoach)));
               },
           ),
         ],

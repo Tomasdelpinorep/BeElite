@@ -1,5 +1,5 @@
-import 'package:be_elite/models/login/login_request.dart';
-import 'package:be_elite/models/login/login_response.dart';
+import 'package:be_elite/models/auth/login_request.dart';
+import 'package:be_elite/models/auth/login_response.dart';
 import 'package:be_elite/repositories/auth/auth_repository.dart';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';

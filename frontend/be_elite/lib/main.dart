@@ -1,3 +1,5 @@
+import 'package:be_elite/ui/athlete/athlete_main_screen.dart';
+import 'package:be_elite/ui/coach/coach_main_screen.dart';
 import 'package:be_elite/ui/intro_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -18,6 +20,10 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.yellow,
       ),
       home: const IntroScreen(),
+      routes: {
+        '/athlete': (context) => const AthleteMainScreen(),
+        '/coach': (context) => const CoachMainScreen()
+      },
     );
   }
 }

@@ -10,8 +10,8 @@ class AthleteMainScreen extends StatefulWidget {
 class _AthleteMainScreenState extends State<AthleteMainScreen> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Text("you have logged in")
+    return Scaffold(
+      body: const Text('This is the main athlete page'),
     );
   }
 }

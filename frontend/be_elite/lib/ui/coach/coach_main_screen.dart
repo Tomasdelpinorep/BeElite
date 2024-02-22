@@ -10,6 +10,8 @@ class CoachMainScreen extends StatefulWidget {
 class _CoachMainScreenState extends State<CoachMainScreen> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      body: const Text('This is the main coach page'),
+    );
   }
 }
