@@ -11,6 +11,7 @@ class DoRegisterEvent extends RegisterEvent{
   final String verifyPassword;
   final bool isCoach;
 
-  DoRegisterEvent(this.name, this.username, this.email, this.password, this.verifyPassword, this.isCoach);
+  DoRegisterEvent({required this.name, required this.username, required this.email, required this.password,
+  required this.verifyPassword,required this.isCoach});
 
 }

@@ -29,8 +29,8 @@ class AuthRepositoryImpl extends AuthRepository {
   Future<LoginResponse> register(RegisterRequest registerRequest) async{
     Uri uri;
     registerRequest.isCoach! ? 
-    uri =  Uri.parse("http://localhost:8080/coach/auth/register") : 
-    uri = Uri.parse("http://localhost:8080/athlete/auth/register");
+    uri =  Uri.parse("http://localhost:8080/auth/register") : 
+    uri = Uri.parse("http://localhost:8080/auth/register");
 
     final response = await _client.post(
       uri,

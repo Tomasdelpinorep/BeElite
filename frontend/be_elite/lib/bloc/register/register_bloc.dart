@@ -7,10 +7,10 @@ import 'package:meta/meta.dart';
 part 'register_event.dart';
 part 'register_state.dart';
 
-class RegisterBlocBloc extends Bloc<RegisterEvent, RegisterState> {
+class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
   final AuthRepository authRepository;
 
-  RegisterBlocBloc(this.authRepository) : super(RegisterInitial()) {
+  RegisterBloc(this.authRepository) : super(RegisterInitial()) {
     on<DoRegisterEvent>(_doRegister);
   }
 
