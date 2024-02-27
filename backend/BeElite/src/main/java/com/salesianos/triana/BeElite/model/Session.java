@@ -20,8 +20,11 @@ public class Session {
     private LocalDate date;
 
     @ManyToOne
-    @JoinColumn(name = "program_id")
-    private Program program;
+    @JoinColumns({
+            @JoinColumn(name = "week_id", referencedColumnName = "id"),
+            @JoinColumn(name = "week_name", referencedColumnName = "week_name")
+    })
+    private Week week;
 
     @OneToMany(mappedBy = "session", cascade = CascadeType.ALL)
     private List<Block> blocks;
