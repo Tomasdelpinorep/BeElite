@@ -18,7 +18,7 @@ import java.util.Collection;
 public class UserResponse {
 
     protected String id;
-    protected String username, email, name, role;
+    protected String username, email, name, role, profilePicUrl;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     protected LocalDateTime createdAt;
@@ -33,6 +33,7 @@ public class UserResponse {
                 .username(usuario.getUsername())
                 .email(usuario.getEmail())
                 .name(usuario.getName())
+                .profilePicUrl(usuario.getProfilePicUrl())
                 .createdAt(usuario.getCreatedAt())
                 .role(getRole(usuario.getAuthorities()))
                 .build();

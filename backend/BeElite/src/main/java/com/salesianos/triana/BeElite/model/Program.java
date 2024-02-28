@@ -13,6 +13,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 @Builder
 public class Program {
@@ -30,6 +31,7 @@ public class Program {
     private Coach coach;
 
     @OneToMany(mappedBy = "program", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<Week> weeks;
 
     private String description;
@@ -37,8 +39,18 @@ public class Program {
     private String image;
 
     @OneToMany(mappedBy = "program")
+    @ToString.Exclude
     private List<Athlete> athletes;
 
     @CreatedDate
     private LocalDate createdAt;
+
+    public void removeAthletes(){
+        if(!athletes.isEmpty()){
+            for(Athlete athlete : athletes){
+                athlete.setProgram(null);
+            }
+            athletes.clear();
+        }
+    }
 }

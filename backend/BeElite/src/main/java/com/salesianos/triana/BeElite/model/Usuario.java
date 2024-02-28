@@ -43,6 +43,8 @@ public abstract class Usuario implements UserDetails {
 
     private String name;
 
+    private String profilePicUrl;
+
     private boolean accountNonExpired = true;
     private boolean accountNonLocked = true;
     private boolean credentialsNonExpired = true;

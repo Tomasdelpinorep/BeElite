@@ -26,6 +26,7 @@ public class Week {
     @OneToMany(mappedBy = "week")
     private List<Session> sessions;
 
+    @Id
     @ManyToOne
     @JoinColumn(name = "program_id")
     private Program program;

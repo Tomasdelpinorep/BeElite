@@ -2,7 +2,9 @@ import 'package:be_elite/bloc/login/login_bloc.dart';
 import 'package:be_elite/repositories/auth/auth_repository.dart';
 import 'package:be_elite/repositories/auth/auth_repository_impl.dart';
 import 'package:be_elite/styles/app_colors.dart';
-import 'package:be_elite/ui/register_screen.dart';
+import 'package:be_elite/ui/athlete/athlete_main_screen.dart';
+import 'package:be_elite/ui/coach/coach_main_screen.dart';
+import 'package:be_elite/ui/auth/register_screen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -62,10 +64,12 @@ class _LoginScreenState extends State<LoginScreen> {
               listener: (context, state) {
                 if (state is DoLoginSuccess) {
                   if (state.userLogin.role!.toUpperCase() == "ROLE_ATHLETE") {
-                    Navigator.pushReplacementNamed(context, '/athlete');
+                    Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                    const AthleteMainScreen()));
                   } else if (state.userLogin.role!.toUpperCase() ==
                       "ROLE_COACH") {
-                    Navigator.pushReplacementNamed(context, '/coach');
+                    Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                    CoachMainScreen(userLogin : state.userLogin)));
                   }
                 }
               },

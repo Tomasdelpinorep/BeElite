@@ -1,5 +1,5 @@
 import 'package:be_elite/styles/app_colors.dart';
-import 'package:be_elite/ui/login_screen.dart';
+import 'package:be_elite/ui/auth/login_screen.dart';
 import 'package:flutter/material.dart';
 
 class IntroScreen extends StatelessWidget {

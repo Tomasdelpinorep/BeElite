@@ -20,11 +20,11 @@ public class Coach extends Usuario {
     private List<Program> programs;
 
     public Coach(UUID id, String username, String password, String email,
-                 String name, boolean accountNonExpired,
+                 String name, String profilePicUrl,boolean accountNonExpired,
                  boolean accountNonLocked, boolean credentialsNonExpired,
                  boolean enabled, LocalDateTime createdAt, LocalDateTime lastPasswordChangeAt,
                  List<Program> programs) {
-        super(id, username, password, email, name, accountNonExpired, accountNonLocked,
+        super(id, username, password, email, name, profilePicUrl, accountNonExpired, accountNonLocked,
                 credentialsNonExpired, enabled, createdAt, lastPasswordChangeAt);
         this.programs = programs;
     }

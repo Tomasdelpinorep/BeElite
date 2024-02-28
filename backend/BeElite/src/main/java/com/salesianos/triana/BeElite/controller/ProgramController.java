@@ -7,6 +7,9 @@ import com.salesianos.triana.BeElite.model.Program;
 import com.salesianos.triana.BeElite.service.ProgramService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,8 +26,10 @@ public class ProgramController {
     private final ProgramService programService;
 
     @GetMapping("/admin/program")
-    public List<ProgramDto> getAll(){
-        return programService.findAll();
+    public Page<ProgramDto> getAll(@PageableDefault(page = 0, size = 20) Pageable page){
+        Page<Program> pagedResult = programService.findPage(page);
+
+        return pagedResult.map(ProgramDto::of);
     }
 
     @GetMapping("/coach/program")
@@ -33,6 +38,12 @@ public class ProgramController {
         return programService.findByCoach(coach.getId()).stream()
                 .map(ProgramDto::of)
                 .toList();
+    }
+
+    @GetMapping("/coach/program/details/{programName}")
+    @PreAuthorize("#coach.id == principal.id")
+    public Program getProgramDetails(@AuthenticationPrincipal Coach coach, @PathVariable String programName){
+        return programService.findByCoachAndProgramName(coach.getId(),programName);
     }
 
     @PostMapping("coach/program")
@@ -47,7 +58,14 @@ public class ProgramController {
     }
 
     @PutMapping("coach/program/{programName}")
-    public ProgramDto editProgram(@Valid @RequestParam String programName, @RequestBody PostProgramDto editedProgram){
+    public ProgramDto editProgram(@RequestParam String programName,@Valid @RequestBody PostProgramDto editedProgram){
         return ProgramDto.of(programService.edit(programName, editedProgram));
+    }
+
+    @DeleteMapping("coach/program/{programName}")
+    public ResponseEntity<?> deleteProgram(@AuthenticationPrincipal Coach coach,@RequestParam String programName){
+        programService.deleteByCoachAndProgramName(coach.getId(), programName);
+
+        return ResponseEntity.noContent().build();
     }
 }

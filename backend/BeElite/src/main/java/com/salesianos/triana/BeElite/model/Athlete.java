@@ -19,10 +19,10 @@ public class Athlete extends Usuario {
     @ManyToOne
     private Program program;
 
-    public Athlete(UUID id, String username, String password, String email, String name,
+    public Athlete(UUID id, String username, String password, String email, String name, String profilePicUrl,
                    boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled,
                    LocalDateTime createdAt, LocalDateTime lastPasswordChangeAt, int completed_sessions, Program program) {
-        super(id, username, password, email, name, accountNonExpired, accountNonLocked, credentialsNonExpired,
+        super(id, username, password, email, name, profilePicUrl, accountNonExpired, accountNonLocked, credentialsNonExpired,
                 enabled, createdAt, lastPasswordChangeAt);
         this.completed_sessions = completed_sessions;
         this.program = program;

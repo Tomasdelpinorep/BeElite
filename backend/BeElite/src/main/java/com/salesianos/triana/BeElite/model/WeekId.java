@@ -5,4 +5,6 @@ import java.io.Serializable;
 public class WeekId implements Serializable {
     private Long id;
     private String week_name;
+
+    private Program program;
 }

@@ -61,11 +61,13 @@ public class ProgramService {
     }
 
     public List<Program> findByCoach(UUID coach_id) {
-        if (programRepository.findByCoach(coach_id).isEmpty()) {
+        List<Program> p = programRepository.findByCoach(coach_id);
+
+        if (!p.isEmpty()) {
             return programRepository.findByCoach(coach_id);
         }
 
-        throw new NotFoundException("No programs linked to this coach id.");
+        throw new NotFoundException("programs linked to this coach id.");
     }
 
     public List<ProgramDto> findAll() {
@@ -75,5 +77,32 @@ public class ProgramService {
         return programRepository.findAll().stream()
                 .map(ProgramDto::of)
                 .toList();
+    }
+
+    public Program findByCoachAndProgramName(UUID coachId, String programName){
+        Optional<Program> p = programRepository.findByCoachAndProgramName(coachId,programName);
+
+        if(p.isPresent())
+            return p.get();
+
+        throw new EntityNotFoundException("Unable to find any programs with said name and coach Id.");
+    }
+
+    public Page<Program> findPage(Pageable page){
+        Page<Program> pagedResult = programRepository.findPage(page);
+
+        if(pagedResult.isEmpty())
+            throw new EntityNotFoundException("No programs found in this page.");
+
+        return pagedResult;
+    }
+
+    public void deleteByCoachAndProgramName(UUID coachId, String programName) {
+        Optional<Program> programOptional = programRepository.findByCoachAndProgramName(coachId, programName);
+
+        programOptional.ifPresent(program -> {
+                program.removeAthletes();
+                programRepository.delete(program);
+        });
     }
 }

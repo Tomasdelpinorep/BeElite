@@ -4,6 +4,7 @@ class LoginResponse {
 	String? email;
 	String? name;
 	String? role;
+	String? profilePicUrl;
 	String? createdAt;
 	String? token;
 
@@ -13,6 +14,7 @@ class LoginResponse {
 		this.email, 
 		this.name, 
 		this.role, 
+		this.profilePicUrl, 
 		this.createdAt, 
 		this.token, 
 	});
@@ -23,6 +25,7 @@ class LoginResponse {
 				email: json['email'] as String?,
 				name: json['name'] as String?,
 				role: json['role'] as String?,
+				profilePicUrl: json['profilePicUrl'] as String?,
 				createdAt: json['createdAt'] as String?,
 				token: json['token'] as String?,
 			);
@@ -33,6 +36,7 @@ class LoginResponse {
 				'email': email,
 				'name': name,
 				'role': role,
+				'profilePicUrl': profilePicUrl,
 				'createdAt': createdAt,
 				'token': token,
 			};
