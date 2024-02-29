@@ -1,5 +1,5 @@
 import 'package:be_elite/styles/app_colors.dart';
-import 'package:be_elite/ui/auth/login_screen.dart';
+import 'package:be_elite/ui/auth/register_screen.dart';
 import 'package:flutter/material.dart';
 
 class IntroScreen extends StatelessWidget {
@@ -35,7 +35,7 @@ class IntroScreen extends StatelessWidget {
                         child: FilledButton(
                           onPressed: () {
                             Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => const LoginScreen(isCoach:false)));
+                              MaterialPageRoute(builder: (context) => const RegisterScreen(isCoach:false)));
                           },
                           style: FilledButton.styleFrom(
                               backgroundColor: AppColors.mainYellow,
@@ -58,7 +58,7 @@ class IntroScreen extends StatelessWidget {
                       OutlinedButton(
                         onPressed: () {
                           Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => const LoginScreen(isCoach: true)));
+                              MaterialPageRoute(builder: (context) => const RegisterScreen(isCoach: true)));
                         },
                         style: OutlinedButton.styleFrom(
                           fixedSize: const Size(275, 75),

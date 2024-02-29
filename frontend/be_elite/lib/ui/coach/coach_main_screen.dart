@@ -19,7 +19,8 @@ class _CoachMainScreenState extends State<CoachMainScreen> {
   void initState() {
     super.initState();
     widgetList = [
-      ProgramsScreen(coachDetails: coachDetails),
+      // ProgramsScreen(coachDetails: coachDetails),
+      const AthletesScreen(),
       const AthletesScreen(),
       const CoachProfileScreen()
     ];

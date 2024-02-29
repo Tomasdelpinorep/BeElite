@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:be_elite/models/auth/login_request.dart';
 import 'package:be_elite/models/auth/login_response.dart';
 import 'package:be_elite/repositories/auth/auth_repository.dart';
@@ -13,21 +15,22 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   LoginBloc(this.authRepository) : super(LoginInitial()) {
     on<DoLoginEvent>(_doLogin);
+    on<CheckTokenEvent>(_checkToken);
   }
 
-  void _doLogin(DoLoginEvent event, Emitter<LoginState> emitter)async{
+  void _doLogin(DoLoginEvent event, Emitter<LoginState> emitter) async {
     emitter(DoLoginLoading());
 
-    try{
+    try {
       final LoginRequest loginRequest =
-      LoginRequest(username: event.username, password: event.password);
+          LoginRequest(username: event.username, password: event.password);
 
       final response = await authRepository.login(loginRequest);
       _saveAuthTokenAndRole(response.token!, response.role!);
 
       emitter(DoLoginSuccess(response));
       return;
-    }on Exception catch(e){
+    } on Exception catch (e) {
       emitter(DoLoginError(e.toString()));
     }
   }
@@ -35,6 +38,19 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   Future<void> _saveAuthTokenAndRole(String token, String role) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('authToken', token);
-    await prefs.setString('userRole', role);
+    await prefs.setString('role', role);
+  }
+
+  Future<FutureOr<void>> _checkToken(
+      CheckTokenEvent event, Emitter<LoginState> emitter) async {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        String? role = prefs.getString('role');
+        
+    try {
+      final response = await authRepository.checkToken();
+      emitter(CheckTokenSuccess(response, role));
+    } on Exception catch (e) {
+      emitter(CheckTokenError(e.toString()));
+    }
   }
 }

@@ -1,5 +1,5 @@
 import 'package:be_elite/styles/app_colors.dart';
-import 'package:be_elite/ui/auth/splash_screen.dart';
+import 'package:be_elite/ui/auth/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:url_strategy/url_strategy.dart';
 
@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
           unselectedLabelStyle: const TextStyle(color: Colors.white54)
         )
       ),
-      home: const SplashScreen(),
+      home: const LoginScreen(),
     );
   }
 }
