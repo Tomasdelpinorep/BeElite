@@ -1,4 +1,3 @@
-import 'package:be_elite/models/auth/login_response.dart';
 import 'package:be_elite/widgets/beElite_logo.dart';
 import 'package:be_elite/widgets/circular_avatar.dart';
 import 'package:flutter/material.dart';

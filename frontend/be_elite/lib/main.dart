@@ -1,5 +1,8 @@
 import 'package:be_elite/styles/app_colors.dart';
+import 'package:be_elite/ui/athlete/athlete_main_screen.dart';
+import 'package:be_elite/ui/auth/intro_screen.dart';
 import 'package:be_elite/ui/auth/splash_screen.dart';
+import 'package:be_elite/ui/coach/coach_main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:url_strategy/url_strategy.dart';
 
@@ -30,6 +33,11 @@ class MyApp extends StatelessWidget {
         )
       ),
       home: const SplashScreen(),
+      routes: {
+        '/coach': (context) => const CoachMainScreen(),
+        '/athlete': (context) => const AthleteMainScreen(),
+        '/': (context) => const IntroScreen()
+      },
     );
   }
 }
