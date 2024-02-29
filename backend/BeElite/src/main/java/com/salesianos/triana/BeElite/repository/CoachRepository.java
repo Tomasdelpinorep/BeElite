@@ -9,5 +9,5 @@ import java.util.UUID;
 @Repository
 public interface CoachRepository extends JpaRepository<Coach, UUID> {
 
-    Optional<Coach> findByName(String name);
+    Optional<Coach> findByUsername(String username);
 }

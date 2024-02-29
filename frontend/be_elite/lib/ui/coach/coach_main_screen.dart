@@ -3,6 +3,7 @@ import 'package:be_elite/ui/coach/athletes_screen.dart';
 import 'package:be_elite/ui/coach/coach_profile_screen.dart';
 import 'package:be_elite/ui/coach/programs_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CoachMainScreen extends StatefulWidget {
   const CoachMainScreen({super.key});
@@ -19,8 +20,7 @@ class _CoachMainScreenState extends State<CoachMainScreen> {
   void initState() {
     super.initState();
     widgetList = [
-      // ProgramsScreen(coachDetails: coachDetails),
-      const AthletesScreen(),
+      const ProgramsScreen(),
       const AthletesScreen(),
       const CoachProfileScreen()
     ];
@@ -29,8 +29,10 @@ class _CoachMainScreenState extends State<CoachMainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: widgetList[myIndex],
+      body: Container(
+        child: BlocProvider.value(
+          value: ,
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: AppColors.mainYellow.withOpacity(0.25),

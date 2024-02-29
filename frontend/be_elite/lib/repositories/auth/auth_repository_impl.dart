@@ -48,11 +48,8 @@ class AuthRepositoryImpl extends AuthRepository {
   Future<bool> checkToken() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    Uri uri;
-    uri =  Uri.parse("http://localhost:8080/auth/validateToken");
-
     final response = await _client.post(
-      uri,
+      Uri.parse("http://localhost:8080/auth/validateToken"),
       headers: <String, String>{'Content-Type': 'application/json'},
       body: prefs.getString('authToken')
     );

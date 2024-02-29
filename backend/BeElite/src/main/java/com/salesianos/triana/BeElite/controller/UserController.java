@@ -111,11 +111,7 @@ public class UserController {
 
     @PostMapping("/auth/validateToken")
     public ResponseEntity<Boolean> validateToken(@RequestBody String token){
-        boolean isValid = jwtProvider.validateToken(token.trim());
-
-        return isValid ?
-                ResponseEntity.status(HttpStatus.ACCEPTED).body(true) :
-                ResponseEntity.status(HttpStatus.FORBIDDEN).body(false);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(jwtProvider.validateToken(token));
     }
 
 }

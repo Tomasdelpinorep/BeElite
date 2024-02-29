@@ -26,7 +26,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           LoginRequest(username: event.username, password: event.password);
 
       final response = await authRepository.login(loginRequest);
-      _saveAuthTokenAndRole(response.token!, response.role!);
+      _saveAuthInfo(response.token!, response.role!, response.id!);
 
       emitter(DoLoginSuccess(response));
       return;
@@ -35,17 +35,18 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     }
   }
 
-  Future<void> _saveAuthTokenAndRole(String token, String role) async {
+  Future<void> _saveAuthInfo(String token, String role, String id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('authToken', token);
     await prefs.setString('role', role);
+    await prefs.setString('userId', id);
   }
 
   Future<FutureOr<void>> _checkToken(
       CheckTokenEvent event, Emitter<LoginState> emitter) async {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         String? role = prefs.getString('role');
-        
+
     try {
       final response = await authRepository.checkToken();
       emitter(CheckTokenSuccess(response, role));
