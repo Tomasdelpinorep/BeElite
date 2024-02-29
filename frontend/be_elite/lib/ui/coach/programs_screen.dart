@@ -3,8 +3,7 @@ import 'package:be_elite/widgets/circular_avatar.dart';
 import 'package:flutter/material.dart';
 
 class ProgramsScreen extends StatefulWidget {
-  final CoachDetails coachDetails;
-  const ProgramsScreen({super.key, required this.userLogin});
+  const ProgramsScreen({super.key});
 
   @override
   State<ProgramsScreen> createState() => _ProgramsScreenState();
@@ -16,7 +15,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Container(
+        child: SizedBox(
           height: 50,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround, 

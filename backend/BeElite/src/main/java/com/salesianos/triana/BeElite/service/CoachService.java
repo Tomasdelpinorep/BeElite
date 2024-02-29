@@ -25,8 +25,8 @@ public class CoachService {
         return coachRepository.save(coach);
     }
 
-    public Coach getDetails(Coach coach){
-        return coachRepository.findById(coach.getId()).orElseThrow(() -> new NotFoundException("coach"));
+    public Coach findByName(String coachUsername){
+        return coachRepository.findByUsername(coachUsername).orElseThrow(() -> new NotFoundException("coach"));
     }
 
     public Coach findById(UUID id){

@@ -6,6 +6,7 @@ import com.salesianos.triana.BeElite.model.Athlete;
 import com.salesianos.triana.BeElite.repository.AthleteRepository;
 import com.salesianos.triana.BeElite.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,6 @@ public class AthleteService {
 
     private final PasswordEncoder passwordEncoder;
     private final AthleteRepository athleteRepository;
-    private final UserRepository userRepository;
 
     public Athlete createAthlete(AddUser addAthlete) {
 
@@ -30,8 +30,8 @@ public class AthleteService {
         return athleteRepository.save(user);
     }
 
-    public Athlete getDetails(Athlete user){
-        return athleteRepository.findById(user.getId()).orElseThrow(() -> new NotFoundException("athlete"));
+    public Athlete findByName(String athleteUsername){
+        return athleteRepository.findByUsername(athleteUsername).orElseThrow(() -> new NotFoundException("athlete"));
     }
 
     public Athlete findById(UUID id){

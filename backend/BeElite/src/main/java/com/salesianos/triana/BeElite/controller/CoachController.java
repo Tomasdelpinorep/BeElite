@@ -1,8 +1,10 @@
 package com.salesianos.triana.BeElite.controller;
 
 import com.salesianos.triana.BeElite.dto.User.AddUser;
+import com.salesianos.triana.BeElite.dto.User.CoachDetailsDto;
 import com.salesianos.triana.BeElite.model.Athlete;
 import com.salesianos.triana.BeElite.model.Coach;
+import com.salesianos.triana.BeElite.model.Program;
 import com.salesianos.triana.BeElite.security.jwt.JwtProvider;
 import com.salesianos.triana.BeElite.security.jwt.JwtUserResponse;
 import com.salesianos.triana.BeElite.service.AthleteService;
@@ -19,14 +21,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,4 +36,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class CoachController {
 
     private final CoachService coachService;
+
+    @GetMapping("/{coachUsername}")
+    @PreAuthorize("#coach.id == principal.id")
+    public ResponseEntity<CoachDetailsDto> getCoachDetails(@AuthenticationPrincipal Coach coach , @PathVariable String coachUsername){
+        return ResponseEntity.ok(CoachDetailsDto.of(coachService.findByName(coachUsername)));
+    }
 }

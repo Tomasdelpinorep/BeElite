@@ -9,3 +9,5 @@ class DoLoginEvent extends LoginEvent{
 
   DoLoginEvent({required this.password, required this.username});
 }
+
+class CheckTokenEvent extends LoginEvent {}

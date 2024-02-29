@@ -3,16 +3,14 @@ import 'package:be_elite/repositories/auth/auth_repository.dart';
 import 'package:be_elite/repositories/auth/auth_repository_impl.dart';
 import 'package:be_elite/styles/app_colors.dart';
 import 'package:be_elite/ui/athlete/athlete_main_screen.dart';
+import 'package:be_elite/ui/auth/intro_screen.dart';
 import 'package:be_elite/ui/coach/coach_main_screen.dart';
-import 'package:be_elite/ui/auth/register_screen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LoginScreen extends StatefulWidget {
-  final bool isCoach;
-
-  const LoginScreen({super.key, required this.isCoach});
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -29,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     authRepository = AuthRepositoryImpl();
-    _loginBloc = LoginBloc(authRepository);
+    _loginBloc = LoginBloc(authRepository)..add(CheckTokenEvent());
     super.initState();
   }
 
@@ -49,8 +47,8 @@ class _LoginScreenState extends State<LoginScreen> {
             child: BlocConsumer<LoginBloc, LoginState>(
               buildWhen: (context, state) {
                 return state is DoLoginLoading ||
-                    state is DoLoginSuccess ||
-                    state is DoLoginError;
+                    state is DoLoginError ||
+                    state is CheckTokenError;
               },
               builder: (context, state) {
                 if (state is DoLoginError) {
@@ -61,15 +59,37 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 return _loginForm();
               },
+              listenWhen: (previous, current) {
+                return current is DoLoginSuccess ||
+                    current is CheckTokenSuccess;
+              },
               listener: (context, state) {
-                if (state is DoLoginSuccess) {
+                if (state is CheckTokenSuccess) {
+                  if (state.isValid) {
+                    if (state.role!.toUpperCase() == "ROLE_COACH") {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const CoachMainScreen()));
+                    } else if (state.role!.toUpperCase() == "ROLE_ATHLETE") {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const AthleteMainScreen()));
+                    }
+                  }
+                } else if (state is DoLoginSuccess) {
                   if (state.userLogin.role!.toUpperCase() == "ROLE_ATHLETE") {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                    const AthleteMainScreen()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const AthleteMainScreen()));
                   } else if (state.userLogin.role!.toUpperCase() ==
                       "ROLE_COACH") {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                    CoachMainScreen(userLogin : state.userLogin)));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const CoachMainScreen()));
                   }
                 }
               },
@@ -208,8 +228,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) =>
-                            RegisterScreen(isCoach: widget.isCoach)));
+                        builder: (context) => const IntroScreen()));
               },
           ),
         ],
