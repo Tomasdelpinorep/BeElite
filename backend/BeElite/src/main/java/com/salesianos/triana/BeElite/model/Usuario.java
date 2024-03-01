@@ -1,5 +1,6 @@
 package com.salesianos.triana.BeElite.model;
 
+import com.salesianos.triana.BeElite.repository.AdminRepository;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -60,8 +61,10 @@ public abstract class Usuario implements UserDetails {
         String role = "ROLE_";
         if (this instanceof Coach) {
             role += "COACH";
-        } else {
+        } else if (this instanceof  Athlete){
             role += "ATHLETE";
+        }else if (this instanceof Admin){
+            role += "ADMIN";
         }
         return List.of(new SimpleGrantedAuthority(role));
     }

@@ -1,2 +1,10 @@
 INSERT INTO Usuario(id, username, password, email, name, profile_pic_url, account_non_expired, account_non_locked, credentials_non_expired, enabled, created_at, last_password_change_at) VALUES ('c62db400-22e3-4e92-94db-1447f5688f2c', 'coach1', '{bcrypt}$2a$12$.De8k7s.QaZzVr1ZmExgEuDkwyFglRmryR4Yce7PWLRNxcnCfHM9i', 'coach@beelite.com', 'Coach name', 'https://i.imgur.com/e4s1C4H.png', true, true, true, true, current_timestamp, current_timestamp);
 INSERT INTO Coach(id) VALUES('c62db400-22e3-4e92-94db-1447f5688f2c');
+
+INSERT INTO Usuario(id, username, password, email, name, profile_pic_url, account_non_expired, account_non_locked, credentials_non_expired, enabled, created_at, last_password_change_at) VALUES ('3850cdb2-04a3-4642-bc12-58f01f7187c7', 'admin', '{bcrypt}$2a$12$.De8k7s.QaZzVr1ZmExgEuDkwyFglRmryR4Yce7PWLRNxcnCfHM9i', 'admin@beelite.com', 'Admin name', 'https://i.imgur.com/e4s1C4H.png', true, true, true, true, current_timestamp, current_timestamp);
+INSERT INTO Admin(id) VALUES ('3850cdb2-04a3-4642-bc12-58f01f7187c7');
+
+INSERT INTO Usuario(id, username, password, email, name, profile_pic_url, account_non_expired, account_non_locked, credentials_non_expired, enabled, created_at, last_password_change_at) VALUES ('b031e329-d938-40ae-b37f-c8cf96cd48fa', 'athlete1', '{bcrypt}$2a$12$.De8k7s.QaZzVr1ZmExgEuDkwyFglRmryR4Yce7PWLRNxcnCfHM9i', 'athlete@beelite.com', 'Athlete name', 'https://i.imgur.com/e4s1C4H.png', true, true, true, true, current_timestamp, current_timestamp);
+INSERT INTO Athlete(id, completed_sessions) VALUES ('b031e329-d938-40ae-b37f-c8cf96cd48fa', 0);
+
+INSERT INTO Program(id, program_name, description, image, created_at, coach_id) VALUES ('7b4bfd75-ee79-4ee9-9aec-63d422aac614', 'FSC', 'Weightlifting by Tomas del Pino', 'https.deeznutz.com', current_timestamp, 'c62db400-22e3-4e92-94db-1447f5688f2c');

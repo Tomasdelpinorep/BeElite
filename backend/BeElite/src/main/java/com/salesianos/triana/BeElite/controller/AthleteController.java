@@ -1,6 +1,7 @@
 package com.salesianos.triana.BeElite.controller;
 
 import com.salesianos.triana.BeElite.dto.User.AddUser;
+import com.salesianos.triana.BeElite.dto.User.AthleteDetailsDto;
 import com.salesianos.triana.BeElite.dto.User.CoachDetailsDto;
 import com.salesianos.triana.BeElite.model.Athlete;
 import com.salesianos.triana.BeElite.model.Coach;
@@ -38,6 +39,6 @@ public class AthleteController {
 
     @GetMapping("/{athleteUsername}")
     public ResponseEntity<AthleteDetailsDto> getCoachDetails(@PathVariable String athleteUsername){
-        return ResponseEntity.ok(AthleteDetailsDto.of(athleteService.findByName(athleteService)));
+        return ResponseEntity.ok(AthleteDetailsDto.of(athleteService.findByName(athleteUsername)));
     }
 }

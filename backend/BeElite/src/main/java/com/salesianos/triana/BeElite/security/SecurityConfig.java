@@ -85,13 +85,13 @@ public class SecurityConfig {
                         .sessionManagement((session) -> session
                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                        .authorizeHttpRequests((authz) -> authz
+                        .authorizeHttpRequests((auth) -> auth
                                 .requestMatchers(
                                         antMatcher("/athlete/**")
-                                ).hasRole("ATHLETE")
+                                ).hasAnyRole("ATHLETE", "ADMIN")
                                 .requestMatchers(
                                         antMatcher("/coach/**")
-                                ).hasRole("COACH")
+                                ).hasAnyRole("COACH", "ADMIN")
                                 .requestMatchers(
                                         antMatcher("/admin/**"))
                                 .hasRole("ADMIN")

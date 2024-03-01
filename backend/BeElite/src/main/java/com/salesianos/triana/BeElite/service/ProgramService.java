@@ -1,14 +1,18 @@
 package com.salesianos.triana.BeElite.service;
 
+import com.salesianos.triana.BeElite.dto.Program.InviteDto;
 import com.salesianos.triana.BeElite.dto.Program.PostProgramDto;
 import com.salesianos.triana.BeElite.dto.Program.ProgramDto;
+import com.salesianos.triana.BeElite.exception.InviteErrorException;
 import com.salesianos.triana.BeElite.exception.NotFoundException;
 import com.salesianos.triana.BeElite.exception.ProgramNameAlreadyInUseException;
-import com.salesianos.triana.BeElite.model.Coach;
-import com.salesianos.triana.BeElite.model.Program;
+import com.salesianos.triana.BeElite.model.*;
+import com.salesianos.triana.BeElite.repository.AthleteRepository;
 import com.salesianos.triana.BeElite.repository.CoachRepository;
+import com.salesianos.triana.BeElite.repository.InviteRepository;
 import com.salesianos.triana.BeElite.repository.ProgramRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.ast.Not;
 import org.hibernate.annotations.NotFound;
@@ -16,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,6 +31,8 @@ public class ProgramService {
 
     private final ProgramRepository programRepository;
     private final CoachRepository coachRepository;
+    private final InviteRepository inviteRepository;
+    private final AthleteRepository athleteRepository;
 
     public boolean programExists(String program_name) {
         return programRepository.existsByProgramNameIgnoreCase(program_name);
@@ -35,6 +42,17 @@ public class ProgramService {
         Coach c = coachRepository.findById(newProgram.coach_id()).orElseThrow(() -> new NotFoundException("Coach"));
 
         return programRepository.save(PostProgramDto.toEntity(newProgram,c));
+    }
+
+    public Invite saveInvite(InviteDto i){
+        Invite invite = Invite.builder()
+                .athlete(athleteRepository.findById(i.athleteId()).orElseThrow(() -> new InviteErrorException("Could not send invite.")))
+                .program(programRepository.findById(i.programId()).orElseThrow(() -> new InviteErrorException("Could not send invite.")))
+                .status(InvitationStatus.PENDING)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        return inviteRepository.save(invite);
     }
 
     public Program edit(String programName, PostProgramDto editedProgram){

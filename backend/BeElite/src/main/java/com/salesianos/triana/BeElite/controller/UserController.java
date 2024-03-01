@@ -3,8 +3,10 @@ package com.salesianos.triana.BeElite.controller;
 import com.salesianos.triana.BeElite.dto.User.AddUser;
 import com.salesianos.triana.BeElite.model.Usuario;
 import com.salesianos.triana.BeElite.dto.User.LoginUser;
+import com.salesianos.triana.BeElite.repository.AdminRepository;
 import com.salesianos.triana.BeElite.security.jwt.JwtProvider;
 import com.salesianos.triana.BeElite.security.jwt.JwtUserResponse;
+import com.salesianos.triana.BeElite.service.AdminService;
 import com.salesianos.triana.BeElite.service.AthleteService;
 import com.salesianos.triana.BeElite.service.CoachService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -43,6 +45,7 @@ public class UserController {
     private final JwtProvider jwtProvider;
     private final CoachService coachService;
     private final AthleteService athleteService;
+    private final AdminService adminService;
 
     @Operation(summary = "Login for athletes and coaches")
     @ApiResponses(value = {
@@ -96,10 +99,16 @@ public class UserController {
     @PostMapping("/auth/register")
     public ResponseEntity<JwtUserResponse> createUser(@Valid @RequestBody AddUser addUser) {
         Usuario user;
-        if (addUser.isCoach()) {
+        if (addUser.userType().equalsIgnoreCase("coach")) {
             user = coachService.createCoach(addUser);
-        } else {
+
+        } else if(addUser.userType().equalsIgnoreCase("athlete")){
             user = athleteService.createAthlete(addUser);
+
+        }else if((addUser.userType().equalsIgnoreCase("admin"))){
+            user = adminService.createAdmin(addUser);
+        }else{
+            user = null;
         }
 
         Authentication authentication = authManager.authenticate(new UsernamePasswordAuthenticationToken(addUser.username(), addUser.password()));

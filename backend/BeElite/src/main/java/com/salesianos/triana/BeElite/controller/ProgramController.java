@@ -1,8 +1,10 @@
 package com.salesianos.triana.BeElite.controller;
 
+import com.salesianos.triana.BeElite.dto.Program.InviteDto;
 import com.salesianos.triana.BeElite.dto.Program.PostProgramDto;
 import com.salesianos.triana.BeElite.dto.Program.ProgramDto;
 import com.salesianos.triana.BeElite.model.Coach;
+import com.salesianos.triana.BeElite.model.Invite;
 import com.salesianos.triana.BeElite.model.Program;
 import com.salesianos.triana.BeElite.service.ProgramService;
 import jakarta.validation.Valid;
@@ -55,6 +57,16 @@ public class ProgramController {
                 .buildAndExpand(p.getId()).toUri();
 
         return ResponseEntity.created(createdURI).body(ProgramDto.of(p));
+    }
+
+    @PostMapping("/coach/invite")
+    public ResponseEntity<InviteDto> sendInvite(@RequestBody InviteDto invite){
+        Invite i = programService.saveInvite(invite);
+
+        URI createdUri = ServletUriComponentsBuilder.fromCurrentRequest()
+                .buildAndExpand(i.getId()).toUri();
+
+        return ResponseEntity.created(createdUri).body(InviteDto.of(i));
     }
 
     @PutMapping("coach/program/{programName}")

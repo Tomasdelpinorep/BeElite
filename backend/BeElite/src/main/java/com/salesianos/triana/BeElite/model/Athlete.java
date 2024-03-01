@@ -1,20 +1,27 @@
 package com.salesianos.triana.BeElite.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Getter
 @Setter
 @ToString
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class Athlete extends Usuario {
 
     private int completed_sessions;
+
+    @OneToMany(mappedBy = "athlete", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private List<Invite> invites;
 
     @ManyToOne
     private Program program;

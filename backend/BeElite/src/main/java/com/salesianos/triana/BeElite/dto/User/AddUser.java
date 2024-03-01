@@ -26,6 +26,6 @@ public record AddUser(
         String name,
 
         @NotNull(message = "User must be either coach or athlete to register.")
-        boolean isCoach
+        String userType
 ) {
 }

@@ -1,5 +1,6 @@
 package com.salesianos.triana.BeElite.controller;
 
+import com.salesianos.triana.BeElite.dto.Program.InviteDto;
 import com.salesianos.triana.BeElite.dto.User.AddUser;
 import com.salesianos.triana.BeElite.dto.User.CoachDetailsDto;
 import com.salesianos.triana.BeElite.model.Athlete;
@@ -9,6 +10,7 @@ import com.salesianos.triana.BeElite.security.jwt.JwtProvider;
 import com.salesianos.triana.BeElite.security.jwt.JwtUserResponse;
 import com.salesianos.triana.BeElite.service.AthleteService;
 import com.salesianos.triana.BeElite.service.CoachService;
+import com.salesianos.triana.BeElite.service.ProgramService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -38,7 +40,7 @@ public class CoachController {
     private final CoachService coachService;
 
     @GetMapping("/{coachUsername}")
-    @PreAuthorize("#coach.id == principal.id")
+    @PreAuthorize("hasRole('COACH') and #coach.id == principal.id or hasRole('ADMIN')")
     public ResponseEntity<CoachDetailsDto> getCoachDetails(@AuthenticationPrincipal Coach coach , @PathVariable String coachUsername){
         return ResponseEntity.ok(CoachDetailsDto.of(coachService.findByName(coachUsername)));
     }
