@@ -1,9 +1,7 @@
 package com.salesianos.triana.BeElite.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -11,6 +9,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
+@Setter
 @IdClass(WeekId.class)
 public class Week {
 
@@ -21,7 +21,7 @@ public class Week {
     @Id
     private String week_name;
 
-    private String instructions;
+    private String description;
 
     @OneToMany(mappedBy = "week")
     private List<Session> sessions;

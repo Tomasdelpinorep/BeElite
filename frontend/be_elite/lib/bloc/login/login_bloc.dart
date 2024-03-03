@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:be_elite/models/auth/login_request.dart';
-import 'package:be_elite/models/auth/login_response.dart';
+import 'package:be_elite/models/Auth/login_request.dart';
+import 'package:be_elite/models/Auth/login_response.dart';
 import 'package:be_elite/repositories/auth/auth_repository.dart';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
@@ -26,7 +26,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           LoginRequest(username: event.username, password: event.password);
 
       final response = await authRepository.login(loginRequest);
-      _saveAuthInfo(response.token!, response.role!, response.id!);
+      _saveAuthInfo(response.token!, response.role!, response.username!);
 
       emitter(DoLoginSuccess(response));
       return;
@@ -35,11 +35,11 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     }
   }
 
-  Future<void> _saveAuthInfo(String token, String role, String id) async {
+  Future<void> _saveAuthInfo(String token, String role, String username) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('authToken', token);
     await prefs.setString('role', role);
-    await prefs.setString('userId', id);
+    await prefs.setString('username', username);
   }
 
   Future<FutureOr<void>> _checkToken(

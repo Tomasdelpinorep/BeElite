@@ -27,7 +27,9 @@ public class ProgramController {
 
     private final ProgramService programService;
 
+
     @GetMapping("/admin/program")
+    @PreAuthorize("hasRole('COACH') and #coach.id == principal.id or hasRole('ADMIN')")
     public Page<ProgramDto> getAll(@PageableDefault(page = 0, size = 20) Pageable page){
         Page<Program> pagedResult = programService.findPage(page);
 
@@ -35,7 +37,7 @@ public class ProgramController {
     }
 
     @GetMapping("/coach/program")
-    @PreAuthorize("#coach.id == principal.id")
+    @PreAuthorize("hasRole('COACH') and #coach.id == principal.id or hasRole('ADMIN')")
     public List<ProgramDto> getAllByCoach(@AuthenticationPrincipal Coach coach){
         return programService.findByCoach(coach.getId()).stream()
                 .map(ProgramDto::of)
@@ -43,13 +45,14 @@ public class ProgramController {
     }
 
     @GetMapping("/coach/program/details/{programName}")
-    @PreAuthorize("#coach.id == principal.id")
+    @PreAuthorize("hasRole('COACH') and #coach.id == principal.id or hasRole('ADMIN')")
     public Program getProgramDetails(@AuthenticationPrincipal Coach coach, @PathVariable String programName){
         return programService.findByCoachAndProgramName(coach.getId(),programName);
     }
 
     @PostMapping("coach/program")
-    public ResponseEntity<ProgramDto> addProgram(@Valid @RequestBody PostProgramDto newProgram){
+    @PreAuthorize("hasRole('COACH') and #coach.id == principal.id or hasRole('ADMIN')")
+    public ResponseEntity<ProgramDto> addProgram(@AuthenticationPrincipal Coach coach, @Valid @RequestBody PostProgramDto newProgram){
         Program p = programService.save(newProgram);
 
         URI createdURI = ServletUriComponentsBuilder
@@ -60,6 +63,7 @@ public class ProgramController {
     }
 
     @PostMapping("/coach/invite")
+    @PreAuthorize("hasRole('COACH') and #coach.id == principal.id or hasRole('ADMIN')")
     public ResponseEntity<InviteDto> sendInvite(@RequestBody InviteDto invite){
         Invite i = programService.saveInvite(invite);
 
@@ -70,11 +74,13 @@ public class ProgramController {
     }
 
     @PutMapping("coach/program/{programName}")
+    @PreAuthorize("hasRole('COACH') and #coach.id == principal.id or hasRole('ADMIN')")
     public ProgramDto editProgram(@RequestParam String programName,@Valid @RequestBody PostProgramDto editedProgram){
         return ProgramDto.of(programService.edit(programName, editedProgram));
     }
 
     @DeleteMapping("coach/program/{programName}")
+    @PreAuthorize("hasRole('COACH') and #coach.id == principal.id or hasRole('ADMIN')")
     public ResponseEntity<?> deleteProgram(@AuthenticationPrincipal Coach coach,@RequestParam String programName){
         programService.deleteByCoachAndProgramName(coach.getId(), programName);
 

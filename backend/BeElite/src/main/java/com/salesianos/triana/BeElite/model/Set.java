@@ -19,11 +19,9 @@ public class Set {
     @JoinColumn(name = "block_id")
     private Block block;
 
-    private double weight;
-
     private double percentage;
 
     private double rest_after_completion;
 
-    private String extra_instructions;
+    private String set_instructions;
 }

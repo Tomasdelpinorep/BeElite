@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:be_elite/models/auth/login_request.dart';
-import 'package:be_elite/models/auth/login_response.dart';
-import 'package:be_elite/models/auth/register_request.dart';
+import 'package:be_elite/models/Auth/login_request.dart';
+import 'package:be_elite/models/Auth/login_response.dart';
+import 'package:be_elite/models/Auth/register_request.dart';
 import 'package:be_elite/repositories/auth/auth_repository.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';

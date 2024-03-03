@@ -15,7 +15,7 @@ public interface ProgramRepository extends JpaRepository<Program, UUID> {
 
     boolean existsByProgramNameIgnoreCase(String programName);
 
-    @Query(value = "SELECT * FROM program p WHERE p.coach_id = :coach_id AND p.programName = :programName", nativeQuery = true)
+    @Query(value = "SELECT * FROM program p WHERE p.coach_id = :coach_id AND p.program_name = :programName", nativeQuery = true)
     Optional<Program> findByCoachAndProgramName(UUID coach_id, String programName);
 
     @Query(value = "SELECT * FROM program p WHERE p.coach_id = :coachId", nativeQuery = true)

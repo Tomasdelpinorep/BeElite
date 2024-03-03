@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.List;
 import java.util.UUID;
 
 @Builder
@@ -18,5 +19,9 @@ public record InviteDto(
                 .athleteId(i.getAthlete().getId())
                 .programId(i.getProgram().getId())
                 .build();
+    }
+
+    public static List<InviteDto> emptyList(){
+        return List.of(InviteDto.builder().build());
     }
 }

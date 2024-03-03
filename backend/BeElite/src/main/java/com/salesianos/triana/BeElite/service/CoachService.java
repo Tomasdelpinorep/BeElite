@@ -25,7 +25,7 @@ public class CoachService {
         return coachRepository.save(coach);
     }
 
-    public Coach findByName(String coachUsername){
+    public Coach findByUsername(String coachUsername){
         return coachRepository.findByUsername(coachUsername).orElseThrow(() -> new NotFoundException("coach"));
     }
 

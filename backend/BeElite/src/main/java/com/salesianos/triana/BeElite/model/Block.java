@@ -17,7 +17,7 @@ public class Block {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Movements movement;
+    private String movement;
 
     @ManyToOne
     @JoinColumn(name = "session_id")

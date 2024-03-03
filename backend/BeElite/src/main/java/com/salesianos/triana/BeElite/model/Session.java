@@ -1,9 +1,8 @@
 package com.salesianos.triana.BeElite.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -11,6 +10,8 @@ import java.util.List;
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class Session {
 
     @Id
@@ -32,4 +33,6 @@ public class Session {
     private String title;
 
     private String subtitle;
+
+    private int sessionNumber;
 }

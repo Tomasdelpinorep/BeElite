@@ -42,6 +42,6 @@ public class CoachController {
     @GetMapping("/{coachUsername}")
     @PreAuthorize("hasRole('COACH') and #coach.id == principal.id or hasRole('ADMIN')")
     public ResponseEntity<CoachDetailsDto> getCoachDetails(@AuthenticationPrincipal Coach coach , @PathVariable String coachUsername){
-        return ResponseEntity.ok(CoachDetailsDto.of(coachService.findByName(coachUsername)));
+        return ResponseEntity.ok(CoachDetailsDto.of(coachService.findByUsername(coachUsername)));
     }
 }
