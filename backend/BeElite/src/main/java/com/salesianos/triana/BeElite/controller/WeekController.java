@@ -1,9 +1,11 @@
 package com.salesianos.triana.BeElite.controller;
 
+import com.salesianos.triana.BeElite.dto.Week.PostWeekDto;
 import com.salesianos.triana.BeElite.dto.Week.WeekDto;
 import com.salesianos.triana.BeElite.model.Coach;
 import com.salesianos.triana.BeElite.model.Week;
 import com.salesianos.triana.BeElite.service.WeekService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,10 +13,10 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,5 +32,19 @@ public class WeekController {
         Page<Week> pagedResult = weekService.findPageByProgram(page, programName, coachUsername);
 
         return pagedResult.map(WeekDto::of);
+    }
+
+    @PostMapping("/coach/{coachUsername}/weeks/new")
+    @PreAuthorize("hasRole('COACH') and #coach.id == principal.id or hasRole('ADMIN')")
+    ResponseEntity<WeekDto> addWeek(@PathVariable String coachUsername,
+                                    @AuthenticationPrincipal Coach coach,
+                                    @Valid @RequestBody PostWeekDto newWeek){
+        Week w = weekService.save(newWeek, coachUsername);
+
+        URI createdUri = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .buildAndExpand(w.getId()).toUri();
+
+        return ResponseEntity.created(createdUri).body(WeekDto.of(w));
     }
 }

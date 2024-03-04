@@ -26,7 +26,7 @@ public class Block {
     @OneToMany(mappedBy = "block", cascade = CascadeType.ALL)
     private List<Set> sets;
 
-    private double rest_between_sets;
+    private Double rest_between_sets;
 
     private String instructions;
 }

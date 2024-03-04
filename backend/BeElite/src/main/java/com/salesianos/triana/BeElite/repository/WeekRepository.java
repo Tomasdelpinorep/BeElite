@@ -13,4 +13,7 @@ public interface WeekRepository extends JpaRepository<Week, WeekId> {
 
     @Query(value = "SELECT * FROM week w WHERE program_id = :programId",nativeQuery = true)
     Page<Week> findPageByProgram(Pageable sortedPage, UUID programId);
+
+    @Query(value = "SELECT COUNT(*) FROM week w WHERE program_id = :program_id AND week_name = :week_name", nativeQuery = true)
+    int countWeeksByNameAndProgram(String week_name, UUID program_id);
 }

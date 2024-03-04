@@ -5,6 +5,7 @@ import 'package:be_elite/models/Week/week_dto.dart';
 import 'package:be_elite/repositories/coach/coach_repository.dart';
 import 'package:be_elite/repositories/coach/coach_repository_impl.dart';
 import 'package:be_elite/styles/app_colors.dart';
+import 'package:be_elite/ui/coach/coach_add_week_screen.dart';
 import 'package:be_elite/widgets/beElite_logo.dart';
 import 'package:be_elite/widgets/circular_avatar.dart';
 import 'package:flutter/material.dart';
@@ -169,60 +170,120 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
   }
 
   Widget weeksWidget(WeekDto weekPage) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 30),
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.8,
-        child: ListView.separated(
-          itemCount: weekPage.content!.length,
-          separatorBuilder: (BuildContext context, int index) {
-            return const SizedBox(
-                height: 16); // Adjust the height as needed for spacing
-          },
-          itemBuilder: (context, index) {
-            return Container(
-              margin: const EdgeInsets.symmetric(
-                  vertical: 8.0), // Adjust vertical spacing between cards
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.mainYellow.withOpacity(0.5),
-                    spreadRadius: 1,
-                    blurRadius: 4,
-                  ),
-                ],
-              ),
-              child: Card(
-                  color: Colors.grey[800],
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  clipBehavior: Clip.antiAliasWithSaveLayer,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                                "${weekPage.content![index].weekName!} - Week ${weekPage.content![index].id}",
-                                style: const TextStyle(fontSize: 20))
-                          ],
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 30),
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.75,
+            height: MediaQuery.of(context).size.height * 0.8,
+            child: ListView.separated(
+              itemCount: weekPage.content!.length,
+              separatorBuilder: (BuildContext context, int index) {
+                return const SizedBox(
+                    height: 16); // Adjust the height as needed for spacing
+              },
+              itemBuilder: (context, index) {
+                return Container(
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.mainYellow.withOpacity(0.5),
+                          spreadRadius: 1,
+                          blurRadius: 4,
                         ),
-                        Divider(color: AppColors.mainYellow),
-                        Text(weekPage.content![index].description!,
-                        style: TextStyle(
-                          color: Colors.grey[400],
-                        )),
-                        Divider(color: AppColors.mainYellow)
                       ],
                     ),
-                  )),
-            );
-          },
+                    child: Card(
+                      color: Colors.grey[800],
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      clipBehavior: Clip.antiAliasWithSaveLayer,
+                      child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                      "${weekPage.content![index].weekName!} - Week ${weekPage.content![index].id}",
+                                      style: const TextStyle(fontSize: 20))
+                                ],
+                              ),
+                              Divider(color: AppColors.mainYellow),
+                              Text(weekPage.content![index].description!,
+                                  style: TextStyle(
+                                    color: Colors.grey[400],
+                                  )),
+                              Divider(color: AppColors.mainYellow),
+                              Center(
+                                child: Wrap(
+                                  alignment: WrapAlignment.spaceAround,
+                                  children: weekPage.content![index].sessions!
+                                      .map((session) {
+                                    return Padding(
+                                      padding:
+                                          const EdgeInsets.symmetric(horizontal: 4)
+                                              .copyWith(top: 20),
+                                      child: SizedBox(
+                                        width: 150,
+                                        child: OutlinedButton(
+                                          onPressed: () {},
+                                          style: ButtonStyle(
+                                              overlayColor:
+                                                  MaterialStatePropertyAll(
+                                                      Colors.grey[850])),
+                                          child: session.sessionNumber! > 1
+                                              ? Text(
+                                                  "${capitalizeFirstLetter(session.dayOfWeek!)} #${session.sessionNumber}",
+                                                  style: const TextStyle(
+                                                      color: Colors.grey,
+                                                      fontWeight: FontWeight.w100))
+                                              : Text(capitalizeFirstLetter(session.dayOfWeek!),
+                                                  style: const TextStyle(
+                                                      color: Colors.grey,
+                                                      fontWeight: FontWeight.w100)),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            ],
+                          )),
+                    ));
+              },
+            ),
+          ),
         ),
+        _addWeekButton()
+      ],
+    );
+  }
+
+  Widget _addWeekButton(){
+    return GestureDetector(
+      onTap: (){
+        Navigator.push(context, MaterialPageRoute(
+          builder: (context) => CoachAddWeekScreen(programName : programName)
+        ));
+      },
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.add_circle_outline_sharp),
+          Text(' Add new week')
+        ],
       ),
     );
   }
 }
+
+String capitalizeFirstLetter(String s) {
+  if (s.isEmpty) return s;
+  return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
+}
+

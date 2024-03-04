@@ -20,7 +20,9 @@ public record WeekDto(
         return WeekDto.builder()
                 .weekName(w.getWeek_name())
                 .description(w.getDescription())
-                .sessions(w.getSessions().stream().map(SessionDto::of).toList())
+                .sessions(w.getSessions() != null ?
+                        w.getSessions().stream().map(SessionDto::of).toList() :
+                        List.of())
                 .id(w.getId())
                 .build();
     }

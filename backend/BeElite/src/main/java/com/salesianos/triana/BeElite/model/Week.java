@@ -1,7 +1,9 @@
 package com.salesianos.triana.BeElite.model;
 
+import com.salesianos.triana.BeElite.service.WeekService;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
@@ -17,7 +19,6 @@ import java.util.List;
 public class Week {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Id
@@ -35,4 +36,5 @@ public class Week {
 
     @CreatedDate
     LocalDateTime createdAt;
+
 }
