@@ -45,10 +45,8 @@ class _CoachMainScreenState extends State<CoachMainScreen> {
             builder: (context, state) {
               if (state is CoachDetailsLoadingState) {
                 return const Center(child: CircularProgressIndicator());
-                
               } else if (state is CoachDetailsErrorState) {
                 return const Text('Error getting coach information.');
-
               } else if (state is CoachDetailsSuccessState) {
                 widgetList = [
                   ProgramsScreen(coachDetails: state.coachDetails),
@@ -57,7 +55,6 @@ class _CoachMainScreenState extends State<CoachMainScreen> {
                 ];
 
                 return widgetList[myIndex];
-
               } else {
                 return const Placeholder();
               }

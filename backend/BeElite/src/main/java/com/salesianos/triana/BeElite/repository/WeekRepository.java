@@ -12,5 +12,5 @@ import java.util.UUID;
 public interface WeekRepository extends JpaRepository<Week, WeekId> {
 
     @Query(value = "SELECT * FROM week w WHERE program_id = :programId",nativeQuery = true)
-    Page<Week> findPageByProgram(Pageable page, UUID programId);
+    Page<Week> findPageByProgram(Pageable sortedPage, UUID programId);
 }

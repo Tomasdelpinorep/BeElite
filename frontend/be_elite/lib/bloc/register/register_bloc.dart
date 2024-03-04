@@ -14,17 +14,22 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
     on<DoRegisterEvent>(_doRegister);
   }
 
-  void _doRegister(DoRegisterEvent event, Emitter<RegisterState> emitter) async{
+  void _doRegister(
+      DoRegisterEvent event, Emitter<RegisterState> emitter) async {
     emitter(RegisterLoading());
 
-    try{
-      RegisterRequest registerRequest =
-      RegisterRequest(name: event.name, username: event.username, email: event.email,
-      password: event.password, verifyPassword: event.verifyPassword, isCoach: event.isCoach);
+    try {
+      RegisterRequest registerRequest = RegisterRequest(
+          name: event.name,
+          username: event.username,
+          email: event.email,
+          password: event.password,
+          verifyPassword: event.verifyPassword,
+          isCoach: event.isCoach);
 
       final response = await authRepository.register(registerRequest);
       emitter(RegisterSuccess(response));
-    }on Exception catch(e){
+    } on Exception catch (e) {
       emitter(RegisterError(e.toString()));
     }
   }

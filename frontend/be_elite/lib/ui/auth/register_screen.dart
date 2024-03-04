@@ -96,7 +96,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _nameField(){
+  Widget _nameField() {
     return SizedBox(
       width: 400,
       child: TextFormField(
@@ -180,13 +180,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ? Colors.white
                     : Colors.white54)),
         validator: (value) {
-          String pattern =
-                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
-                  RegExp regExp = RegExp(pattern);
+          String pattern = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
+          RegExp regExp = RegExp(pattern);
 
           if (value == null || value.isEmpty) return 'Email cannot be empty.';
 
-          if (!regExp.hasMatch(value)) return 'Please enter a valid email address.';
+          if (!regExp.hasMatch(value))
+            return 'Please enter a valid email address.';
 
           return null;
         },
@@ -253,11 +253,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
         validator: (value) {
-          if (value == null || value.isEmpty) return 'Password cannot be empty.';
+          if (value == null || value.isEmpty)
+            return 'Password cannot be empty.';
 
-          if (value.length < 6) return 'Password must be at least 6 characters long.';
+          if (value.length < 6)
+            return 'Password must be at least 6 characters long.';
 
-          if(value.toString() != passwordTextController.text.toString()) return "Passwords don't match";
+          if (value.toString() != passwordTextController.text.toString())
+            return "Passwords don't match";
 
           return null;
         },

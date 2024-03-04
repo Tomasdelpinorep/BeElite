@@ -60,8 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 return _loginForm();
               },
               listenWhen: (context, state) {
-                return state is DoLoginSuccess ||
-                    state is CheckTokenSuccess;
+                return state is DoLoginSuccess || state is CheckTokenSuccess;
               },
               listener: (context, state) {
                 if (state is CheckTokenSuccess) {

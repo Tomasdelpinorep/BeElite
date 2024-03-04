@@ -3,7 +3,7 @@ part of 'register_bloc.dart';
 @immutable
 sealed class RegisterEvent {}
 
-class DoRegisterEvent extends RegisterEvent{
+class DoRegisterEvent extends RegisterEvent {
   final String name;
   final String username;
   final String email;
@@ -11,7 +11,11 @@ class DoRegisterEvent extends RegisterEvent{
   final String verifyPassword;
   final bool isCoach;
 
-  DoRegisterEvent({required this.name, required this.username, required this.email, required this.password,
-  required this.verifyPassword,required this.isCoach});
-
+  DoRegisterEvent(
+      {required this.name,
+      required this.username,
+      required this.email,
+      required this.password,
+      required this.verifyPassword,
+      required this.isCoach});
 }

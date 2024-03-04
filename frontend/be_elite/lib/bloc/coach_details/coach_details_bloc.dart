@@ -16,16 +16,17 @@ class CoachDetailsBloc extends Bloc<CoachDetailsEvent, CoachDetailsState> {
     on<GetCoachDetailsEvent>(_getCoachDetails);
   }
 
-
-  FutureOr<void> _getCoachDetails(GetCoachDetailsEvent event, Emitter<CoachDetailsState> emit) async{
+  FutureOr<void> _getCoachDetails(
+      GetCoachDetailsEvent event, Emitter<CoachDetailsState> emit) async {
     emit(CoachDetailsLoadingState());
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    
-    try{
-      final response = await userRepository.getCoachDetails(prefs.getString('username')!, prefs.getString('authToken')!);
+
+    try {
+      final response = await userRepository.getCoachDetails(
+          prefs.getString('username')!, prefs.getString('authToken')!);
 
       emit(CoachDetailsSuccessState(response));
-    }on Exception catch (e){
+    } on Exception catch (e) {
       emit(CoachDetailsErrorState(e.toString()));
     }
   }

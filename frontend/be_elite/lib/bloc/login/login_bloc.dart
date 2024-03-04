@@ -44,8 +44,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   Future<FutureOr<void>> _checkToken(
       CheckTokenEvent event, Emitter<LoginState> emitter) async {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        String? role = prefs.getString('role');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? role = prefs.getString('role');
 
     try {
       final response = await authRepository.checkToken();

@@ -10,12 +10,12 @@ class IntroScreen extends StatelessWidget {
     return Scaffold(
       body: Container(
         alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  gradient: RadialGradient(
-                    colors: [Colors.grey[900]!, Colors.black],
-                    radius: 0.5,
-                  ),
-                ),
+        decoration: BoxDecoration(
+          gradient: RadialGradient(
+            colors: [Colors.grey[900]!, Colors.black],
+            radius: 0.5,
+          ),
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -34,15 +34,18 @@ class IntroScreen extends StatelessWidget {
                         ]),
                         child: FilledButton(
                           onPressed: () {
-                            Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => const RegisterScreen(isCoach:false)));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const RegisterScreen(isCoach: false)));
                           },
                           style: FilledButton.styleFrom(
                               backgroundColor: AppColors.mainYellow,
                               fixedSize: const Size(275, 75),
                               shape: const RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.elliptical(5, 5)))),
+                                  borderRadius: BorderRadius.all(
+                                      Radius.elliptical(5, 5)))),
                           child: const Text(
                             "I'm an Athlete",
                             style: TextStyle(
@@ -57,13 +60,17 @@ class IntroScreen extends StatelessWidget {
                       ),
                       OutlinedButton(
                         onPressed: () {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => const RegisterScreen(isCoach: true)));
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const RegisterScreen(isCoach: true)));
                         },
                         style: OutlinedButton.styleFrom(
                           fixedSize: const Size(275, 75),
                           shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(5))),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5))),
                           side: const BorderSide(
                             width: 3,
                             color: Colors.grey,

@@ -2,7 +2,9 @@ package com.salesianos.triana.BeElite.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -30,4 +32,7 @@ public class Week {
     @ManyToOne
     @JoinColumn(name = "program_id")
     private Program program;
+
+    @CreatedDate
+    LocalDateTime createdAt;
 }

@@ -18,17 +18,15 @@ class MyApp extends StatelessWidget {
       title: 'BeElite',
       themeMode: ThemeMode.dark,
       darkTheme: ThemeData(
-        scaffoldBackgroundColor: AppColors.completeBlack,
-        brightness: Brightness.dark,
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          backgroundColor: AppColors.mainYellow.withOpacity(0.25),
-          selectedIconTheme: const IconThemeData(color: Colors.white),
-          elevation: 5,
-          unselectedIconTheme: const IconThemeData(color: Colors.white54),
-          selectedLabelStyle: const TextStyle(color: Colors.white),
-          unselectedLabelStyle: const TextStyle(color: Colors.white54)
-        )
-      ),
+          scaffoldBackgroundColor: AppColors.completeBlack,
+          brightness: Brightness.dark,
+          bottomNavigationBarTheme: BottomNavigationBarThemeData(
+              backgroundColor: AppColors.mainYellow.withOpacity(0.25),
+              selectedIconTheme: const IconThemeData(color: Colors.white),
+              elevation: 5,
+              unselectedIconTheme: const IconThemeData(color: Colors.white54),
+              selectedLabelStyle: const TextStyle(color: Colors.white),
+              unselectedLabelStyle: const TextStyle(color: Colors.white54))),
       home: const LoginScreen(),
     );
   }

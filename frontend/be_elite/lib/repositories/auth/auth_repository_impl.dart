@@ -10,26 +10,25 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthRepositoryImpl extends AuthRepository {
   final Client _client = Client();
 
-
   @override
-  Future<LoginResponse> login(LoginRequest loginRequest) async{
+  Future<LoginResponse> login(LoginRequest loginRequest) async {
     final response = await _client.post(
       Uri.parse("http://localhost:8080/auth/login"),
       headers: <String, String>{'Content-Type': 'application/json'},
       body: jsonEncode(loginRequest.toJson()),
     );
 
-    if (response.statusCode == 201){
+    if (response.statusCode == 201) {
       return LoginResponse.fromJson(json.decode(response.body));
-    }else{
+    } else {
       throw Exception('Login failed.');
     }
   }
 
   @override
-  Future<LoginResponse> register(RegisterRequest registerRequest) async{
+  Future<LoginResponse> register(RegisterRequest registerRequest) async {
     Uri uri;
-    uri =  Uri.parse("http://localhost:8080/auth/register");
+    uri = Uri.parse("http://localhost:8080/auth/register");
 
     final response = await _client.post(
       uri,
@@ -37,26 +36,25 @@ class AuthRepositoryImpl extends AuthRepository {
       body: jsonEncode(registerRequest.toJson()),
     );
 
-    if(response.statusCode == 201){
+    if (response.statusCode == 201) {
       return LoginResponse.fromJson(json.decode(response.body));
-    }else{
+    } else {
       throw Exception('Register failed');
     }
   }
-  
+
   @override
-  Future<bool> checkToken() async{
+  Future<bool> checkToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     final response = await _client.post(
-      Uri.parse("http://localhost:8080/auth/validateToken"),
-      headers: <String, String>{'Content-Type': 'application/json'},
-      body: prefs.getString('authToken')
-    );
+        Uri.parse("http://localhost:8080/auth/validateToken"),
+        headers: <String, String>{'Content-Type': 'application/json'},
+        body: prefs.getString('authToken'));
 
-    if(response.statusCode == 202){
+    if (response.statusCode == 202) {
       return true;
-    }else{
+    } else {
       return false;
     }
   }

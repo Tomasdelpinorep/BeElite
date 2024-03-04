@@ -1,8 +1,14 @@
+import 'package:be_elite/bloc/week/week_bloc.dart';
 import 'package:be_elite/models/Coach/coach_details.dart';
 import 'package:be_elite/models/Coach/program_dto.dart';
+import 'package:be_elite/models/Week/week_dto.dart';
+import 'package:be_elite/repositories/coach/coach_repository.dart';
+import 'package:be_elite/repositories/coach/coach_repository_impl.dart';
+import 'package:be_elite/styles/app_colors.dart';
 import 'package:be_elite/widgets/beElite_logo.dart';
 import 'package:be_elite/widgets/circular_avatar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProgramsScreen extends StatefulWidget {
   final CoachDetails coachDetails;
@@ -13,36 +19,53 @@ class ProgramsScreen extends StatefulWidget {
 }
 
 class _ProgramsScreenState extends State<ProgramsScreen> {
+  late CoachRepository _coachRepository;
+  late WeekBloc _weekBloc;
+  late String programName;
+
+  @override
+  void initState() {
+    _coachRepository = CoachRepositoryImpl();
+    programName = widget.coachDetails.programs!.first.programName.toString();
+    _weekBloc = WeekBloc(_coachRepository)..add(GetWeeksEvent(programName));
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: SizedBox(
-          width: double.infinity,
-          height: 50,
-          child:
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            CircularProfileAvatar(
-                imageUrl: widget.coachDetails.profilePicUrl ??
-                    'https://i.imgur.com/jNNT4LE.png'),
-            _programSelectorWidget(),
-            const BeEliteLogo()
-          ]),
+        child: Column(
+          children: [
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    CircularProfileAvatar(
+                        imageUrl: widget.coachDetails.profilePicUrl ??
+                            'https://i.imgur.com/jNNT4LE.png'),
+                    _programSelectorWidget(),
+                    const BeEliteLogo()
+                  ]),
+            ),
+            _weeksBlocWidget()
+          ],
         ),
-        _weeksWidget(),
       ),
     );
   }
 
   Widget _programSelectorWidget() {
-    String _dropDownValue =
+    String dropDownValue =
         widget.coachDetails.programs?.first.programName ?? '';
-    List<ProgramDto> _programs = [];
+    List<ProgramDto> programs = [];
 
     if (widget.coachDetails.programs != null) {
       for (ProgramDto program in widget.coachDetails.programs!) {
-        _programs.add(program);
+        programs.add(program);
       }
     }
 
@@ -61,7 +84,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
           ),
           items: [
             // Existing programs
-            ..._programs.map((ProgramDto program) {
+            ...programs.map((ProgramDto program) {
               return DropdownMenuItem<String>(
                 value: program.programName,
                 child: Row(
@@ -90,16 +113,16 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
               value: 'new',
               child: Row(
                 children: [
-                  Icon(Icons.add_circle_outline, color: Colors.white), // Icon for "Create New"
+                  Icon(Icons.add_circle_outline,
+                      color: Colors.white), // Icon for "Create New"
                   SizedBox(width: 8),
                   Text(
                     'Create New Program',
                     style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.white,
-                      fontWeight: FontWeight.normal,
-                      fontStyle: FontStyle.italic
-                    ),
+                        fontSize: 14,
+                        color: Colors.white,
+                        fontWeight: FontWeight.normal,
+                        fontStyle: FontStyle.italic),
                   ),
                 ],
               ),
@@ -107,16 +130,99 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
           ],
           onChanged: (String? newValue) {
             setState(() {
-              _dropDownValue = newValue!;
+              dropDownValue = newValue!;
+              programName = dropDownValue;
             });
           },
-          value: _dropDownValue,
+          value: dropDownValue,
         ),
       ),
     );
   }
 
-  Widget _weeksWidget(){
-    
+  Widget _weeksBlocWidget() {
+    return Container(
+      alignment: Alignment.center,
+      child: BlocProvider.value(
+        value: _weekBloc,
+        child: BlocConsumer<WeekBloc, WeekState>(
+          buildWhen: (context, state) {
+            return state is WeekLoadingState ||
+                state is WeekErrorState ||
+                state is WeekSuccessState;
+          },
+          builder: (context, state) {
+            if (state is WeekLoadingState) {
+              return const CircularProgressIndicator();
+            } else if (state is WeekErrorState) {
+              return const Text('Error fetching week data.');
+            } else if (state is WeekSuccessState) {
+              return weeksWidget(state.week);
+            } else {
+              return const Placeholder();
+            }
+          },
+          listener: (context, state) {},
+        ),
+      ),
+    );
+  }
+
+  Widget weeksWidget(WeekDto weekPage) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 30),
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height * 0.8,
+        child: ListView.separated(
+          itemCount: weekPage.content!.length,
+          separatorBuilder: (BuildContext context, int index) {
+            return const SizedBox(
+                height: 16); // Adjust the height as needed for spacing
+          },
+          itemBuilder: (context, index) {
+            return Container(
+              margin: const EdgeInsets.symmetric(
+                  vertical: 8.0), // Adjust vertical spacing between cards
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.mainYellow.withOpacity(0.5),
+                    spreadRadius: 1,
+                    blurRadius: 4,
+                  ),
+                ],
+              ),
+              child: Card(
+                  color: Colors.grey[800],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                                "${weekPage.content![index].weekName!} - Week ${weekPage.content![index].id}",
+                                style: const TextStyle(fontSize: 20))
+                          ],
+                        ),
+                        Divider(color: AppColors.mainYellow),
+                        Text(weekPage.content![index].description!,
+                        style: TextStyle(
+                          color: Colors.grey[400],
+                        )),
+                        Divider(color: AppColors.mainYellow)
+                      ],
+                    ),
+                  )),
+            );
+          },
+        ),
+      ),
+    );
   }
 }

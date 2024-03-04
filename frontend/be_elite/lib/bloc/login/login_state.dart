@@ -24,7 +24,6 @@ final class CheckTokenSuccess extends LoginState {
 }
 
 final class CheckTokenError extends LoginState {
-   final String errorMessage;
+  final String errorMessage;
   CheckTokenError(this.errorMessage);
 }
-

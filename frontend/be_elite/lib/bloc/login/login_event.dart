@@ -3,7 +3,7 @@ part of 'login_bloc.dart';
 @immutable
 sealed class LoginEvent {}
 
-class DoLoginEvent extends LoginEvent{
+class DoLoginEvent extends LoginEvent {
   final String password;
   final String username;
 

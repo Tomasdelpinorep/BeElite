@@ -12,7 +12,8 @@ import java.util.UUID;
 public record WeekDto(
         String weekName,
         String description,
-        List<SessionDto> sessions
+        List<SessionDto> sessions,
+        Long id
 ) {
 
     public static WeekDto of(Week w){
@@ -20,6 +21,7 @@ public record WeekDto(
                 .weekName(w.getWeek_name())
                 .description(w.getDescription())
                 .sessions(w.getSessions().stream().map(SessionDto::of).toList())
+                .id(w.getId())
                 .build();
     }
 }
