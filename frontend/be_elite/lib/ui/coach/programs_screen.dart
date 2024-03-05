@@ -259,16 +259,16 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
             ),
           ),
         ),
-        _addWeekButton()
+        _addWeekButton(weekPage)
       ],
     );
   }
 
-  Widget _addWeekButton(){
+  Widget _addWeekButton(weekPage){
     return GestureDetector(
       onTap: (){
         Navigator.push(context, MaterialPageRoute(
-          builder: (context) => CoachAddWeekScreen(programName : programName)
+          builder: (context) => CoachAddWeekScreen(programName : programName, weeksPage : weekPage)
         ));
       },
       child: const Row(

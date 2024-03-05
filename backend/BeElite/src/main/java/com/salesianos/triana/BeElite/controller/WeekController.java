@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,6 +33,15 @@ public class WeekController {
         Page<Week> pagedResult = weekService.findPageByProgram(page, programName, coachUsername);
 
         return pagedResult.map(WeekDto::of);
+    }
+
+    @GetMapping("/coach/{coachUsername}/{programName}/weeks/names")
+    @PreAuthorize("hasRole('COACH') and #coach.id == principal.id or hasRole('ADMIN')")
+    public List<String> getWeekNamesByProgram(@AuthenticationPrincipal Coach coach,
+                                              @PathVariable String programName,
+                                              @PathVariable String coachUsername){
+
+        return weekService.findWeekNamesByProgram(programName, coachUsername);
     }
 
     @PostMapping("/coach/{coachUsername}/weeks/new")

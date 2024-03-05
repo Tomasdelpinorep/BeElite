@@ -32,7 +32,7 @@ class CoachRepositoryImpl extends CoachRepository {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     final response = await _client.get(
-      Uri.parse('$urlChrome/coach/${prefs.getString('username')}/$programName/weeks'),
+      Uri.parse('$urlChrome/coach/${prefs.getString('username')}/$programName/weeks/names'),
       headers: <String, String>{
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ${prefs.getString('authToken')}'
@@ -40,8 +40,11 @@ class CoachRepositoryImpl extends CoachRepository {
     );
 
     if (response.statusCode == 200) {
-      return List<String>.fromJson(json.decode(response.body));
+      List<dynamic> decodedData = json.decode(response.body);
+      List<String> weekNames = List<String>.from(decodedData);
+      return weekNames;
     } else {
       throw Exception('Failed to get week data.');
     }
-  }}
+  }
+  }

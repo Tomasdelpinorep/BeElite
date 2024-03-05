@@ -1,12 +1,17 @@
 import 'package:be_elite/bloc/week/week_bloc.dart';
+import 'package:be_elite/models/Week/content.dart';
+import 'package:be_elite/models/Week/week_dto.dart';
 import 'package:be_elite/repositories/coach/coach_repository.dart';
 import 'package:be_elite/repositories/coach/coach_repository_impl.dart';
+import 'package:be_elite/widgets/_weekDescriptionField.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CoachAddWeekScreen extends StatefulWidget {
   final String programName;
-  const CoachAddWeekScreen({super.key, required this.programName});
+  final WeekDto weeksPage;
+  const CoachAddWeekScreen(
+      {super.key, required this.programName, required this.weeksPage});
 
   @override
   State<CoachAddWeekScreen> createState() => _CoachAddWeekScreenState();
@@ -16,9 +21,8 @@ class _CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
   final formKey = GlobalKey<FormState>();
   final weekNameTextController = TextEditingController();
   final weekDescriptionTextController = TextEditingController();
-  late List<String> existingWeekNames = ['Week 1', 'Week 2', 'Week 3'];
-  List<String> _suggestions = [];
 
+  List<String> _suggestions = [];
   late CoachRepository coachRepository;
   late WeekBloc _weekBloc;
 
@@ -26,7 +30,6 @@ class _CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
   void initState() {
     coachRepository = CoachRepositoryImpl();
     _weekBloc = WeekBloc(coachRepository);
-    existingWeekNames = coachRepository.getWeekNames(widget.programName);
     super.initState();
   }
 
@@ -45,7 +48,9 @@ class _CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
             value: _weekBloc,
             child: BlocConsumer<WeekBloc, WeekState>(
               buildWhen: (context, state) {
-                return state is WeekLoadingState || state is WeekErrorState;
+                return state is WeekLoadingState ||
+                    state is WeekErrorState ||
+                    state is WeekNamesSuccessState;
               },
               builder: (context, state) {
                 if (state is WeekErrorState) {
@@ -53,6 +58,8 @@ class _CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
                       'An error occured while saving the new week.');
                 } else if (state is WeekLoadingState) {
                   return const Center(child: CircularProgressIndicator());
+                } else if (state is WeekSuccessState) {
+                  return const Placeholder();
                 }
 
                 return _addWeekForm();
@@ -81,7 +88,7 @@ class _CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
                     children: [
                   _weekNameField(),
                   const SizedBox(height: 30),
-                  _weekDescriptionField(),
+                  WeekDescriptionField(weekNameTextController: weekNameTextController, weekPage: widget.weeksPage),
                   const SizedBox(height: 30),
                   // _saveButton(),
                 ])),
@@ -90,7 +97,8 @@ class _CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
   }
 
   Widget _weekNameField() {
-    _suggestions == existingWeekNames;
+    List<String> existingWeekNames =
+        List.from(extractWeekNames(widget.weeksPage.content!));
 
     return SizedBox(
       width: 400,
@@ -98,15 +106,34 @@ class _CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
         children: [
           TextField(
             controller: weekNameTextController,
+            onTap: () {
+              if (weekNameTextController.value.text.isEmpty) {
+                setState(() {
+                  _suggestions = existingWeekNames;
+                });
+              }
+            },
             onChanged: (weekName) {
               setState(() {
                 _suggestions = existingWeekNames
-                    .where((existingWeekName) =>
-                        existingWeekName.toLowerCase().contains(weekName.toLowerCase()))
+                    .where((existingWeekName) => existingWeekName
+                        .toLowerCase()
+                        .contains(weekName.toLowerCase()))
                     .toList();
               });
             },
-            decoration: const InputDecoration(labelText: 'Week Name'),
+            decoration: const InputDecoration(
+              hintText: "Week Name",
+              hintStyle: TextStyle(color: Colors.white54),
+              enabledBorder: UnderlineInputBorder(
+                borderSide:
+                    BorderSide(color: Colors.white54), // Underline color
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide:
+                    BorderSide(color: Colors.white), // Focused underline color
+              ),
+            ),
           ),
           const SizedBox(height: 10),
           _suggestions.isNotEmpty
@@ -132,31 +159,42 @@ class _CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
   }
 
   Widget _weekDescriptionField() {
+    String? weekDescription;
+    weekNameTextController.addListener(() {
+      String currentWeekName = weekNameTextController.text;
+
+      Content? matchingWeek = widget.weeksPage.content?.firstWhere(
+        (week) => week.weekName == currentWeekName,
+      );
+        weekDescription = matchingWeek?.description;
+        print(weekDescription);
+    });
+
     return SizedBox(
       width: 400,
       child: TextFormField(
         controller: weekDescriptionTextController,
+        initialValue: weekDescription,
         style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
-            hintText: "Username",
-            hintStyle: const TextStyle(color: Colors.white54),
-            enabledBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.white54), // Underline color
-            ),
-            focusedBorder: const UnderlineInputBorder(
-              borderSide:
-                  BorderSide(color: Colors.white), // Focused underline color
-            ),
-            prefixIcon: const Icon(Icons.person),
-            prefixIconColor: MaterialStateColor.resolveWith((states) =>
-                states.contains(MaterialState.focused)
-                    ? Colors.white
-                    : Colors.white54)),
+          hintText:
+              weekDescription == null ? 'Week Description' : weekDescription!,
+          hintStyle: const TextStyle(color: Colors.white54),
+          enabledBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.white54),
+          ),
+          focusedBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.white),
+          ),
+        ),
         validator: (value) {
           if (value == null || value.isEmpty) {
-            return 'Username cannot be empty.';
+            return 'Week description cannot be empty.';
           }
           return null;
+        },
+        onChanged: (value) {
+          // Handle onChanged if needed
         },
       ),
     );
@@ -187,4 +225,17 @@ class _CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
   //     ),
   //   );
   // }
+
+  Set<String> extractWeekNames(dynamic content) {
+    Set<String> weekNames = {};
+    if (content != null && content is List) {
+      for (var item in content) {
+        String? weekName = item.weekName;
+        if (weekName != null) {
+          weekNames.add(weekName);
+        }
+      }
+    }
+    return weekNames;
+  }
 }
