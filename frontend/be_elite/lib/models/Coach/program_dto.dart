@@ -1,16 +1,16 @@
 class ProgramDto {
-  String? programName;
+  String? program_name;
   String? image;
 
-  ProgramDto({this.programName, this.image});
+  ProgramDto({this.program_name, this.image});
 
   factory ProgramDto.fromJson(Map<String, dynamic> json) => ProgramDto(
-        programName: json['program_name'] as String?,
+        program_name: json['program_name'] as String?,
         image: json['image'] as String?,
       );
 
   Map<String, dynamic> toJson() => {
-        'program_name': programName,
+        'program_name': program_name,
         'image': image,
       };
 }

@@ -27,7 +27,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
   @override
   void initState() {
     _coachRepository = CoachRepositoryImpl();
-    programName = widget.coachDetails.programs!.first.programName.toString();
+    programName = widget.coachDetails.programs!.first.program_name.toString();
     _weekBloc = WeekBloc(_coachRepository)..add(GetWeeksEvent(programName));
     super.initState();
   }
@@ -61,7 +61,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
 
   Widget _programSelectorWidget() {
     String dropDownValue =
-        widget.coachDetails.programs?.first.programName ?? '';
+        widget.coachDetails.programs?.first.program_name ?? '';
     List<ProgramDto> programs = [];
 
     if (widget.coachDetails.programs != null) {
@@ -87,7 +87,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
             // Existing programs
             ...programs.map((ProgramDto program) {
               return DropdownMenuItem<String>(
-                value: program.programName,
+                value: program.program_name,
                 child: Row(
                   children: [
                     Image.network(
@@ -98,7 +98,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                     ),
                     const SizedBox(width: 25),
                     Text(
-                      program.programName!,
+                      program.program_name!,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 24,

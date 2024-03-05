@@ -21,3 +21,8 @@ final class WeekNamesSuccessState extends WeekState{
   final List<String> weekNames;
   WeekNamesSuccessState(this.weekNames);
 }
+
+final class SaveNewWeekSuccessState extends WeekState{
+  final WeekDto newWeek;
+  SaveNewWeekSuccessState(this.newWeek);
+}

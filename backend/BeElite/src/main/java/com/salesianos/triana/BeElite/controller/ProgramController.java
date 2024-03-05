@@ -44,10 +44,17 @@ public class ProgramController {
                 .toList();
     }
 
-    @GetMapping("/coach/program/details/{programName}")
+    @GetMapping("/coach/{coachUsername}/{programName}/details")
     @PreAuthorize("hasRole('COACH') and #coach.id == principal.id or hasRole('ADMIN')")
-    public Program getProgramDetails(@AuthenticationPrincipal Coach coach, @PathVariable String programName){
-        return programService.findByCoachAndProgramName(coach.getId(),programName);
+    //Must create a programDetailsDto
+    public Program getProgramDetails(@AuthenticationPrincipal Coach coach,@PathVariable String coachUsername ,@PathVariable String programName){
+        return programService.findByCoachAndProgramName(coachUsername,programName);
+    }
+
+    @GetMapping("/coach/{coachUsername}/{programName}/dto")
+    @PreAuthorize("hasRole('COACH') and #coach.id == principal.id or hasRole('ADMIN')")
+    public ProgramDto getProgramDto(@AuthenticationPrincipal Coach coach,@PathVariable String coachUsername ,@PathVariable String programName){
+        return ProgramDto.of(programService.findByCoachAndProgramName(coachUsername,programName));
     }
 
     @PostMapping("coach/program")

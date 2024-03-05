@@ -15,6 +15,7 @@ class WeekBloc extends Bloc<WeekEvent, WeekState> {
   WeekBloc(this.coachRepository) : super(WeekInitial()) {
     on<GetWeekNamesEvent>(_getWeekNames);
     on<GetWeeksEvent>(_getWeeks);
+    on<SaveNewWeekEvent>(_saveNewWeek);
   }
 
   FutureOr<void> _getWeeks(GetWeeksEvent event, Emitter<WeekState> emit) async {
@@ -40,6 +41,18 @@ class WeekBloc extends Bloc<WeekEvent, WeekState> {
       final response = await coachRepository.getWeekNames(event.programName);
 
       emit(WeekNamesSuccessState(response));
+    }on Exception catch(e){
+      emit(WeekErrorState(e.toString()));
+    }
+  }
+
+  FutureOr<void> _saveNewWeek(SaveNewWeekEvent event, Emitter<WeekState> emit) async{
+    emit(WeekLoadingState());
+
+    try{
+      final response = await coachRepository.saveNewWeek(event.newWeek);
+
+      emit(SaveNewWeekSuccessState(response));
     }on Exception catch(e){
       emit(WeekErrorState(e.toString()));
     }

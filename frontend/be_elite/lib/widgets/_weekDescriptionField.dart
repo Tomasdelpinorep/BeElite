@@ -6,7 +6,11 @@ class WeekDescriptionField extends StatefulWidget {
   final TextEditingController weekNameTextController;
   final WeekDto weekPage;
   final Function handleWeekDescriptionChanged;
-  const WeekDescriptionField({super.key, required this.weekNameTextController, required this.weekPage, required this.handleWeekDescriptionChanged});
+  const WeekDescriptionField(
+      {super.key,
+      required this.weekNameTextController,
+      required this.weekPage,
+      required this.handleWeekDescriptionChanged});
 
   @override
   State<WeekDescriptionField> createState() => _WeekDescriptionFieldState();
@@ -33,14 +37,15 @@ class _WeekDescriptionFieldState extends State<WeekDescriptionField> {
   void updateWeekDescription() {
     String currentWeekName = widget.weekNameTextController.text;
     Content? matchingWeek = widget.weekPage.content?.firstWhere(
-      (week) => week.weekName == currentWeekName,
-      orElse: () => Content()
-    );
+        (week) => week.weekName == currentWeekName,
+        orElse: () => Content());
     setState(() {
-      if(matchingWeek == Content()){
+      if (matchingWeek == Content()) {
         weekDescription = 'Week description';
+      } else {
+        weekDescription = matchingWeek?.description;
+        weekDescriptionTextController.text = weekDescription!;
       }
-      weekDescription = matchingWeek?.description;
       widget.handleWeekDescriptionChanged(weekDescription);
     });
   }
@@ -50,29 +55,28 @@ class _WeekDescriptionFieldState extends State<WeekDescriptionField> {
     return SizedBox(
       width: 400,
       child: TextFormField(
-        controller: weekDescriptionTextController,
-        style: const TextStyle(color: Colors.white),
-        decoration: InputDecoration(
-          hintText:
-              weekDescription == null ? 'Week Description' : weekDescription!,
-          hintStyle: const TextStyle(color: Colors.white54),
-          enabledBorder: const UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white54),
+          controller: weekDescriptionTextController,
+          style: const TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            hintText:
+                weekDescription == null ? 'Week Description' : weekDescription!,
+            hintStyle: const TextStyle(color: Colors.white54),
+            enabledBorder: const UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white54),
+            ),
+            focusedBorder: const UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
           ),
-          focusedBorder: const UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
-          ),
-        ),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Week description cannot be empty.';
-          }
-          return null;
-        },
-        onChanged: (value) {
-          // Handle onChanged if needed
-        },
-      ),
+          onChanged: (value){
+            widget.handleWeekDescriptionChanged(value);
+          },
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Week description cannot be empty.';
+            }
+            return null;
+          }),
     );
   }
 }

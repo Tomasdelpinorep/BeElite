@@ -97,8 +97,9 @@ public class ProgramService {
                 .toList();
     }
 
-    public Program findByCoachAndProgramName(UUID coachId, String programName){
-        Optional<Program> p = programRepository.findByCoachAndProgramName(coachId,programName);
+    public Program findByCoachAndProgramName(String coachUsername, String programName){
+        Coach c = coachRepository.findByUsername(coachUsername).orElseThrow(() -> new NotFoundException("No coach with that username."));
+        Optional<Program> p = programRepository.findByCoachAndProgramName(c.getId(),programName);
 
         if(p.isPresent())
             return p.get();
