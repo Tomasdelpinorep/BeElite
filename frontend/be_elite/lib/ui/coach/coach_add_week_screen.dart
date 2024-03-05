@@ -1,8 +1,10 @@
 import 'package:be_elite/bloc/week/week_bloc.dart';
-import 'package:be_elite/models/Week/content.dart';
+import 'package:be_elite/models/Week/post_week_dto.dart';
+
 import 'package:be_elite/models/Week/week_dto.dart';
 import 'package:be_elite/repositories/coach/coach_repository.dart';
 import 'package:be_elite/repositories/coach/coach_repository_impl.dart';
+import 'package:be_elite/styles/app_colors.dart';
 import 'package:be_elite/widgets/_weekDescriptionField.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,6 +27,7 @@ class _CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
   List<String> _suggestions = [];
   late CoachRepository coachRepository;
   late WeekBloc _weekBloc;
+  late String weekDescriptionValue;
 
   @override
   void initState() {
@@ -88,9 +91,12 @@ class _CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
                     children: [
                   _weekNameField(),
                   const SizedBox(height: 30),
-                  WeekDescriptionField(weekNameTextController: weekNameTextController, weekPage: widget.weeksPage),
+                  WeekDescriptionField(
+                      weekNameTextController: weekNameTextController,
+                      weekPage: widget.weeksPage,
+                      handleWeekDescriptionChanged: handleWeekDescriptionChanged),
                   const SizedBox(height: 30),
-                  // _saveButton(),
+                  _saveButton(),
                 ])),
           ],
         ));
@@ -158,73 +164,29 @@ class _CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
     );
   }
 
-  Widget _weekDescriptionField() {
-    String? weekDescription;
-    weekNameTextController.addListener(() {
-      String currentWeekName = weekNameTextController.text;
-
-      Content? matchingWeek = widget.weeksPage.content?.firstWhere(
-        (week) => week.weekName == currentWeekName,
-      );
-        weekDescription = matchingWeek?.description;
-        print(weekDescription);
-    });
-
-    return SizedBox(
-      width: 400,
-      child: TextFormField(
-        controller: weekDescriptionTextController,
-        initialValue: weekDescription,
-        style: const TextStyle(color: Colors.white),
-        decoration: InputDecoration(
-          hintText:
-              weekDescription == null ? 'Week Description' : weekDescription!,
-          hintStyle: const TextStyle(color: Colors.white54),
-          enabledBorder: const UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white54),
-          ),
-          focusedBorder: const UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
-          ),
-        ),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Week description cannot be empty.';
+  Widget _saveButton() {
+    return Container(
+      decoration: const BoxDecoration(
+          boxShadow: [BoxShadow(color: Color(0xFFD6CD0B), blurRadius: 5)]),
+      child: FilledButton(
+        onPressed: () {
+          if (formKey.currentState!.validate()) {
+            _weekBloc.add(SaveNewWeekEvent(PostWeekDto(createdAt: DateTime.now().toString(), weekName: weekNameTextController.text, description: weekDescriptionValue )));
           }
-          return null;
         },
-        onChanged: (value) {
-          // Handle onChanged if needed
-        },
+        style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.mainYellow,
+            fixedSize: const Size(200, 50),
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.elliptical(5, 5)))),
+        child: const Text(
+          "Add new week",
+          style: TextStyle(
+              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
+        ),
       ),
     );
   }
-
-  // Widget _saveButton() {
-  //   return Container(
-  //     decoration: const BoxDecoration(
-  //         boxShadow: [BoxShadow(color: Color(0xFFD6CD0B), blurRadius: 5)]),
-  //     child: FilledButton(
-  //       onPressed: () {
-  //         if (formKey.currentState!.validate()) {
-  //           _loginBloc.add(DoLoginEvent(
-  //               password: passwordTextController.text,
-  //               username: usernameTextController.text));
-  //         }
-  //       },
-  //       style: ElevatedButton.styleFrom(
-  //           backgroundColor: AppColors.mainYellow,
-  //           fixedSize: const Size(150, 50),
-  //           shape: const RoundedRectangleBorder(
-  //               borderRadius: BorderRadius.all(Radius.elliptical(5, 5)))),
-  //       child: const Text(
-  //         "Login",
-  //         style: TextStyle(
-  //             color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
-  //       ),
-  //     ),
-  //   );
-  // }
 
   Set<String> extractWeekNames(dynamic content) {
     Set<String> weekNames = {};
@@ -237,5 +199,11 @@ class _CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
       }
     }
     return weekNames;
+  }
+
+  void handleWeekDescriptionChanged(String? weekDescription) {
+    weekDescription != null ?
+    weekDescriptionValue = weekDescription :
+    weekDescriptionValue = "";
   }
 }

@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 class WeekDescriptionField extends StatefulWidget {
   final TextEditingController weekNameTextController;
   final WeekDto weekPage;
-  const WeekDescriptionField({super.key, required this.weekNameTextController, required this.weekPage});
+  final Function handleWeekDescriptionChanged;
+  const WeekDescriptionField({super.key, required this.weekNameTextController, required this.weekPage, required this.handleWeekDescriptionChanged});
 
   @override
   State<WeekDescriptionField> createState() => _WeekDescriptionFieldState();
@@ -40,6 +41,7 @@ class _WeekDescriptionFieldState extends State<WeekDescriptionField> {
         weekDescription = 'Week description';
       }
       weekDescription = matchingWeek?.description;
+      widget.handleWeekDescriptionChanged(weekDescription);
     });
   }
 
