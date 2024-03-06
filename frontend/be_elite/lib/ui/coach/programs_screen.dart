@@ -4,7 +4,6 @@ import 'package:be_elite/models/Coach/program_dto.dart';
 import 'package:be_elite/models/Week/week_dto.dart';
 import 'package:be_elite/repositories/coach/coach_repository.dart';
 import 'package:be_elite/repositories/coach/coach_repository_impl.dart';
-import 'package:be_elite/styles/app_colors.dart';
 import 'package:be_elite/ui/coach/coach_add_week_screen.dart';
 import 'package:be_elite/widgets/beElite_logo.dart';
 import 'package:be_elite/widgets/circular_avatar.dart';
@@ -23,6 +22,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
   late CoachRepository _coachRepository;
   late WeekBloc _weekBloc;
   late String programName;
+  late WeekDto weekPage;
 
   @override
   void initState() {
@@ -37,23 +37,35 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CircularProfileAvatar(
-                        imageUrl: widget.coachDetails.profilePicUrl ??
-                            'https://i.imgur.com/jNNT4LE.png'),
-                    _programSelectorWidget(),
-                    const BeEliteLogo()
-                  ]),
+        child: Container(
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            gradient: RadialGradient(
+              colors: [Colors.grey[900]!, Colors.black],
+              radius: 0.5,
             ),
-            _weeksBlocWidget()
-          ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      CircularProfileAvatar(
+                          imageUrl: widget.coachDetails.profilePicUrl ??
+                              'https://i.imgur.com/jNNT4LE.png'),
+                      _programSelectorWidget(),
+                      const BeEliteLogo()
+                    ]),
+              ),
+              Expanded(child: _weeksBlocWidget()),
+              const SizedBox(height: 10),
+              _addWeekButton()
+            ],
+          ),
         ),
       ),
     );
@@ -158,6 +170,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
             } else if (state is WeekErrorState) {
               return const Text('Error fetching week data.');
             } else if (state is WeekSuccessState) {
+              weekPage = state.week;
               return weeksWidget(state.week);
             } else {
               return const Placeholder();
@@ -170,113 +183,107 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
   }
 
   Widget weeksWidget(WeekDto weekPage) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 30),
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.75,
-            height: MediaQuery.of(context).size.height * 0.8,
-            child: ListView.separated(
-              itemCount: weekPage.content!.length,
-              separatorBuilder: (BuildContext context, int index) {
-                return const SizedBox(
-                    height: 16); // Adjust the height as needed for spacing
-              },
-              itemBuilder: (context, index) {
-                return Container(
-                    margin: const EdgeInsets.symmetric(vertical: 8.0),
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.mainYellow.withOpacity(0.5),
-                          spreadRadius: 1,
-                          blurRadius: 4,
-                        ),
-                      ],
+    return Container(
+      margin: const EdgeInsets.only(top: 30),
+      width: MediaQuery.of(context).size.width * 0.75,
+      child: SingleChildScrollView(
+        child: Column(
+          children: weekPage.content!.map((item) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0)
+                  .copyWith(bottom: 40),
+              child: Container(
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.white.withOpacity(0.5),
+                      spreadRadius: 0.1,
+                      blurRadius: 10,
                     ),
-                    child: Card(
-                      color: Colors.grey[800],
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      clipBehavior: Clip.antiAliasWithSaveLayer,
-                      child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                      "${weekPage.content![index].weekName!} - Week ${weekPage.content![index].id}",
-                                      style: const TextStyle(fontSize: 20))
-                                ],
-                              ),
-                              Divider(color: AppColors.mainYellow),
-                              Text(weekPage.content![index].description!,
-                                  style: TextStyle(
-                                    color: Colors.grey[400],
-                                  )),
-                              Divider(color: AppColors.mainYellow),
-                              Center(
-                                child: Wrap(
-                                  alignment: WrapAlignment.spaceAround,
-                                  children: weekPage.content![index].sessions!
-                                      .map((session) {
-                                    return Padding(
-                                      padding:
-                                          const EdgeInsets.symmetric(horizontal: 4)
-                                              .copyWith(top: 20),
-                                      child: SizedBox(
-                                        width: 150,
-                                        child: OutlinedButton(
-                                          onPressed: () {},
-                                          style: ButtonStyle(
-                                              overlayColor:
-                                                  MaterialStatePropertyAll(
-                                                      Colors.grey[850])),
-                                          child: session.sessionNumber! > 1
-                                              ? Text(
-                                                  "${capitalizeFirstLetter(session.dayOfWeek!)} #${session.sessionNumber}",
-                                                  style: const TextStyle(
-                                                      color: Colors.grey,
-                                                      fontWeight: FontWeight.w100))
-                                              : Text(capitalizeFirstLetter(session.dayOfWeek!),
-                                                  style: const TextStyle(
-                                                      color: Colors.grey,
-                                                      fontWeight: FontWeight.w100)),
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
-                                ),
-                              ),
-                            ],
-                          )),
-                    ));
-              },
-            ),
-          ),
+                  ],
+                ),
+                width: 350,
+                child: Card(
+                  color: Colors.grey[800],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                  child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("${item.weekName} - Week ${item.id}",
+                              style: const TextStyle(fontSize: 20),
+                              softWrap: true,),
+                          const Divider(color: Colors.white),
+                          Text(item.description.toString(),
+                              style: TextStyle(
+                                color: Colors.grey[400],
+                              )),
+                          const Divider(color: Colors.white),
+                          Center(
+                            child: Wrap(
+                              alignment: WrapAlignment.spaceAround,
+                              children: item.sessions!.map((session) {
+                                return Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 4)
+                                          .copyWith(top: 20),
+                                  child: SizedBox(
+                                    width: 150,
+                                    child: OutlinedButton(
+                                      onPressed: () {},
+                                      style: ButtonStyle(
+                                          overlayColor:
+                                              MaterialStatePropertyAll(
+                                                  Colors.grey[850])),
+                                      child: session.sessionNumber! > 1
+                                          ? Text(
+                                              "${capitalizeFirstLetter(session.dayOfWeek!)} #${session.sessionNumber}",
+                                              style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w100))
+                                          : Text(
+                                              capitalizeFirstLetter(
+                                                  session.dayOfWeek!),
+                                              style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w100)),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ],
+                      )),
+                ),
+              ),
+            );
+          }).toList(),
         ),
-        _addWeekButton(weekPage)
-      ],
+      ),
     );
   }
 
-  Widget _addWeekButton(weekPage){
-    return GestureDetector(
-      onTap: (){
-        Navigator.push(context, MaterialPageRoute(
-          builder: (context) => CoachAddWeekScreen(programName : programName, weeksPage : weekPage)
-        ));
-      },
-      child: const Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.add_circle_outline_sharp),
-          Text(' Add new week')
-        ],
+  Widget _addWeekButton() {
+    return SizedBox(
+      height: 25,
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => CoachAddWeekScreen(
+                      programName: programName, weeksPage: weekPage, coachDetails: widget.coachDetails)));
+        },
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [Icon(Icons.add_circle_outline_sharp), Text(' Add new week')],
+        ),
       ),
     );
   }
@@ -286,4 +293,3 @@ String capitalizeFirstLetter(String s) {
   if (s.isEmpty) return s;
   return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
 }
-

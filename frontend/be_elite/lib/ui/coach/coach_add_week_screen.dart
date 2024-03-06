@@ -1,8 +1,9 @@
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:be_elite/bloc/bloc/program_bloc.dart';
 import 'package:be_elite/bloc/week/week_bloc.dart';
+import 'package:be_elite/models/Coach/coach_details.dart';
 import 'package:be_elite/models/Coach/program_dto.dart';
 import 'package:be_elite/models/Week/post_week_dto.dart';
+import 'package:be_elite/ui/coach/programs_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:be_elite/models/Week/week_dto.dart';
 import 'package:be_elite/repositories/coach/coach_repository.dart';
@@ -17,8 +18,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class CoachAddWeekScreen extends StatefulWidget {
   final String programName;
   final WeekDto weeksPage;
+  final CoachDetails coachDetails;
   const CoachAddWeekScreen(
-      {super.key, required this.programName, required this.weeksPage});
+      {super.key,
+      required this.programName,
+      required this.weeksPage,
+      required this.coachDetails});
 
   @override
   State<CoachAddWeekScreen> createState() => _CoachAddWeekScreenState();
@@ -48,89 +53,93 @@ class _CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider.value(value: _weekBloc),
-        BlocProvider.value(value: _programBloc)
-      ], 
-      child: _buildHome());
+    return MultiBlocProvider(providers: [
+      BlocProvider.value(value: _weekBloc),
+      BlocProvider.value(value: _programBloc)
+    ], child: _buildHome());
   }
 
-  Widget _buildHome(){
+  Widget _buildHome() {
     return Scaffold(
-      body: Container(
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            gradient: RadialGradient(
-              colors: [Colors.grey[900]!, Colors.black],
-              radius: 0.5,
+        body: Container(
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        gradient: RadialGradient(
+          colors: [Colors.grey[900]!, Colors.black],
+          radius: 0.5,
+        ),
+      ),
+      child: Column(
+        children: [
+          Expanded(
+            child: BlocBuilder<WeekBloc, WeekState>(
+              buildWhen: (context, state) {
+                return state is WeekLoadingState ||
+                    state is WeekErrorState ||
+                    state is WeekNamesSuccessState ||
+                    state is SaveNewWeekSuccessState;
+              },
+              builder: (context, state) {
+                if (state is WeekErrorState) {
+                  return const Text(
+                      'An error occured while saving the new week.');
+                } else if (state is WeekLoadingState) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is WeekSuccessState) {
+                  return Container();
+                } else if (state is SaveNewWeekSuccessState) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text('Success!',
+                              style: TextStyle(color: Colors.white)),
+                          content: const Text(
+                              'New week has been added to your program.',
+                              style: TextStyle(color: Colors.white)),
+                          backgroundColor: AppColors.successGreen,
+                        );
+                      },
+                    ).then((_) {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ProgramsScreen(
+                                  coachDetails: widget.coachDetails)));
+                    });
+                  });
+                }
+
+                return _addWeekForm();
+              },
             ),
           ),
-          child: Column(
-            children: [
-              Expanded(
-                child: BlocConsumer<WeekBloc, WeekState>(
-                    buildWhen: (context, state) {
-                      return state is WeekLoadingState ||
-                          state is WeekErrorState ||
-                          state is WeekNamesSuccessState ||
-                          state is SaveNewWeekSuccessState;
-                    },
-                    builder: (context, state) {
-                      if (state is WeekErrorState) {
-                        return const Text(
-                            'An error occured while saving the new week.');
-                      } else if (state is WeekLoadingState) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else if (state is WeekSuccessState) {
-                        return Container();
-                      }else if(state is SaveNewWeekSuccessState){
-                        throw AwesomeDialog(
-                          context: context,
-                          dialogType: DialogType.success,
-                          animType: AnimType.topSlide,
-                          showCloseIcon: false,
-                          title: 'Success',
-                          desc: 'New week has been added to the program.'
-                          );
-                      }
-                
-                      return _addWeekForm();
-                    },
-                    listenWhen: (context, state) {
-                      return state is SaveNewWeekSuccessState;
-                    },
-                    listener: (context, state) {
-                      if (state is SaveNewWeekSuccessState) {
-                        //Navigate back to programs page
-                      }
-                    },
-                  ),
-              ),
-                Expanded(
-                  child: BlocBuilder<ProgramBloc, ProgramState>(
-                    buildWhen: (context, state){return state is GetProgramDtoSuccessState;},
-                    builder: (context,state){
-                      if(state is GetProgramDtoSuccessState){
-                        DateTime now = DateTime.now();
-                        String formattedDateTime = DateFormat('yyyy-MM-ddTHH:mm:ss').format(now);
+          Expanded(
+            child: BlocBuilder<ProgramBloc, ProgramState>(
+              buildWhen: (context, state) {
+                return state is GetProgramDtoSuccessState;
+              },
+              builder: (context, state) {
+                if (state is GetProgramDtoSuccessState) {
+                  DateTime now = DateTime.now();
+                  String formattedDateTime =
+                      DateFormat('yyyy-MM-ddTHH:mm:ss').format(now);
 
-                        programDto = state.programDto;
-                        _weekBloc.add(SaveNewWeekEvent(PostWeekDto(
-                          created_at: formattedDateTime, 
-                          week_name: weekNameTextController.text, 
-                          description: weekDescriptionValue, 
-                          program: programDto
-                          )
-                          ));
-                      }
-                      return Container();
-                    },
-                  ),
-                )
-            ],
-          ),
-          ));
+                  programDto = state.programDto;
+                  _weekBloc.add(SaveNewWeekEvent(PostWeekDto(
+                      created_at: formattedDateTime,
+                      week_name: weekNameTextController.text,
+                      description: weekDescriptionValue,
+                      program: programDto)));
+                }
+                return Container();
+              },
+            ),
+          )
+        ],
+      ),
+    ));
   }
 
   Widget _addWeekForm() {
@@ -147,7 +156,8 @@ class _CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
                   WeekDescriptionField(
                       weekNameTextController: weekNameTextController,
                       weekPage: widget.weeksPage,
-                      handleWeekDescriptionChanged: handleWeekDescriptionChanged),
+                      handleWeekDescriptionChanged:
+                          handleWeekDescriptionChanged),
                   const SizedBox(height: 30),
                   _saveButton(),
                 ])),
@@ -255,8 +265,8 @@ class _CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
   }
 
   void handleWeekDescriptionChanged(String? weekDescription) {
-    weekDescription != null ?
-    weekDescriptionValue = weekDescription :
-    weekDescriptionValue = "";
+    weekDescription != null
+        ? weekDescriptionValue = weekDescription
+        : weekDescriptionValue = "";
   }
 }
