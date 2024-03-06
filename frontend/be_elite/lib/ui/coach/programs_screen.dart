@@ -4,6 +4,7 @@ import 'package:be_elite/models/Coach/program_dto.dart';
 import 'package:be_elite/models/Week/week_dto.dart';
 import 'package:be_elite/repositories/coach/coach_repository.dart';
 import 'package:be_elite/repositories/coach/coach_repository_impl.dart';
+import 'package:be_elite/styles/app_colors.dart';
 import 'package:be_elite/ui/coach/coach_add_week_screen.dart';
 import 'package:be_elite/widgets/beElite_logo.dart';
 import 'package:be_elite/widgets/circular_avatar.dart';
@@ -41,7 +42,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             gradient: RadialGradient(
-              colors: [Colors.grey[900]!, Colors.black],
+              colors: [Colors.grey[800]!, Colors.grey[900]!],
               radius: 0.5,
             ),
           ),
@@ -204,61 +205,31 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                 ),
                 width: 350,
                 child: Card(
-                  color: Colors.grey[800],
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  clipBehavior: Clip.antiAliasWithSaveLayer,
-                  child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("${item.weekName} - Week ${item.id}",
-                              style: const TextStyle(fontSize: 20),
-                              softWrap: true,),
-                          const Divider(color: Colors.white),
-                          Text(item.description.toString(),
-                              style: TextStyle(
-                                color: Colors.grey[400],
-                              )),
-                          const Divider(color: Colors.white),
-                          Center(
-                            child: Wrap(
-                              alignment: WrapAlignment.spaceAround,
-                              children: item.sessions!.map((session) {
-                                return Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 4)
-                                          .copyWith(top: 20),
-                                  child: SizedBox(
-                                    width: 150,
-                                    child: OutlinedButton(
-                                      onPressed: () {},
-                                      style: ButtonStyle(
-                                          overlayColor:
-                                              MaterialStatePropertyAll(
-                                                  Colors.grey[850])),
-                                      child: session.sessionNumber! > 1
-                                          ? Text(
-                                              "${capitalizeFirstLetter(session.dayOfWeek!)} #${session.sessionNumber}",
-                                              style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.w100))
-                                          : Text(
-                                              capitalizeFirstLetter(
-                                                  session.dayOfWeek!),
-                                              style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.w100)),
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
+                  child: Column(
+                    children: [
+                      Stack(children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.mainYellow,
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(10),
+                              topRight: Radius.circular(10),
                             ),
                           ),
-                        ],
-                      )),
+                          height: 50,
+                        ),
+                        const Row(
+                          children: [
+                             Text('example'),
+                             Text('example 2')
+                          ],
+                        )
+                      ]),
+                      Container(
+                          height: 120,
+                        )
+                    ],
+                  ),
                 ),
               ),
             );
@@ -268,7 +239,93 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
     );
   }
 
-  Widget _addWeekButton() {
+  // Widget weeksWidget(WeekDto weekPage) {
+  //   return Container(
+  //     margin: const EdgeInsets.only(top: 30),
+  //     width: MediaQuery.of(context).size.width * 0.75,
+  //     child: SingleChildScrollView(
+  //       child: Column(
+  //         children: weekPage.content!.map((item) {
+  //           return Padding(
+  //             padding: const EdgeInsets.symmetric(vertical: 8.0)
+  //                 .copyWith(bottom: 40),
+  //             child: Container(
+  //               decoration: BoxDecoration(
+  //                 boxShadow: [
+  //                   BoxShadow(
+  //                     color: Colors.white.withOpacity(0.5),
+  //                     spreadRadius: 0.1,
+  //                     blurRadius: 10,
+  //                   ),
+  //                 ],
+  //               ),
+  //               width: 350,
+  //               child: Card(
+  //                 color: Colors.grey[800],
+  //                 shape: RoundedRectangleBorder(
+  //                   borderRadius: BorderRadius.circular(10),
+  //                 ),
+  //                 clipBehavior: Clip.antiAliasWithSaveLayer,
+  //                 child: Padding(
+  //                     padding: const EdgeInsets.all(8.0),
+  //                     child: Column(
+  //                       crossAxisAlignment: CrossAxisAlignment.start,
+  //                       children: [
+  //                         Text("${item.weekName} - Week ${item.id}",
+  //                             style: const TextStyle(fontSize: 20),
+  //                             softWrap: true,),
+  //                         const Divider(color: Colors.white),
+  //                         Text(item.description.toString(),
+  //                             style: TextStyle(
+  //                               color: Colors.grey[400],
+  //                             )),
+  //                         const Divider(color: Colors.white),
+  //                         Center(
+  //                           child: Wrap(
+  //                             alignment: WrapAlignment.spaceAround,
+  //                             children: item.sessions!.map((session) {
+  //                               return Padding(
+  //                                 padding:
+  //                                     const EdgeInsets.symmetric(horizontal: 4)
+  //                                         .copyWith(top: 20),
+  //                                 child: SizedBox(
+  //                                   width: 150,
+  //                                   child: OutlinedButton(
+  //                                     onPressed: () {},
+  //                                     style: ButtonStyle(
+  //                                         overlayColor:
+  //                                             MaterialStatePropertyAll(
+  //                                                 Colors.grey[850])),
+  //                                     child: session.sessionNumber! > 1
+  //                                         ? Text(
+  //                                             "${capitalizeFirstLetter(session.dayOfWeek!)} #${session.sessionNumber}",
+  //                                             style: const TextStyle(
+  //                                                 color: Colors.white,
+  //                                                 fontWeight: FontWeight.w100))
+  //                                         : Text(
+  //                                             capitalizeFirstLetter(
+  //                                                 session.dayOfWeek!),
+  //                                             style: const TextStyle(
+  //                                                 color: Colors.white,
+  //                                                 fontWeight: FontWeight.w100)),
+  //                                   ),
+  //                                 ),
+  //                               );
+  //                             }).toList(),
+  //                           ),
+  //                         ),
+  //                       ],
+  //                     )),
+  //               ),
+  //             ),
+  //           );
+  //         }).toList(),
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  Widget _addWeekButton() { // Change to floating button at bottom right
     return SizedBox(
       height: 25,
       child: GestureDetector(
@@ -277,12 +334,17 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
               context,
               MaterialPageRoute(
                   builder: (context) => CoachAddWeekScreen(
-                      programName: programName, weeksPage: weekPage, coachDetails: widget.coachDetails)));
+                      programName: programName,
+                      weeksPage: weekPage,
+                      coachDetails: widget.coachDetails)));
         },
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: [Icon(Icons.add_circle_outline_sharp), Text(' Add new week')],
+          children: [
+            Icon(Icons.add_circle_outline_sharp),
+            Text(' Add new week')
+          ],
         ),
       ),
     );
