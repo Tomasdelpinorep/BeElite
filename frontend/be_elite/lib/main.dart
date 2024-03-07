@@ -18,6 +18,7 @@ class MyApp extends StatelessWidget {
       title: 'BeElite',
       themeMode: ThemeMode.dark,
       darkTheme: ThemeData(
+          fontFamily: 'Roboto',
           scaffoldBackgroundColor: AppColors.completeBlack,
           brightness: Brightness.dark,
           bottomNavigationBarTheme: BottomNavigationBarThemeData(
@@ -26,7 +27,8 @@ class MyApp extends StatelessWidget {
               elevation: 5,
               unselectedIconTheme: const IconThemeData(color: Colors.white54),
               selectedLabelStyle: const TextStyle(color: Colors.white),
-              unselectedLabelStyle: const TextStyle(color: Colors.white54))),
+              unselectedLabelStyle: const TextStyle(color: Colors.white54)),
+              ),
       home: const LoginScreen(),
     );
   }
