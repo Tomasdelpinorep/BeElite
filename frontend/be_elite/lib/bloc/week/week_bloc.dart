@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:be_elite/models/Week/edit_week_dto.dart';
 import 'package:be_elite/models/Week/post_week_dto.dart';
 import 'package:be_elite/models/Week/week_dto.dart';
 import 'package:be_elite/repositories/coach/coach_repository.dart';
@@ -16,6 +17,7 @@ class WeekBloc extends Bloc<WeekEvent, WeekState> {
     on<GetWeekNamesEvent>(_getWeekNames);
     on<GetWeeksEvent>(_getWeeks);
     on<SaveNewWeekEvent>(_saveNewWeek);
+    on<SaveEditedWeekEvent>(_saveEditedWeek);
   }
 
   FutureOr<void> _getWeeks(GetWeeksEvent event, Emitter<WeekState> emit) async {
@@ -51,6 +53,18 @@ class WeekBloc extends Bloc<WeekEvent, WeekState> {
 
     try{
       final response = await coachRepository.saveNewWeek(event.newWeek);
+
+      emit(SaveNewWeekSuccessState(response));
+    }on Exception catch(e){
+      emit(WeekErrorState(e.toString()));
+    }
+  }
+
+  FutureOr<void> _saveEditedWeek(SaveEditedWeekEvent event, Emitter<WeekState> emit) async{
+    emit(WeekLoadingState());
+
+    try{
+      final response = await coachRepository.saveEditedWeek(event.editedWeek);
 
       emit(SaveNewWeekSuccessState(response));
     }on Exception catch(e){

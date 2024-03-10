@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:be_elite/models/Week/edit_week_dto.dart';
 import 'package:be_elite/models/Week/post_week_dto.dart';
 import 'package:be_elite/models/Week/week_dto.dart';
 import 'package:be_elite/repositories/coach/coach_repository.dart';
@@ -63,6 +63,26 @@ class CoachRepositoryImpl extends CoachRepository {
     );
 
     if(response.statusCode == 201){
+      return WeekDto.fromJson(json.decode(response.body));
+    }else{
+      throw Exception('There was an error saving new week.');
+    }
+  }
+
+  @override
+  Future<WeekDto> saveEditedWeek(EditWeekDto editedWeek) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    final response = await _client.put(
+      Uri.parse('$urlChrome/coach/coach1/weeks/edit'),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${prefs.getString('authToken')}'
+      },
+      body: jsonEncode(editedWeek.toJson())
+    );
+
+    if(response.statusCode == 200){
       return WeekDto.fromJson(json.decode(response.body));
     }else{
       throw Exception('There was an error saving new week.');

@@ -23,13 +23,11 @@ class _WeekDescriptionFieldState extends State<WeekDescriptionField> {
   @override
   void initState() {
     super.initState();
-    // Add listener to weekNameTextController
     widget.weekNameTextController.addListener(updateWeekDescription);
   }
 
   @override
   void dispose() {
-    // Remove listener to prevent memory leaks
     widget.weekNameTextController.removeListener(updateWeekDescription);
     super.dispose();
   }

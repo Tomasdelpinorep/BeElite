@@ -26,7 +26,7 @@ public class Week {
 
     private String description;
 
-    @OneToMany(mappedBy = "week")
+    @OneToMany(mappedBy = "week", cascade = CascadeType.REMOVE)
     private List<Session> sessions;
 
     @Id

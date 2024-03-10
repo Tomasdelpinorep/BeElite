@@ -6,6 +6,7 @@ import 'package:be_elite/repositories/coach/coach_repository.dart';
 import 'package:be_elite/repositories/coach/coach_repository_impl.dart';
 import 'package:be_elite/styles/app_colors.dart';
 import 'package:be_elite/ui/coach/coach_add_week_screen.dart';
+import 'package:be_elite/ui/coach/edit_week_screen.dart';
 import 'package:be_elite/widgets/beElite_logo.dart';
 import 'package:be_elite/widgets/circular_avatar.dart';
 import 'package:flutter/material.dart';
@@ -35,8 +36,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
+    return Container(
         alignment: Alignment.center,
         decoration: BoxDecoration(
           gradient: RadialGradient(
@@ -100,8 +100,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 
   Widget _programSelectorWidget() {
@@ -249,7 +248,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(capitalizeFirstLetter(week.weekName!),
+                                    Text('${capitalizeFirstLetter(week.weekName!)} - Week ${week.id}',
                                         style: const TextStyle(
                                             color: Colors.black,
                                             fontWeight: FontWeight.bold,
@@ -270,6 +269,13 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     GestureDetector(
+                                      onTap: (){
+                                        Navigator.push(context, MaterialPageRoute(builder: (context) => 
+                                        EditWeekScreen(week: week, 
+                                        programName : programName, 
+                                        coachDetails: widget.coachDetails, 
+                                        weekPage : weekPage)));
+                                      },
                                         child: const Icon(Icons.edit,
                                             color: Colors.black, size: 26)),
                                     const SizedBox(height: 5),

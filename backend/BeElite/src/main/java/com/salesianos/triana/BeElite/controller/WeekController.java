@@ -1,5 +1,6 @@
 package com.salesianos.triana.BeElite.controller;
 
+import com.salesianos.triana.BeElite.dto.Week.EditWeekDto;
 import com.salesianos.triana.BeElite.dto.Week.PostWeekDto;
 import com.salesianos.triana.BeElite.dto.Week.WeekDto;
 import com.salesianos.triana.BeElite.model.Coach;
@@ -56,5 +57,15 @@ public class WeekController {
                 .buildAndExpand(w.getId()).toUri();
 
         return ResponseEntity.created(createdUri).body(WeekDto.of(w));
+    }
+
+    @PutMapping("/coach/{coachUsername}/weeks/edit")
+    @PreAuthorize("hasRole('COACH') and #coach.id == principal.id or hasRole('ADMIN')")
+    WeekDto editWeek(@PathVariable String coachUsername,
+                                    @AuthenticationPrincipal Coach coach,
+                                    @Valid @RequestBody EditWeekDto editedWeek){
+        Week w = weekService.edit(editedWeek, coachUsername);
+
+        return WeekDto.of(w);
     }
 }

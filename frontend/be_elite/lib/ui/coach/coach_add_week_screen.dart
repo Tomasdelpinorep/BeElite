@@ -1,4 +1,5 @@
-import 'package:be_elite/bloc/bloc/program_bloc.dart';
+
+import 'package:be_elite/bloc/program/program_bloc.dart';
 import 'package:be_elite/bloc/week/week_bloc.dart';
 import 'package:be_elite/models/Coach/coach_details.dart';
 import 'package:be_elite/models/Coach/program_dto.dart';
@@ -26,10 +27,10 @@ class CoachAddWeekScreen extends StatefulWidget {
       required this.coachDetails});
 
   @override
-  State<CoachAddWeekScreen> createState() => _CoachAddWeekScreenState();
+  State<CoachAddWeekScreen> createState() => CoachAddWeekScreenState();
 }
 
-class _CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
+class CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
   final formKey = GlobalKey<FormState>();
   final weekNameTextController = TextEditingController();
   final weekDescriptionTextController = TextEditingController();
@@ -251,7 +252,7 @@ class _CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
     );
   }
 
-  Set<String> extractWeekNames(dynamic content) {
+  static Set<String> extractWeekNames(dynamic content) {
     Set<String> weekNames = {};
     if (content != null && content is List) {
       for (var item in content) {

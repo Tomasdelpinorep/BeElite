@@ -17,3 +17,8 @@ class GetWeekNamesEvent extends WeekEvent{
   final String programName;
   GetWeekNamesEvent(this.programName);
 }
+
+class SaveEditedWeekEvent extends WeekEvent{
+  final EditWeekDto editedWeek;
+  SaveEditedWeekEvent(this.editedWeek);
+}
