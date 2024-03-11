@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:be_elite/models/Week/edit_week_dto.dart';
 import 'package:be_elite/models/Week/post_week_dto.dart';
@@ -11,7 +12,7 @@ class CoachRepositoryImpl extends CoachRepository {
   final Client _client = Client();
 
   @override
-  Future<WeekDto> getWeeks(
+  FutureOr<WeekDto?> getWeeks(
       String authToken, String coachUsername, String programName) async {
     final response = await _client.get(
       Uri.parse('$urlChrome/coach/$coachUsername/$programName/weeks'),
@@ -23,7 +24,9 @@ class CoachRepositoryImpl extends CoachRepository {
 
     if (response.statusCode == 200) {
       return WeekDto.fromJson(json.decode(response.body));
-    } else {
+    }else if(response.statusCode == 404){
+      return null;
+    }else {
       throw Exception('Failed to get week data.');
     }
   }
@@ -85,7 +88,24 @@ class CoachRepositoryImpl extends CoachRepository {
     if(response.statusCode == 200){
       return WeekDto.fromJson(json.decode(response.body));
     }else{
-      throw Exception('There was an error saving new week.');
+      throw Exception('There was an error saving the week.');
+    }
+  }
+  
+  @override
+  Future<void> deleteWeek(String coachUsername, String programName, String weekName, int weekNumber) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    final response = await _client.delete(
+      Uri.parse('$urlChrome/coach/coach1/$programName/weeks/$weekName/$weekNumber'),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${prefs.getString('authToken')}'
+      },
+    );
+
+    if(response.statusCode != 204){
+      throw Exception('There was an error deleting the week.');
     }
   }
   }

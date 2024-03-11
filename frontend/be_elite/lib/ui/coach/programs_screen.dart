@@ -1,4 +1,4 @@
-import 'package:be_elite/bloc/week/week_bloc.dart';
+import 'package:be_elite/bloc/Week/week_bloc.dart';
 import 'package:be_elite/models/Coach/coach_details.dart';
 import 'package:be_elite/models/Coach/program_dto.dart';
 import 'package:be_elite/models/Week/week_dto.dart';
@@ -6,6 +6,7 @@ import 'package:be_elite/repositories/coach/coach_repository.dart';
 import 'package:be_elite/repositories/coach/coach_repository_impl.dart';
 import 'package:be_elite/styles/app_colors.dart';
 import 'package:be_elite/ui/coach/coach_add_week_screen.dart';
+import 'package:be_elite/ui/coach/coach_main_screen.dart';
 import 'package:be_elite/ui/coach/edit_week_screen.dart';
 import 'package:be_elite/widgets/beElite_logo.dart';
 import 'package:be_elite/widgets/circular_avatar.dart';
@@ -37,70 +38,70 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          gradient: RadialGradient(
-            colors: [Colors.grey[800]!, Colors.grey[900]!],
-            radius: 0.5,
-          ),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        gradient: RadialGradient(
+          colors: [Colors.grey[800]!, Colors.grey[900]!],
+          radius: 0.5,
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: Row(
-                  children: [
-                    CircularProfileAvatar(
-                        imageUrl: widget.coachDetails.profilePicUrl ??
-                            'https://i.imgur.com/jNNT4LE.png'),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            right:
-                                40), //This centers the welcome message over the program selector, 40 is avatar's radius
-                        child: Column(
-                          children: [
-                            Text('Hello ${widget.coachDetails.name}'),
-                            const Text(
-                              'Welcome Back!',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w700, fontSize: 18),
-                            )
-                          ],
-                        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: Row(
+                children: [
+                  CircularProfileAvatar(
+                      imageUrl: widget.coachDetails.profilePicUrl ??
+                          'https://i.imgur.com/jNNT4LE.png'),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          right:
+                              40), //This centers the welcome message over the program selector, 40 is avatar's radius
+                      child: Column(
+                        children: [
+                          Text('Hello ${widget.coachDetails.name}'),
+                          const Text(
+                            'Welcome Back!',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w700, fontSize: 18),
+                          )
+                        ],
                       ),
                     ),
-                    const BeEliteLogo()
-                  ],
-                ),
+                  ),
+                  const BeEliteLogo()
+                ],
               ),
-              const SizedBox(
-                height: 10,
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child:
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                _programSelectorWidget(),
+              ]),
+            ),
+            Expanded(
+              child: Stack(
+                children: [
+                  _weeksBlocWidget(),
+                  Positioned(bottom: 0, right: 0, child: _addWeekButton())
+                ],
               ),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child:
-                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  _programSelectorWidget(),
-                ]),
-              ),
-              Expanded(
-                child: Stack(
-                  children: [
-                    _weeksBlocWidget(),
-                    Positioned(bottom: 0, right: 0, child: _addWeekButton())
-                  ],
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
-      );
+      ),
+    );
   }
 
   Widget _programSelectorWidget() {
@@ -194,7 +195,8 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
           buildWhen: (context, state) {
             return state is WeekLoadingState ||
                 state is WeekErrorState ||
-                state is WeekSuccessState;
+                state is WeekSuccessState ||
+                state is EmptyWeekListState;
           },
           builder: (context, state) {
             if (state is WeekLoadingState) {
@@ -204,11 +206,37 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
             } else if (state is WeekSuccessState) {
               weekPage = state.week;
               return weeksWidget(state.week);
-            } else {
+            }else if (state is EmptyWeekListState){
+              weekPage = WeekDto();
+              return const Text('Your training weeks will appear here.');
+            }else {
               return const Placeholder();
             }
           },
-          listener: (context, state) {},
+          listener: (context, state) {
+            if(state is DeleteWeekSuccessState){
+              showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        // Show dialog
+                        return AlertDialog(
+                          title: const Text('Success!',
+                              style: TextStyle(color: Colors.white)),
+                          content: const Text('Week has been deleted.',
+                              style: TextStyle(color: Colors.white)),
+                          backgroundColor: AppColors.successGreen,
+                        );
+                      },
+                    );
+                    Future.delayed(const Duration(seconds: 1), () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const CoachMainScreen()),
+                      );
+                    });
+            }
+          },
         ),
       ),
     );
@@ -248,7 +276,8 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('${capitalizeFirstLetter(week.weekName!)} - Week ${week.id}',
+                                    Text(
+                                        '${capitalizeFirstLetter(week.weekName!)} - Week ${week.id}',
                                         style: const TextStyle(
                                             color: Colors.black,
                                             fontWeight: FontWeight.bold,
@@ -269,17 +298,70 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     GestureDetector(
-                                      onTap: (){
-                                        Navigator.push(context, MaterialPageRoute(builder: (context) => 
-                                        EditWeekScreen(week: week, 
-                                        programName : programName, 
-                                        coachDetails: widget.coachDetails, 
-                                        weekPage : weekPage)));
-                                      },
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      EditWeekScreen(
+                                                          week: week,
+                                                          programName:
+                                                              programName,
+                                                          coachDetails: widget
+                                                              .coachDetails,
+                                                          weekPage: weekPage)));
+                                        },
                                         child: const Icon(Icons.edit,
                                             color: Colors.black, size: 26)),
                                     const SizedBox(height: 5),
                                     GestureDetector(
+                                        onTap: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title: const Row(
+                                                  children: [
+                                                    Icon(Icons.delete),
+                                                    Expanded(
+                                                      child: Text('Delete?',
+                                                          style: TextStyle(
+                                                              color: Colors.white)),
+                                                    ),
+                                                  ],
+                                                ),
+                                                content: const Text(
+                                                    'All associated sessions will be deleted too.',
+                                                    style: TextStyle(
+                                                        color: Colors.white)),
+                                                backgroundColor:
+                                                    Colors.grey[800],
+                                                actions: [
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.spaceAround,
+                                                    children: [
+                                                      TextButton(
+                                                        style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.grey[600])),
+                                                          onPressed: () {
+                                                            Navigator.pop(context);
+                                                          },
+                                                          child:
+                                                              const Text('No', style: TextStyle(color: Colors.white))),
+                                                      TextButton(
+                                                        style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(AppColors.alertYellow)),
+                                                          onPressed: () {
+                                                            _weekBloc.add(DeleteWeekEvent(widget.coachDetails.username!, programName.replaceAll(' ', '%20'),week.weekName!.replaceAll(' ', '%20') ,week.id!));
+                                                          },
+                                                          child:
+                                                              const Text('Yes', style: TextStyle(color: Colors.white))),
+                                                    ],
+                                                  )
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        },
                                         child: const Icon(Icons.delete,
                                             color: Colors.black, size: 26))
                                   ],
@@ -366,12 +448,13 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
     return Container(
       height: 50,
       width: 50,
-      decoration: BoxDecoration(boxShadow: const [
-        BoxShadow(color: Colors.black54, spreadRadius: 2, blurRadius: 7)
-      ],
-      shape: BoxShape.rectangle,
-      borderRadius: BorderRadius.circular(10),
-    border: Border.all(color: Colors.black45, width: 2.0)),
+      decoration: BoxDecoration(
+          boxShadow: const [
+            BoxShadow(color: Colors.black54, spreadRadius: 2, blurRadius: 7)
+          ],
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: Colors.black45, width: 2.0)),
       child: FloatingActionButton(
           backgroundColor: Colors.yellowAccent,
           child: const Icon(Icons.add, color: Colors.black),

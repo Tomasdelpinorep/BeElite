@@ -18,6 +18,7 @@ class WeekBloc extends Bloc<WeekEvent, WeekState> {
     on<GetWeeksEvent>(_getWeeks);
     on<SaveNewWeekEvent>(_saveNewWeek);
     on<SaveEditedWeekEvent>(_saveEditedWeek);
+    on<DeleteWeekEvent>(_deleteWeek);
   }
 
   FutureOr<void> _getWeeks(GetWeeksEvent event, Emitter<WeekState> emit) async {
@@ -30,7 +31,7 @@ class WeekBloc extends Bloc<WeekEvent, WeekState> {
           prefs.getString('username')!,
           event.programName);
 
-      emit(WeekSuccessState(response));
+      response != null ? emit(WeekSuccessState(response)) : emit(EmptyWeekListState());
     } on Exception catch (e) {
       emit(WeekErrorState(e.toString()));
     }
@@ -67,6 +68,17 @@ class WeekBloc extends Bloc<WeekEvent, WeekState> {
       final response = await coachRepository.saveEditedWeek(event.editedWeek);
 
       emit(SaveNewWeekSuccessState(response));
+    }on Exception catch(e){
+      emit(WeekErrorState(e.toString()));
+    }
+  }
+
+  FutureOr<void> _deleteWeek(DeleteWeekEvent event, Emitter<WeekState> emit) async{
+    emit(WeekLoadingState());
+
+    try{
+      await coachRepository.deleteWeek(event.coachUsername, event.programName, event.weekName, event.weekNumber);
+      emit(DeleteWeekSuccessState());
     }on Exception catch(e){
       emit(WeekErrorState(e.toString()));
     }

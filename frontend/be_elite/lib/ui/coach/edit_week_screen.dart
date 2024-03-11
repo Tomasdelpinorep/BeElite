@@ -97,6 +97,7 @@ class _EditWeekScreenState extends State<EditWeekScreen> {
                           showDialog(
                             context: context,
                             builder: (BuildContext context) {
+                              // Show dialog
                               return AlertDialog(
                                 title: const Text('Success!',
                                     style: TextStyle(color: Colors.white)),
@@ -106,12 +107,14 @@ class _EditWeekScreenState extends State<EditWeekScreen> {
                                 backgroundColor: AppColors.successGreen,
                               );
                             },
-                          ).then((_) {
+                          );
+                          Future.delayed(const Duration(seconds: 1), () {
                             Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const CoachMainScreen()));
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const CoachMainScreen()),
+                            );
                           });
                         });
                       }

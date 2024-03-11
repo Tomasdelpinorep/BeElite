@@ -9,6 +9,7 @@ import com.salesianos.triana.BeElite.repository.ProgramRepository;
 import com.salesianos.triana.BeElite.repository.SessionRepository;
 import com.salesianos.triana.BeElite.repository.WeekRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -91,5 +92,14 @@ public class WeekService {
 
     private Long generateCompositeId(String week_name, UUID program_id) {
         return (long) (weekRepository.countWeeksByNameAndProgram(week_name, program_id) + 1);
+    }
+
+    @Transactional
+    public void deleteWeek(String coachUsername, String programName, String weekName, Long weekNumber){
+        Coach c = coachRepository.findByUsername(coachUsername).orElseThrow(() -> new NotFoundException("coach"));
+        Program p = programRepository.findByCoachAndProgramName(c.getId(),  programName).orElseThrow(() -> new NotFoundException("program"));
+
+        Week w = weekRepository.findById(WeekId.of(weekNumber, weekName, p)).orElseThrow(() -> new NotFoundException("week"));
+        weekRepository.delete(w);
     }
 }

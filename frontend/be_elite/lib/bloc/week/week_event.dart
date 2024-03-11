@@ -22,3 +22,11 @@ class SaveEditedWeekEvent extends WeekEvent{
   final EditWeekDto editedWeek;
   SaveEditedWeekEvent(this.editedWeek);
 }
+
+class DeleteWeekEvent extends WeekEvent{
+  final String coachUsername;
+  final String programName;
+  final String weekName;
+  final int weekNumber;
+  DeleteWeekEvent(this.coachUsername, this.programName, this.weekName, this.weekNumber);
+}

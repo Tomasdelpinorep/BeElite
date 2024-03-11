@@ -68,4 +68,15 @@ public class WeekController {
 
         return WeekDto.of(w);
     }
+
+    @DeleteMapping("/coach/{coachUsername}/{programName}/weeks/{weekName}/{weekNumber}")
+    @PreAuthorize("hasRole('COACH') and #coach.id == principal.id or hasRole('ADMIN')")
+    public ResponseEntity<?> deleteWeek(@PathVariable String coachUsername,
+                                             @PathVariable String programName,
+                                             @PathVariable String weekName,
+                                             @PathVariable Long weekNumber,
+                                             @AuthenticationPrincipal Coach coach){
+        weekService.deleteWeek(coachUsername, programName, weekName, weekNumber);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -1,10 +1,9 @@
-
 import 'package:be_elite/bloc/program/program_bloc.dart';
 import 'package:be_elite/bloc/week/week_bloc.dart';
 import 'package:be_elite/models/Coach/coach_details.dart';
 import 'package:be_elite/models/Coach/program_dto.dart';
 import 'package:be_elite/models/Week/post_week_dto.dart';
-import 'package:be_elite/ui/coach/programs_screen.dart';
+import 'package:be_elite/ui/coach/coach_main_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:be_elite/models/Week/week_dto.dart';
 import 'package:be_elite/repositories/coach/coach_repository.dart';
@@ -18,12 +17,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CoachAddWeekScreen extends StatefulWidget {
   final String programName;
-  final WeekDto weeksPage;
+  final WeekDto? weeksPage;
   final CoachDetails coachDetails;
   const CoachAddWeekScreen(
       {super.key,
       required this.programName,
-      required this.weeksPage,
+      this.weeksPage,
       required this.coachDetails});
 
   @override
@@ -93,21 +92,22 @@ class CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
+                        // Show dialog
                         return AlertDialog(
                           title: const Text('Success!',
                               style: TextStyle(color: Colors.white)),
-                          content: const Text(
-                              'New week has been added to your program.',
+                          content: const Text('New week has been created.',
                               style: TextStyle(color: Colors.white)),
                           backgroundColor: AppColors.successGreen,
                         );
                       },
-                    ).then((_) {
+                    );
+                    Future.delayed(const Duration(seconds: 1), () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ProgramsScreen(
-                                  coachDetails: widget.coachDetails)));
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const CoachMainScreen()),
+                      );
                     });
                   });
                 }
@@ -167,8 +167,9 @@ class CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
   }
 
   Widget _weekNameField() {
-    List<String> existingWeekNames =
-        List.from(extractWeekNames(widget.weeksPage.content!));
+    List<String> existingWeekNames = widget.weeksPage?.content != null
+        ? List.from(extractWeekNames(widget.weeksPage!.content))
+        : [];
 
     return SizedBox(
       width: 400,
@@ -261,6 +262,8 @@ class CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
           weekNames.add(weekName);
         }
       }
+    } else {
+      return {};
     }
     return weekNames;
   }

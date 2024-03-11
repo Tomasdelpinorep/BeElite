@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 
 class WeekDescriptionField extends StatefulWidget {
   final TextEditingController weekNameTextController;
-  final WeekDto weekPage;
+  final WeekDto? weekPage;
   final Function handleWeekDescriptionChanged;
   const WeekDescriptionField(
       {super.key,
       required this.weekNameTextController,
-      required this.weekPage,
+      this.weekPage,
       required this.handleWeekDescriptionChanged});
 
   @override
@@ -33,19 +33,21 @@ class _WeekDescriptionFieldState extends State<WeekDescriptionField> {
   }
 
   void updateWeekDescription() {
-    String currentWeekName = widget.weekNameTextController.text;
-    Content? matchingWeek = widget.weekPage.content?.firstWhere(
-        (week) => week.weekName == currentWeekName,
-        orElse: () => Content());
-    setState(() {
-      if (matchingWeek == Content()) {
-        weekDescription = 'Week description';
-      } else {
-        weekDescription = matchingWeek?.description;
-        weekDescriptionTextController.text = weekDescription!;
-      }
-      widget.handleWeekDescriptionChanged(weekDescription);
-    });
+    if (widget.weekPage != null) {
+      String currentWeekName = widget.weekNameTextController.text;
+      Content? matchingWeek = widget.weekPage?.content?.firstWhere(
+          (week) => week.weekName == currentWeekName,
+          orElse: () => Content());
+      setState(() {
+        if (matchingWeek == Content()) {
+          weekDescription = 'Week description';
+        } else {
+          weekDescription = matchingWeek?.description;
+          weekDescriptionTextController.text = weekDescription!;
+        }
+        widget.handleWeekDescriptionChanged(weekDescription);
+      });
+    }
   }
 
   @override
@@ -66,7 +68,7 @@ class _WeekDescriptionFieldState extends State<WeekDescriptionField> {
               borderSide: BorderSide(color: Colors.white),
             ),
           ),
-          onChanged: (value){
+          onChanged: (value) {
             widget.handleWeekDescriptionChanged(value);
           },
           validator: (value) {
