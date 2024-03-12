@@ -15,24 +15,20 @@ import java.util.List;
 @Builder
 @Getter
 @Setter
-@IdClass(WeekId.class)
 public class Week {
 
-    @Id
-    private Long id;
-
-    @Id
-    private String week_name;
+    @EmbeddedId
+    private WeekId id;
 
     private String description;
 
-    @OneToMany(mappedBy = "week", cascade = CascadeType.REMOVE)
-    private List<Session> sessions;
-
-    @Id
     @ManyToOne
+    @MapsId("program_id")
     @JoinColumn(name = "program_id")
     private Program program;
+
+    @OneToMany(mappedBy = "week", cascade = CascadeType.REMOVE)
+    private List<Session> sessions;
 
     @CreatedDate
     LocalDateTime createdAt;

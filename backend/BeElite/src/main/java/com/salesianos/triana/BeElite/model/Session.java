@@ -22,8 +22,9 @@ public class Session {
 
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "week_id", referencedColumnName = "id"),
-            @JoinColumn(name = "week_name", referencedColumnName = "week_name")
+            @JoinColumn(name = "week_number", referencedColumnName = "week_number"),
+            @JoinColumn(name = "week_name", referencedColumnName = "week_name"),
+            @JoinColumn(name = "program_id", referencedColumnName = "program_id")
     })
     private Week week;
 

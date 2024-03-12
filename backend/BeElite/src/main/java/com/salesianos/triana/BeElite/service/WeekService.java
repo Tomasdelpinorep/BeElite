@@ -54,7 +54,7 @@ public class WeekService {
         Coach c = coachRepository.findByUsername(coachUsername).orElseThrow(() -> new NotFoundException("coach"));
         Program p = programRepository.findByCoachAndProgramName(c.getId(), newWeek.program().program_name())
                 .orElseThrow(() -> new NotFoundException("program"));
-        Long weekId = generateCompositeId(newWeek.week_name(), p.getId());
+        Long weekId = generateWeekNumber(newWeek.week_name(), p.getId());
 
         return weekRepository.save(PostWeekDto.toEntity(newWeek, p, weekId));
     }
@@ -90,7 +90,7 @@ public class WeekService {
     }
 
 
-    private Long generateCompositeId(String week_name, UUID program_id) {
+    private Long generateWeekNumber(String week_name, UUID program_id) {
         return (long) (weekRepository.countWeeksByNameAndProgram(week_name, program_id) + 1);
     }
 

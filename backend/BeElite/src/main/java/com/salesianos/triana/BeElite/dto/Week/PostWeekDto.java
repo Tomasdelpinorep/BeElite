@@ -3,6 +3,7 @@ package com.salesianos.triana.BeElite.dto.Week;
 import com.salesianos.triana.BeElite.dto.Program.ProgramDto;
 import com.salesianos.triana.BeElite.model.Program;
 import com.salesianos.triana.BeElite.model.Week;
+import com.salesianos.triana.BeElite.model.WeekId;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
@@ -18,13 +19,11 @@ public record PostWeekDto(
         ProgramDto program
 ) {
 
-        public static Week toEntity(PostWeekDto newWeek, Program p, Long weekId){
+        public static Week toEntity(PostWeekDto newWeek, Program p, Long weekNumber){
                 return Week.builder()
-                        .id(weekId)
+                        .id(WeekId.of(weekNumber, newWeek.week_name, p))
                         .createdAt(newWeek.created_at)
-                        .week_name(newWeek.week_name)
                         .description(newWeek.description())
-                        .program(p)
                         .build();
         }
 }

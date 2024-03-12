@@ -14,18 +14,18 @@ public record WeekDto(
         String weekName,
         String description,
         List<SessionDto> sessions,
-        Long id,
+        Long weekNumber,
         LocalDateTime created_at
 ) {
 
     public static WeekDto of(Week w){
         return WeekDto.builder()
-                .weekName(w.getWeek_name())
+                .weekName(w.getId().getWeek_name())
                 .description(w.getDescription())
                 .sessions(w.getSessions() != null ?
                         w.getSessions().stream().map(SessionDto::of).toList() :
                         List.of())
-                .id(w.getId())
+                .weekNumber(w.getId().getWeek_number())
                 .created_at(w.getCreatedAt())
                 .build();
     }

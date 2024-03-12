@@ -85,7 +85,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
               return _buildHome(state.week);
             } else if (state is EmptyWeekListState) {
               weekPage = WeekDto();
-              return const Text('Your training weeks will appear here.');
+              return _buildEmptyHome();
             } else {
               return const Placeholder();
             }
@@ -117,6 +117,26 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildEmptyHome(){
+    return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _topBarWidget(),
+            Expanded(
+              child: Stack(
+                children: [
+                  const Center(child: Text('Your training weeks will appear here.')),
+                  Positioned(bottom: 0, right: 0, child: _addWeekButton())
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
   }
 
   Widget _buildHome(WeekDto weekPage){

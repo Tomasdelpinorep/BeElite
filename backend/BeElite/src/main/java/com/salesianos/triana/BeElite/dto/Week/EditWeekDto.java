@@ -3,6 +3,7 @@ package com.salesianos.triana.BeElite.dto.Week;
 import com.salesianos.triana.BeElite.dto.Program.ProgramDto;
 import com.salesianos.triana.BeElite.model.Program;
 import com.salesianos.triana.BeElite.model.Week;
+import com.salesianos.triana.BeElite.model.WeekId;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -24,11 +25,9 @@ public class EditWeekDto{
         Long week_number;
         public static Week toEntity(EditWeekDto editedWeek, Program p){
                 return Week.builder()
-                        .id(editedWeek.week_number)
+                        .id(WeekId.of(editedWeek.getWeek_number(), editedWeek.getWeek_name(), p))
                         .createdAt(editedWeek.created_at)
-                        .week_name(editedWeek.week_name)
                         .description(editedWeek.description)
-                        .program(p)
                         .build();
         }
 }
