@@ -5,6 +5,7 @@ import 'package:be_elite/models/Week/week_dto.dart';
 import 'package:be_elite/repositories/coach/coach_repository.dart';
 import 'package:be_elite/repositories/coach/coach_repository_impl.dart';
 import 'package:be_elite/styles/app_colors.dart';
+import 'package:be_elite/ui/coach/add_program_screen.dart';
 import 'package:be_elite/ui/coach/coach_add_week_screen.dart';
 import 'package:be_elite/ui/coach/coach_main_screen.dart';
 import 'package:be_elite/ui/coach/edit_week_screen.dart';
@@ -12,6 +13,7 @@ import 'package:be_elite/widgets/beElite_logo.dart';
 import 'package:be_elite/widgets/circular_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProgramsScreen extends StatefulWidget {
   final CoachDetails coachDetails;
@@ -22,6 +24,7 @@ class ProgramsScreen extends StatefulWidget {
 }
 
 class _ProgramsScreenState extends State<ProgramsScreen> {
+  late String dropDownValue;
   late CoachRepository _coachRepository;
   late WeekBloc _weekBloc;
   late String programName;
@@ -31,8 +34,26 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
   void initState() {
     _coachRepository = CoachRepositoryImpl();
     programName = widget.coachDetails.programs!.first.program_name.toString();
-    _weekBloc = WeekBloc(_coachRepository)..add(GetWeeksEvent(programName));
+    _weekBloc = WeekBloc(_coachRepository);
+    _loadDropDownValue();
     super.initState();
+  }
+
+  // Method to load the dropdown value from shared preferences
+  Future<void> _loadDropDownValue() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      dropDownValue = (prefs.getString('selectedValue') ??
+          widget.coachDetails.programs?.first.program_name)!;
+    });
+
+    _weekBloc.add(GetWeeksEvent(dropDownValue));
+  }
+
+  //Method to save the selected value to shared preferences
+  Future<void> _saveDropDownValue(String value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('selectedValue', value);
   }
 
   @override
@@ -45,68 +66,126 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
           radius: 0.5,
         ),
       ),
-      child: Padding(
+      child: BlocProvider.value(
+        value: _weekBloc,
+        child: BlocConsumer<WeekBloc, WeekState>(
+          buildWhen: (context, state) {
+            return state is WeekLoadingState ||
+                state is WeekErrorState ||
+                state is WeekSuccessState ||
+                state is EmptyWeekListState;
+          },
+          builder: (context, state) {
+            if (state is WeekLoadingState) {
+              return const CircularProgressIndicator();
+            } else if (state is WeekErrorState) {
+              return const Text('Error fetching week data.');
+            } else if (state is WeekSuccessState) {
+              weekPage = state.week;
+              return _buildHome(state.week);
+            } else if (state is EmptyWeekListState) {
+              weekPage = WeekDto();
+              return const Text('Your training weeks will appear here.');
+            } else {
+              return const Placeholder();
+            }
+          },
+          listener: (context, state) {
+            if (state is DeleteWeekSuccessState) {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  // Show dialog
+                  return AlertDialog(
+                    title: const Text('Success!',
+                        style: TextStyle(color: Colors.white)),
+                    content: const Text('Week has been deleted.',
+                        style: TextStyle(color: Colors.white)),
+                    backgroundColor: AppColors.successGreen,
+                  );
+                },
+              );
+              Future.delayed(const Duration(seconds: 1), () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const CoachMainScreen()),
+                );
+              });
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHome(WeekDto weekPage){
+    return Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: Row(
-                children: [
-                  CircularProfileAvatar(
-                      imageUrl: widget.coachDetails.profilePicUrl ??
-                          'https://i.imgur.com/jNNT4LE.png'),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          right:
-                              40), //This centers the welcome message over the program selector, 40 is avatar's radius
-                      child: Column(
-                        children: [
-                          Text('Hello ${widget.coachDetails.name}'),
-                          const Text(
-                            'Welcome Back!',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w700, fontSize: 18),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                  const BeEliteLogo()
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child:
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                _programSelectorWidget(),
-              ]),
-            ),
+            _topBarWidget(),
             Expanded(
               child: Stack(
                 children: [
-                  _weeksBlocWidget(),
+                  weeksWidget(weekPage),
                   Positioned(bottom: 0, right: 0, child: _addWeekButton())
                 ],
               ),
             ),
           ],
         ),
-      ),
+      );
+  }
+
+  Widget _topBarWidget() {
+    return Column(
+      children: [
+        SizedBox(
+          width: double.infinity,
+          height: 50,
+          child: Row(
+            children: [
+              CircularProfileAvatar(
+                  imageUrl: widget.coachDetails.profilePicUrl ??
+                      'https://i.imgur.com/jNNT4LE.png'),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                      right:
+                          40), //This centers the welcome message over the program selector, 40 is avatar's radius
+                  child: Column(
+                    children: [
+                      Text('Hello ${widget.coachDetails.name}'),
+                      const Text(
+                        'Welcome Back!',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w700, fontSize: 18),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              const BeEliteLogo()
+            ],
+          ),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        SizedBox(
+          width: double.infinity,
+          height: 50,
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            _programSelectorWidget(),
+          ]),
+        ),
+      ],
     );
   }
 
   Widget _programSelectorWidget() {
-    String dropDownValue =
-        widget.coachDetails.programs?.first.program_name ?? '';
     List<ProgramDto> programs = [];
 
     if (widget.coachDetails.programs != null) {
@@ -116,7 +195,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
     }
 
     return Container(
-      width: 300,
+      width: 472,
       height: 75,
       decoration: BoxDecoration(
         color: Colors.transparent,
@@ -125,33 +204,44 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
       child: Center(
         child: DropdownButton<String>(
           focusColor: Colors.transparent,
-          underline: Container(
-            height: 0,
-          ),
+          underline: Container(),
           items: [
             // Existing programs
             ...programs.map((ProgramDto program) {
               return DropdownMenuItem<String>(
                 value: program.program_name,
-                child: Row(
-                  children: [
-                    Image.network(
-                      program.image!,
-                      width: 50,
-                      height: 50,
-                      fit: BoxFit.cover,
-                    ),
-                    const SizedBox(width: 25),
-                    Text(
-                      program.program_name!,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24,
-                        color: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      program.image!.isNotEmpty
+                          ? Image.network(
+                              program.image!,
+                              width: 50,
+                              height: 50,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.network(
+                              'https://i.imgur.com/95vlMNd.jpg',
+                              width: 50,
+                              height: 50,
+                              fit: BoxFit.cover,
+                            ),
+                      const SizedBox(width: 25),
+                      Text(
+                        program.program_name!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
+                onTap: () {
+                  _weekBloc.add(GetWeeksEvent(program.program_name!));
+                },
               );
             }),
             // "Create New" option
@@ -174,67 +264,26 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
               ),
             ),
           ],
-          onChanged: (String? newValue) {
-            setState(() {
-              dropDownValue = newValue!;
-              programName = dropDownValue;
-            });
-          },
           value: dropDownValue,
-        ),
-      ),
-    );
-  }
+          onChanged: (String? newValue) {
+            if (newValue != dropDownValue) {
+              switch (newValue) {
+                case 'new':
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => CoachAddProgramScreen(
+                              coachDetails: widget.coachDetails)));
+                  break;
+              }
 
-  Widget _weeksBlocWidget() {
-    return Container(
-      alignment: Alignment.center,
-      child: BlocProvider.value(
-        value: _weekBloc,
-        child: BlocConsumer<WeekBloc, WeekState>(
-          buildWhen: (context, state) {
-            return state is WeekLoadingState ||
-                state is WeekErrorState ||
-                state is WeekSuccessState ||
-                state is EmptyWeekListState;
-          },
-          builder: (context, state) {
-            if (state is WeekLoadingState) {
-              return const CircularProgressIndicator();
-            } else if (state is WeekErrorState) {
-              return const Text('Error fetching week data.');
-            } else if (state is WeekSuccessState) {
-              weekPage = state.week;
-              return weeksWidget(state.week);
-            }else if (state is EmptyWeekListState){
-              weekPage = WeekDto();
-              return const Text('Your training weeks will appear here.');
-            }else {
-              return const Placeholder();
-            }
-          },
-          listener: (context, state) {
-            if(state is DeleteWeekSuccessState){
-              showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        // Show dialog
-                        return AlertDialog(
-                          title: const Text('Success!',
-                              style: TextStyle(color: Colors.white)),
-                          content: const Text('Week has been deleted.',
-                              style: TextStyle(color: Colors.white)),
-                          backgroundColor: AppColors.successGreen,
-                        );
-                      },
-                    );
-                    Future.delayed(const Duration(seconds: 1), () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const CoachMainScreen()),
-                      );
-                    });
+              setState(() {
+                dropDownValue = newValue!;
+                programName = dropDownValue;
+                _saveDropDownValue(dropDownValue);
+              });
+
+              _weekBloc.add(GetWeeksEvent(programName));
             }
           },
         ),
@@ -326,7 +375,8 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                                     Expanded(
                                                       child: Text('Delete?',
                                                           style: TextStyle(
-                                                              color: Colors.white)),
+                                                              color: Colors
+                                                                  .white)),
                                                     ),
                                                   ],
                                                 ),
@@ -339,22 +389,49 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                                 actions: [
                                                   Row(
                                                     mainAxisAlignment:
-                                                        MainAxisAlignment.spaceAround,
+                                                        MainAxisAlignment
+                                                            .spaceAround,
                                                     children: [
                                                       TextButton(
-                                                        style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.grey[600])),
+                                                          style: ButtonStyle(
+                                                              backgroundColor:
+                                                                  MaterialStatePropertyAll(
+                                                                      Colors.grey[
+                                                                          600])),
                                                           onPressed: () {
-                                                            Navigator.pop(context);
+                                                            Navigator.pop(
+                                                                context);
                                                           },
-                                                          child:
-                                                              const Text('No', style: TextStyle(color: Colors.white))),
+                                                          child: const Text(
+                                                              'No',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white))),
                                                       TextButton(
-                                                        style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(AppColors.alertYellow)),
+                                                          style: ButtonStyle(
+                                                              backgroundColor:
+                                                                  MaterialStatePropertyAll(
+                                                                      AppColors
+                                                                          .alertYellow)),
                                                           onPressed: () {
-                                                            _weekBloc.add(DeleteWeekEvent(widget.coachDetails.username!, programName.replaceAll(' ', '%20'),week.weekName!.replaceAll(' ', '%20') ,week.id!));
+                                                            _weekBloc.add(DeleteWeekEvent(
+                                                                widget.coachDetails
+                                                                    .username!,
+                                                                programName
+                                                                    .replaceAll(
+                                                                        ' ',
+                                                                        '%20'),
+                                                                week.weekName!
+                                                                    .replaceAll(
+                                                                        ' ',
+                                                                        '%20'),
+                                                                week.id!));
                                                           },
-                                                          child:
-                                                              const Text('Yes', style: TextStyle(color: Colors.white))),
+                                                          child: const Text(
+                                                              'Yes',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white))),
                                                     ],
                                                   )
                                                 ],

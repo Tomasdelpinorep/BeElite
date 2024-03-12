@@ -7,9 +7,11 @@ import org.apache.catalina.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Builder
 public record CoachDetailsDto(
+        UUID id,
         String username,
         String name,
         String email,
@@ -21,6 +23,7 @@ public record CoachDetailsDto(
 
     public static CoachDetailsDto of(Coach c){
         return CoachDetailsDto.builder()
+                .id(c.getId())
                 .username(c.getUsername())
                 .name(c.getName())
                 .email(c.getEmail())

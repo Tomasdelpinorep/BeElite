@@ -5,6 +5,8 @@ sealed class ProgramState {}
 
 final class ProgramInitial extends ProgramState {}
 
+final class ProgramLoadingState extends ProgramState{}
+
 final class ProgramErrorState extends ProgramState{
   final String errorMessage;
   ProgramErrorState(this.errorMessage);
@@ -14,3 +16,9 @@ final class GetProgramDtoSuccessState extends ProgramState{
   final ProgramDto programDto;
   GetProgramDtoSuccessState(this.programDto);
 }
+
+final class CreateProgramSuccessState extends ProgramState{
+  final PostProgramDto program;
+  CreateProgramSuccessState(this.program);
+}
+

@@ -15,7 +15,6 @@ public record PostProgramDto(
         String programName,
         @NotEmpty(message = "Program description cannot be empty.")
         String description,
-        @NotEmpty(message = "Image URL cannot be empty.")
         String image,
         LocalDate createdAt,
         @NotNull(message = "A program must be linked to a valid coach id.")

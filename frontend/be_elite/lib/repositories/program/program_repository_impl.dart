@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:be_elite/models/Coach/program_dto.dart';
+import 'package:be_elite/models/Program/post_program_dto.dart';
 import 'package:be_elite/repositories/program/program_repository.dart';
 import 'package:be_elite/variables.dart';
 import 'package:http/http.dart';
@@ -25,6 +26,26 @@ class ProgramRepositoryImpl implements ProgramRepository{
       return ProgramDto.fromJson(json.decode(response.body));
     } else {
       throw Exception('Failed to get program dto.');
+    }
+  }
+
+  @override
+  Future<PostProgramDto> createNewProgram(PostProgramDto program) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    final response = await _client.post(
+      Uri.parse('$urlChrome/coach/program'),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${prefs.getString('authToken')}'
+      },
+      body: jsonEncode(program.toJson())
+    );
+
+    if(response.statusCode == 201){
+      return PostProgramDto.fromJson(json.decode(response.body));
+    }else{
+      throw Exception('Error creating new program.');
     }
   }
   

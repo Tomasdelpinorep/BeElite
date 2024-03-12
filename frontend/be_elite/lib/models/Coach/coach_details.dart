@@ -2,6 +2,7 @@ import 'user_dto.dart';
 import 'program_dto.dart';
 
 class CoachDetails {
+  String? id;
   String? username;
   String? name;
   String? email;
@@ -11,6 +12,7 @@ class CoachDetails {
   List<ProgramDto>? programs;
 
   CoachDetails({
+    this.id,
     this.username,
     this.name,
     this.email,
@@ -21,6 +23,7 @@ class CoachDetails {
   });
 
   factory CoachDetails.fromJson(Map<String, dynamic> json) => CoachDetails(
+        id: json['id'] as String?,
         username: json['username'] as String?,
         name: json['name'] as String?,
         email: json['email'] as String?,
@@ -37,6 +40,7 @@ class CoachDetails {
       );
 
   Map<String, dynamic> toJson() => {
+        'id': id,
         'username': username,
         'name': name,
         'email': email,

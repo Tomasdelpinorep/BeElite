@@ -65,7 +65,7 @@ class CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         gradient: RadialGradient(
-          colors: [Colors.grey[900]!, Colors.black],
+          colors: [Colors.grey[800]!, Colors.grey[900]!],
           radius: 0.5,
         ),
       ),
