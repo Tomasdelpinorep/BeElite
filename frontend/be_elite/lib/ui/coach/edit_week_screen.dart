@@ -143,7 +143,7 @@ class _EditWeekScreenState extends State<EditWeekScreen> {
                             original_name: widget.week.weekName,
                             description: weekDescriptionTextController.text,
                             program: programDto,
-                            week_number: widget.week.id)));
+                            week_number: widget.week.weekNumber)));
                       }
                       return Container();
                     },

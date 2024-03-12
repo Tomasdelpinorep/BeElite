@@ -33,7 +33,6 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
   @override
   void initState() {
     _coachRepository = CoachRepositoryImpl();
-    programName = widget.coachDetails.programs!.first.program_name.toString();
     _weekBloc = WeekBloc(_coachRepository);
     _loadDropDownValue();
     super.initState();
@@ -45,6 +44,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
     setState(() {
       dropDownValue = (prefs.getString('selectedValue') ??
           widget.coachDetails.programs?.first.program_name)!;
+      programName = dropDownValue;
     });
 
     _weekBloc.add(GetWeeksEvent(dropDownValue));
@@ -346,7 +346,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                        '${capitalizeFirstLetter(week.weekName!)} - Week ${week.id}',
+                                        '${capitalizeFirstLetter(week.weekName!)} - Week ${week.weekNumber}',
                                         style: const TextStyle(
                                             color: Colors.black,
                                             fontWeight: FontWeight.bold,
@@ -445,7 +445,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                                                     .replaceAll(
                                                                         ' ',
                                                                         '%20'),
-                                                                week.id!));
+                                                                week.weekNumber!));
                                                           },
                                                           child: const Text(
                                                               'Yes',

@@ -4,10 +4,10 @@ class Content {
 	String? weekName;
 	String? description;
 	List<Session>? sessions;
-	int? id;
+	int? weekNumber;
   String? created_at;
 
-	Content({this.weekName, this.description, this.sessions, this.id, this.created_at});
+	Content({this.weekName, this.description, this.sessions, this.weekNumber, this.created_at});
 
 	factory Content.fromJson(Map<String, dynamic> json) => Content(
 				weekName: json['weekName'] as String?,
@@ -15,7 +15,7 @@ class Content {
 				sessions: (json['sessions'] as List<dynamic>?)
 						?.map((e) => Session.fromJson(e as Map<String, dynamic>))
 						.toList(),
-				id: json['id'] as int?,
+				weekNumber: json['weekNumber'] as int?,
         created_at: json['created_at'] as String?,
 			);
 
@@ -23,7 +23,7 @@ class Content {
 				'weekName': weekName,
 				'description': description,
 				'sessions': sessions?.map((e) => e.toJson()).toList(),
-				'id': id,
+				'weekNumber': weekNumber,
         'created_at': created_at,
 			};
 }
