@@ -27,5 +27,5 @@ public class Session{
 
     private String subtitle;
 
-    private int same_day_session_number;
+    private Integer same_day_session_number;
 }

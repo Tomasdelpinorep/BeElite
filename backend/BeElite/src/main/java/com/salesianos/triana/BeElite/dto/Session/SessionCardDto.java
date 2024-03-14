@@ -1,11 +1,8 @@
 package com.salesianos.triana.BeElite.dto.Session;
 
 import com.salesianos.triana.BeElite.dto.Block.BlockDto;
-import com.salesianos.triana.BeElite.dto.Week.WeekDto;
 import com.salesianos.triana.BeElite.model.Session;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -26,9 +23,9 @@ public record SessionCardDto(LocalDate date,
         return SessionCardDto.builder()
                 .date(s.getDate())
                 .sessionNumber(s.getId().getSession_number())
-                .programId(s.getId().getWeekId().getProgram_id())
-                .weekName(s.getId().getWeekId().getWeek_name())
-                .weekNumber(s.getId().getWeekId().getWeek_number())
+                .programId(s.getId().getWeek_id().getProgram_id())
+                .weekName(s.getId().getWeek_id().getWeek_name())
+                .weekNumber(s.getId().getWeek_id().getWeek_number())
                 .blocks(s.getBlocks() != null ?
                         s.getBlocks().stream().map(BlockDto::of).toList() :
                         List.of())

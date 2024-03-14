@@ -1,5 +1,6 @@
 package com.salesianos.triana.BeElite.service;
 
+import com.salesianos.triana.BeElite.dto.Session.PostSessionDto;
 import com.salesianos.triana.BeElite.exception.NotFoundException;
 import com.salesianos.triana.BeElite.model.Coach;
 import com.salesianos.triana.BeElite.model.Composite_Ids.SessionId;
@@ -11,7 +12,10 @@ import com.salesianos.triana.BeElite.repository.CoachRepository;
 import com.salesianos.triana.BeElite.repository.ProgramRepository;
 import com.salesianos.triana.BeElite.repository.WeekRepository;
 import com.salesianos.triana.BeElite.repository.SessionRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,13 +27,25 @@ public class SessionService {
     private final WeekRepository weekRepository;
     private final SessionRepository sessionRepository;
 
-    public Session findDetailsById(String coachName, String programName,
-                                   String weekName, Long weekNumber, Long sessionNumber){
+    public Page<Session> findCardPageById(Pageable page, String coachName, String programName,
+                                         String weekName, Long weekNumber, Long sessionNumber){
 
         Coach c = coachRepository.findByUsername(coachName).orElseThrow(() -> new NotFoundException("coach"));
         Program p = programRepository.findByCoachAndProgramName(c.getId(), programName).orElseThrow(() -> new NotFoundException("program"));
-        Week w = weekRepository.findById(WeekId.of(weekNumber, weekName, p.getId())).orElseThrow(() -> new NotFoundException("week"));
 
-        return sessionRepository.findById(SessionId.of(sessionNumber, WeekId.of(weekNumber, weekName, p.getId()))).orElseThrow(() -> new NotFoundException("session"));
+        Page<Session> pagedResult =  sessionRepository.findCardPageById(page, SessionId.of(sessionNumber, WeekId.of(weekNumber, weekName, p.getId())));
+
+        if(pagedResult.isEmpty())
+            throw new EntityNotFoundException("No sessions found in this page.");
+
+        return pagedResult;
+    }
+
+    public Session save(String coachUsername, String programName, String weekName, Long weekNumber, PostSessionDto postSession){
+        Coach c = coachRepository.findByUsername(coachUsername).orElseThrow(() -> new NotFoundException("coach"));
+        Program p = programRepository.findByCoachAndProgramName(c.getId(), programName).orElseThrow(() -> new NotFoundException("program"));
+        WeekId weekId = WeekId.of(weekNumber, weekName, p.getId());
+
+        return sessionRepository.save(PostSessionDto.toEntity(postSession, weekId));
     }
 }

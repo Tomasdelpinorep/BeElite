@@ -15,7 +15,7 @@ public record PostSessionDto(
         String title,
         String subtitle,
         List<PostBlockDto> blocks,
-        int same_day_session_number
+        Integer same_day_session_number
 ) {
 
     public static Session toEntity(PostSessionDto postSession, WeekId weekId){

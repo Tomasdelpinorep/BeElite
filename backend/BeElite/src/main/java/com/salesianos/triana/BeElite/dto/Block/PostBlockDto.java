@@ -4,6 +4,7 @@ import com.salesianos.triana.BeElite.dto.Set.PostSetDto;
 import com.salesianos.triana.BeElite.model.Block;
 import com.salesianos.triana.BeElite.model.Composite_Ids.BlockId;
 import com.salesianos.triana.BeElite.model.Composite_Ids.SessionId;
+import com.salesianos.triana.BeElite.model.Session;
 import lombok.Builder;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public record PostBlockDto(
                 .rest_between_sets(postBlock.rest_between_sets)
                 .sets(postBlock.sets.stream().map(set ->
                         PostSetDto.toEntity(set, blockId)).toList())
+                .session(Session.builder().id(sessionId).build())
                 .build();
     }
 }

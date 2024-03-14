@@ -80,7 +80,7 @@ public class WeekService {
             for (Session session : originalWeekEntity.getSessions()) {
                 SessionId sessionId = session.getId();
                 if (sessionId != null) {
-                    sessionId.setWeekId(WeekId.of(editedWeek.getWeek_number(), editedWeek.getWeek_name(), p.getId()));
+                    sessionId.setWeek_id(WeekId.of(editedWeek.getWeek_number(), editedWeek.getWeek_name(), p.getId()));
                 }
             }
 

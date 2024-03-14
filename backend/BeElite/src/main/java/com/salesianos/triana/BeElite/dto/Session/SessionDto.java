@@ -16,7 +16,7 @@ public record SessionDto(String dayOfWeek,
     public static SessionDto of(Session s){
         return SessionDto.builder()
                 .dayOfWeek(s.getDate().getDayOfWeek().toString())
-                .sessionNumber(s.getSameDaySessionNumber())
+                .sessionNumber(s.getSame_day_session_number())
                 .build();
     }
 }

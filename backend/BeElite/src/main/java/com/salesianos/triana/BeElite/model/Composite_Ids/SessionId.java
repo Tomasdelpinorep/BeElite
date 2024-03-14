@@ -20,7 +20,7 @@ public class SessionId implements Serializable {
     private Long session_number;
 
     @Embedded
-    private WeekId weekId;
+    private WeekId week_id;
 
     public static SessionId of(Long session_number, WeekId weekId){
         return new SessionId(session_number, weekId);
