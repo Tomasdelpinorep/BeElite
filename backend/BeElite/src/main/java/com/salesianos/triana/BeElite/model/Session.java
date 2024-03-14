@@ -1,5 +1,6 @@
 package com.salesianos.triana.BeElite.model;
 
+import com.salesianos.triana.BeElite.model.Composite_Ids.SessionId;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,21 +13,12 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
-public class Session {
+public class Session{
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @EmbeddedId
+    private SessionId id;
 
     private LocalDate date;
-
-    @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "week_number", referencedColumnName = "week_number"),
-            @JoinColumn(name = "week_name", referencedColumnName = "week_name"),
-            @JoinColumn(name = "program_id", referencedColumnName = "program_id")
-    })
-    private Week week;
 
     @OneToMany(mappedBy = "session", cascade = CascadeType.ALL)
     private List<Block> blocks;
@@ -35,5 +27,5 @@ public class Session {
 
     private String subtitle;
 
-    private int sessionNumber;
+    private int same_day_session_number;
 }

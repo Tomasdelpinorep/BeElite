@@ -3,7 +3,7 @@ import 'pageable.dart';
 import 'sort.dart';
 
 class WeekDto {
-	List<Content>? content;
+	List<WeekContent>? content;
 	Pageable? pageable;
 	bool? last;
 	int? totalElements;
@@ -31,7 +31,7 @@ class WeekDto {
 
 	factory WeekDto.fromJson(Map<String, dynamic> json) => WeekDto(
 				content: (json['content'] as List<dynamic>?)
-						?.map((e) => Content.fromJson(e as Map<String, dynamic>))
+						?.map((e) => WeekContent.fromJson(e as Map<String, dynamic>))
 						.toList(),
 				pageable: json['pageable'] == null
 						? null

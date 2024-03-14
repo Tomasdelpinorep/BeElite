@@ -3,11 +3,12 @@ package com.salesianos.triana.BeElite.dto.Week;
 import com.salesianos.triana.BeElite.dto.Program.ProgramDto;
 import com.salesianos.triana.BeElite.model.Program;
 import com.salesianos.triana.BeElite.model.Week;
-import com.salesianos.triana.BeElite.model.WeekId;
+import com.salesianos.triana.BeElite.model.Composite_Ids.WeekId;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record PostWeekDto(
         @NotEmpty(message = "Week must have name")
@@ -19,9 +20,9 @@ public record PostWeekDto(
         ProgramDto program
 ) {
 
-        public static Week toEntity(PostWeekDto newWeek, Program p, Long weekNumber){
+        public static Week toEntity(PostWeekDto newWeek, UUID p_id, Long weekNumber){
                 return Week.builder()
-                        .id(WeekId.of(weekNumber, newWeek.week_name, p))
+                        .id(WeekId.of(weekNumber, newWeek.week_name, p_id))
                         .createdAt(newWeek.created_at)
                         .description(newWeek.description())
                         .build();

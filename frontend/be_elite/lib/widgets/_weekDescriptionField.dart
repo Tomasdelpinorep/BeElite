@@ -35,11 +35,11 @@ class _WeekDescriptionFieldState extends State<WeekDescriptionField> {
   void updateWeekDescription() {
     if (widget.weekPage != null) {
       String currentWeekName = widget.weekNameTextController.text;
-      Content? matchingWeek = widget.weekPage?.content?.firstWhere(
+      WeekContent? matchingWeek = widget.weekPage?.content?.firstWhere(
           (week) => week.weekName == currentWeekName,
-          orElse: () => Content());
+          orElse: () => WeekContent());
       setState(() {
-        if (matchingWeek == Content()) {
+        if (matchingWeek == WeekContent()) {
           weekDescription = 'Week description';
         } else {
           weekDescription = matchingWeek?.description;

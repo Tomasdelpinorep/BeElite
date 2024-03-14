@@ -1,32 +1,34 @@
 package com.salesianos.triana.BeElite.model;
 
+import com.salesianos.triana.BeElite.model.Composite_Ids.BlockId;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
 @AllArgsConstructor
 @RequiredArgsConstructor
+@Getter
+@Setter
 @Builder
 public class Block {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @EmbeddedId
+    private BlockId block_id;
 
     private String movement;
 
     @ManyToOne
-    @JoinColumn(name = "session_id")
+    @MapsId("session_id")
     private Session session;
 
-    @OneToMany(mappedBy = "block", cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Set> sets;
 
     private Double rest_between_sets;
 
     private String instructions;
+
+    private boolean  is_completed;
 }

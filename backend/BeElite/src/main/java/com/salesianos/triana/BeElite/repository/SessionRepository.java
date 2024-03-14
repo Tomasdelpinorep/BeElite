@@ -1,7 +1,8 @@
 package com.salesianos.triana.BeElite.repository;
 
+import com.salesianos.triana.BeElite.model.Composite_Ids.SessionId;
 import com.salesianos.triana.BeElite.model.Session;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface SessionRepository extends JpaRepository<Session, Long> {
+public interface SessionRepository extends JpaRepository<Session, SessionId> {
 }

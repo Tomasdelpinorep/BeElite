@@ -2,9 +2,9 @@ import 'package:be_elite/bloc/coach_details/coach_details_bloc.dart';
 import 'package:be_elite/repositories/user/user_repository.dart';
 import 'package:be_elite/repositories/user/user_repository_impl.dart';
 import 'package:be_elite/styles/app_colors.dart';
-import 'package:be_elite/ui/coach/athletes_screen.dart';
-import 'package:be_elite/ui/coach/coach_profile_screen.dart';
-import 'package:be_elite/ui/coach/programs_screen.dart';
+import 'package:be_elite/ui/coach/athletes/athletes_screen.dart';
+import 'package:be_elite/ui/coach/profile/coach_profile_screen.dart';
+import 'package:be_elite/ui/coach/programs/programs_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

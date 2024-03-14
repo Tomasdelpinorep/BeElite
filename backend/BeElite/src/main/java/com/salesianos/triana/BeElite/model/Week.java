@@ -1,9 +1,8 @@
 package com.salesianos.triana.BeElite.model;
 
-import com.salesianos.triana.BeElite.service.WeekService;
+import com.salesianos.triana.BeElite.model.Composite_Ids.WeekId;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
@@ -27,7 +26,7 @@ public class Week {
     @JoinColumn(name = "program_id")
     private Program program;
 
-    @OneToMany(mappedBy = "week", cascade = CascadeType.REMOVE)
+    @OneToMany(cascade = CascadeType.REMOVE)
     private List<Session> sessions;
 
     @CreatedDate

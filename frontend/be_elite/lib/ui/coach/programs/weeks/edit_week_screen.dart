@@ -10,14 +10,14 @@ import 'package:be_elite/repositories/coach/coach_repository_impl.dart';
 import 'package:be_elite/repositories/program/program_repository.dart';
 import 'package:be_elite/repositories/program/program_repository_impl.dart';
 import 'package:be_elite/styles/app_colors.dart';
-import 'package:be_elite/ui/coach/coach_add_week_screen.dart';
+import 'package:be_elite/ui/coach/programs/weeks/coach_add_week_screen.dart';
 import 'package:be_elite/ui/coach/coach_main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 class EditWeekScreen extends StatefulWidget {
-  final Content week;
+  final WeekContent week;
   final String programName;
   final CoachDetails coachDetails;
   final WeekDto weekPage;

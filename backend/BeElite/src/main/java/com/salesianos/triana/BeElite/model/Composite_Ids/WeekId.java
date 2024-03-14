@@ -1,5 +1,6 @@
-package com.salesianos.triana.BeElite.model;
+package com.salesianos.triana.BeElite.model.Composite_Ids;
 
+import com.salesianos.triana.BeElite.model.Program;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.JoinColumn;
@@ -8,9 +9,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.UUID;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Embeddable
@@ -24,11 +26,10 @@ public class WeekId implements Serializable {
     @Column(name = "week_name")
     private String week_name;
 
-    @ManyToOne
-    @JoinColumn(name = "program_id")
-    private Program program;
+    @Column(name = "program_id")
+    private UUID program_id;
 
-    public static WeekId of(Long id, String week_name, Program program){
-        return new WeekId(id,week_name,program);
+    public static WeekId of(Long week_number, String week_name, UUID program_id){
+        return new WeekId(week_number,week_name, program_id);
     }
 }

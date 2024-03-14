@@ -1,15 +1,15 @@
 import 'session.dart';
 
-class Content {
+class WeekContent {
 	String? weekName;
 	String? description;
 	List<Session>? sessions;
 	int? weekNumber;
   String? created_at;
 
-	Content({this.weekName, this.description, this.sessions, this.weekNumber, this.created_at});
+	WeekContent({this.weekName, this.description, this.sessions, this.weekNumber, this.created_at});
 
-	factory Content.fromJson(Map<String, dynamic> json) => Content(
+	factory WeekContent.fromJson(Map<String, dynamic> json) => WeekContent(
 				weekName: json['weekName'] as String?,
 				description: json['description'] as String?,
 				sessions: (json['sessions'] as List<dynamic>?)

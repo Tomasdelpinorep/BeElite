@@ -5,10 +5,11 @@ import 'package:be_elite/models/Week/week_dto.dart';
 import 'package:be_elite/repositories/coach/coach_repository.dart';
 import 'package:be_elite/repositories/coach/coach_repository_impl.dart';
 import 'package:be_elite/styles/app_colors.dart';
-import 'package:be_elite/ui/coach/add_program_screen.dart';
-import 'package:be_elite/ui/coach/coach_add_week_screen.dart';
+import 'package:be_elite/ui/coach/programs/add_program_screen.dart';
+import 'package:be_elite/ui/coach/programs/sessions/new_session_page.dart';
+import 'package:be_elite/ui/coach/programs/weeks/coach_add_week_screen.dart';
 import 'package:be_elite/ui/coach/coach_main_screen.dart';
-import 'package:be_elite/ui/coach/edit_week_screen.dart';
+import 'package:be_elite/ui/coach/programs/weeks/edit_week_screen.dart';
 import 'package:be_elite/widgets/beElite_logo.dart';
 import 'package:be_elite/widgets/circular_avatar.dart';
 import 'package:flutter/material.dart';
@@ -119,44 +120,45 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
     );
   }
 
-  Widget _buildEmptyHome(){
+  Widget _buildEmptyHome() {
     return Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _topBarWidget(),
-            Expanded(
-              child: Stack(
-                children: [
-                  const Center(child: Text('Your training weeks will appear here.')),
-                  Positioned(bottom: 0, right: 0, child: _addWeekButton())
-                ],
-              ),
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _topBarWidget(),
+          Expanded(
+            child: Stack(
+              children: [
+                const Center(
+                    child: Text('Your training weeks will appear here.')),
+                Positioned(bottom: 0, right: 0, child: _addWeekButton())
+              ],
             ),
-          ],
-        ),
-      );
+          ),
+        ],
+      ),
+    );
   }
 
-  Widget _buildHome(WeekDto weekPage){
+  Widget _buildHome(WeekDto weekPage) {
     return Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _topBarWidget(),
-            Expanded(
-              child: Stack(
-                children: [
-                  weeksWidget(weekPage),
-                  Positioned(bottom: 0, right: 0, child: _addWeekButton())
-                ],
-              ),
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _topBarWidget(),
+          Expanded(
+            child: Stack(
+              children: [
+                weeksWidget(weekPage),
+                Positioned(bottom: 0, right: 0, child: _addWeekButton())
+              ],
             ),
-          ],
-        ),
-      );
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _topBarWidget() {
@@ -346,7 +348,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                        '${capitalizeFirstLetter(week.weekName!)} - Week ${week.weekNumber}',
+                                        '${capitalizeFirstLetter(week.weekName!)} - Week ${week.weekNumber!}',
                                         style: const TextStyle(
                                             color: Colors.black,
                                             fontWeight: FontWeight.bold,
@@ -481,7 +483,13 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                       child: SizedBox(
                                         width: 150,
                                         child: OutlinedButton(
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        CoachSessionPage(session: session)));
+                                          },
                                           style: const ButtonStyle(
                                               overlayColor:
                                                   MaterialStatePropertyAll(
@@ -523,7 +531,11 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                                 MaterialStatePropertyAll(
                                                     Colors.black45)),
                                         onPressed: () {
-                                          //Navigate to new session page
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      CoachNewSessionScreen(week: week)));
                                         },
                                       ),
                                     )
@@ -541,7 +553,6 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
   }
 
   Widget _addWeekButton() {
-    // Change to floating button at bottom right
     return Container(
       height: 50,
       width: 50,

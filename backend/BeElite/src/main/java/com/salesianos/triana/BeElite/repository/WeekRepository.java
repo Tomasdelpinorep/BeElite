@@ -1,7 +1,7 @@
 package com.salesianos.triana.BeElite.repository;
 
 import com.salesianos.triana.BeElite.model.Week;
-import com.salesianos.triana.BeElite.model.WeekId;
+import com.salesianos.triana.BeElite.model.Composite_Ids.WeekId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

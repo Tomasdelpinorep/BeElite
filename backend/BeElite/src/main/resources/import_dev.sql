@@ -9,21 +9,21 @@ INSERT INTO Week(week_number, program_id, week_name, description, created_at) VA
 INSERT INTO Week(week_number, program_id, week_name, description, created_at) VALUES (2, '7b4bfd75-ee79-4ee9-9aec-63d422aac614', 'High Volume Squat', 'Lets get those legs big.', '2024-02-26 12:00:00');
 INSERT INTO Week(week_number, program_id, week_name, description, created_at) VALUES (3, '7b4bfd75-ee79-4ee9-9aec-63d422aac614', 'High Volume Squat', 'Lets get those legs big.', '2024-03-04 12:00:00');
 
-INSERT INTO Session(date, session_number, id, week_number, week_name, program_id, subtitle, title) VALUES ('2024-03-03', 1, 1, 3, 'High Volume Squat', '7b4bfd75-ee79-4ee9-9aec-63d422aac614','Long ass session bruh', 'Muscle Monday');
-INSERT INTO Session(date, session_number, id, week_number, week_name, program_id, subtitle, title) VALUES ('2024-03-03', 2, 2, 3, 'High Volume Squat', '7b4bfd75-ee79-4ee9-9aec-63d422aac614', 'Long ass session bruh', 'Muscle Monday');
-INSERT INTO Session(date, session_number, id, week_number, week_name, program_id, subtitle, title) VALUES ('2024-03-04', 1, 3, 3, 'High Volume Squat', '7b4bfd75-ee79-4ee9-9aec-63d422aac614', 'Nasty ass session bruh', 'Taco Tuesday');
-INSERT INTO Session(date, session_number, id, week_number, week_name, program_id, subtitle, title) VALUES ('2024-03-05', 1, 4, 3, 'High Volume Squat', '7b4bfd75-ee79-4ee9-9aec-63d422aac614', 'Short ass session bruh', 'Watch Out Wednesday');
-INSERT INTO Session(date, session_number, id, week_number, week_name, program_id, subtitle, title) VALUES ('2024-03-07', 1, 5, 3, 'High Volume Squat', '7b4bfd75-ee79-4ee9-9aec-63d422aac614', 'Fun ass session bruh', 'Fried Legs Friday');
+INSERT INTO Session(date, session_number, week_number, week_name, program_id, subtitle, title, same_day_session_number) VALUES ('2024-03-03', 1, 3, 'High Volume Squat', '7b4bfd75-ee79-4ee9-9aec-63d422aac614','Long ass session bruh', 'Muscle Monday', 1);
+INSERT INTO Session(date, session_number, week_number, week_name, program_id, subtitle, title, same_day_session_number) VALUES ('2024-03-03', 2, 3, 'High Volume Squat', '7b4bfd75-ee79-4ee9-9aec-63d422aac614', 'Long ass session bruh', 'Muscle Monday', 2);
+INSERT INTO Session(date, session_number, week_number, week_name, program_id, subtitle, title, same_day_session_number) VALUES ('2024-03-04', 3, 3, 'High Volume Squat', '7b4bfd75-ee79-4ee9-9aec-63d422aac614', 'Nasty ass session bruh', 'Taco Tuesday', 1);
+INSERT INTO Session(date, session_number, week_number, week_name, program_id, subtitle, title, same_day_session_number) VALUES ('2024-03-05', 4, 3, 'High Volume Squat', '7b4bfd75-ee79-4ee9-9aec-63d422aac614', 'Short ass session bruh', 'Watch Out Wednesday', 1);
+INSERT INTO Session(date, session_number, week_number, week_name, program_id, subtitle, title, same_day_session_number) VALUES ('2024-03-07', 5, 3, 'High Volume Squat', '7b4bfd75-ee79-4ee9-9aec-63d422aac614', 'Fun ass session bruh', 'Fried Legs Friday', 1);
 
-INSERT INTO Block(id, session_id, movement, instructions) VALUES(1, 1, 'Back Squat', 'Fast on the way up.');
-INSERT INTO Block(id, session_id, movement, rest_between_sets, instructions) VALUES(2, 1, 'Squat Snatch', 90, 'Must focus on a fast turnover.');
-INSERT INTO Block(id, session_id, movement, rest_between_sets, instructions) VALUES(3, 1, 'Power clean', 90, 'Keep the bar close.');
-INSERT INTO Block(id, session_id, movement, rest_between_sets, instructions) VALUES(4, 1, 'Accessory', 90, 'Core and lower back work.');
+INSERT INTO Block(block_number, session_session_number, session_week_number, session_week_name, session_program_id, movement, instructions, is_completed) VALUES(1, 1, 3, 'High Volume Squat', '7b4bfd75-ee79-4ee9-9aec-63d422aac614', 'Back Squat', 'Fast on the way up.', true);
+INSERT INTO Block(block_number, session_session_number, session_week_number, session_week_name, session_program_id, movement, rest_between_sets, instructions, is_completed) VALUES(2, 1, 3, 'High Volume Squat', '7b4bfd75-ee79-4ee9-9aec-63d422aac614', 'Squat Snatch', 90, 'Must focus on a fast turnover.', false);
+INSERT INTO Block(block_number, session_session_number, session_week_number, session_week_name, session_program_id, movement, rest_between_sets, instructions, is_completed) VALUES(3, 1, 3, 'High Volume Squat', '7b4bfd75-ee79-4ee9-9aec-63d422aac614', 'Power clean', 90, 'Keep the bar close.', false);
+INSERT INTO Block(block_number, session_session_number, session_week_number, session_week_name, session_program_id, movement, rest_between_sets, instructions, is_completed) VALUES(4, 1, 3, 'High Volume Squat', '7b4bfd75-ee79-4ee9-9aec-63d422aac614', 'Accessory', 90, 'Core and lower back work.', false);
 
-INSERT INTO Set(id, block_id, percentage, rest_after_completion) VALUES (1, 1, 60, 60);
-INSERT INTO Set(id, block_id, percentage, rest_after_completion) VALUES (2, 1, 70, 60);
-INSERT INTO Set(id, block_id, percentage, rest_after_completion) VALUES (3, 1, 75, 120);
-INSERT INTO Set(id, block_id, percentage, rest_after_completion, set_instructions) VALUES (4, 1, 80, 180, 'Must keep torso upright and drive knees out.');
+INSERT INTO Set(set_number, block_number, session_number, week_number, week_name, program_id, percentage, rest_after_completion) VALUES (1, 1, 1, 3, 'High Volume Squat', '7b4bfd75-ee79-4ee9-9aec-63d422aac614', 60, 60);
+INSERT INTO Set(set_number, block_number, session_number, week_number, week_name, program_id, percentage, rest_after_completion) VALUES (2, 1, 1, 3, 'High Volume Squat', '7b4bfd75-ee79-4ee9-9aec-63d422aac614', 70, 60);
+INSERT INTO Set(set_number, block_number, session_number, week_number, week_name, program_id, percentage, rest_after_completion) VALUES (3, 1, 1, 3, 'High Volume Squat', '7b4bfd75-ee79-4ee9-9aec-63d422aac614', 75, 120);
+INSERT INTO Set(set_number, block_number, session_number, week_number, week_name, program_id, percentage, rest_after_completion, set_instructions) VALUES (4, 1, 1, 3, 'High Volume Squat', '7b4bfd75-ee79-4ee9-9aec-63d422aac614', 80, 180, 'extra set instructions here');
 
 INSERT INTO Usuario(id, username, password, email, name, profile_pic_url, account_non_expired, account_non_locked, credentials_non_expired, enabled, created_at, last_password_change_at) VALUES ('b031e329-d938-40ae-b37f-c8cf96cd48fa', 'athlete1', '{bcrypt}$2a$12$.De8k7s.QaZzVr1ZmExgEuDkwyFglRmryR4Yce7PWLRNxcnCfHM9i', 'athlete@beelite.com', 'Athlete name', 'https://i.imgur.com/e4s1C4H.png', true, true, true, true, current_timestamp, current_timestamp);
 INSERT INTO Athlete(id, completed_sessions, program_id) VALUES ('b031e329-d938-40ae-b37f-c8cf96cd48fa', 0, '7b4bfd75-ee79-4ee9-9aec-63d422aac614');

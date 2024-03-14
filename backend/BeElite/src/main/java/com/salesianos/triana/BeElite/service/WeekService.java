@@ -4,6 +4,8 @@ import com.salesianos.triana.BeElite.dto.Week.EditWeekDto;
 import com.salesianos.triana.BeElite.dto.Week.PostWeekDto;
 import com.salesianos.triana.BeElite.exception.NotFoundException;
 import com.salesianos.triana.BeElite.model.*;
+import com.salesianos.triana.BeElite.model.Composite_Ids.SessionId;
+import com.salesianos.triana.BeElite.model.Composite_Ids.WeekId;
 import com.salesianos.triana.BeElite.repository.CoachRepository;
 import com.salesianos.triana.BeElite.repository.ProgramRepository;
 import com.salesianos.triana.BeElite.repository.SessionRepository;
@@ -18,7 +20,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -27,7 +28,6 @@ public class WeekService {
     private final WeekRepository weekRepository;
     private final ProgramRepository programRepository;
     private final CoachRepository coachRepository;
-    private final SessionRepository sessionRepository;
 
     public Page<Week> findPageByProgram(Pageable page, String programName, String coachUsername){
         Sort sort = Sort.by(Sort.Direction.DESC, "created_at");
@@ -56,7 +56,7 @@ public class WeekService {
                 .orElseThrow(() -> new NotFoundException("program"));
         Long weekId = generateWeekNumber(newWeek.week_name(), p.getId());
 
-        return weekRepository.save(PostWeekDto.toEntity(newWeek, p, weekId));
+        return weekRepository.save(PostWeekDto.toEntity(newWeek, p.getId(), weekId));
     }
 
     public Week edit(EditWeekDto editedWeek, String coachUsername) {
@@ -65,19 +65,23 @@ public class WeekService {
         Program p = programRepository.findByCoachAndProgramName(c.getId(), editedWeek.getProgram().program_name())
                 .orElseThrow(() -> new NotFoundException("program"));
 
-        Week originalWeekEntity = weekRepository.findById(WeekId.of(editedWeek.getWeek_number(), editedWeek.getOriginal_name(), p))
+        Week originalWeekEntity = weekRepository.findById(WeekId.of(editedWeek.getWeek_number(), editedWeek.getOriginal_name(), p.getId()))
                 .orElseThrow(() -> new NotFoundException("week"));
 
         // Create a new week entity if the name has been edited, else update the original week entity
         if (!editedWeek.getWeek_name().equalsIgnoreCase(editedWeek.getOriginal_name())) {
             editedWeek.setWeek_number((long) (weekRepository.countWeeksByNameAndProgram(editedWeek.getWeek_name(), p.getId()) + 1));
-            Week editedWeekEntity = EditWeekDto.toEntity(editedWeek, p);
+            Week editedWeekEntity = EditWeekDto.toEntity(editedWeek, p.getId());
 
             // Must save the new Week entity before updating sessions
             editedWeekEntity = weekRepository.save(editedWeekEntity);
 
+            // Here I update both the embedded session id to its new week
             for (Session session : originalWeekEntity.getSessions()) {
-                session.setWeek(editedWeekEntity);
+                SessionId sessionId = session.getId();
+                if (sessionId != null) {
+                    sessionId.setWeekId(WeekId.of(editedWeek.getWeek_number(), editedWeek.getWeek_name(), p.getId()));
+                }
             }
 
             weekRepository.delete(originalWeekEntity);
@@ -99,7 +103,7 @@ public class WeekService {
         Coach c = coachRepository.findByUsername(coachUsername).orElseThrow(() -> new NotFoundException("coach"));
         Program p = programRepository.findByCoachAndProgramName(c.getId(),  programName).orElseThrow(() -> new NotFoundException("program"));
 
-        Week w = weekRepository.findById(WeekId.of(weekNumber, weekName, p)).orElseThrow(() -> new NotFoundException("week"));
+        Week w = weekRepository.findById(WeekId.of(weekNumber, weekName, p.getId())).orElseThrow(() -> new NotFoundException("week"));
         weekRepository.delete(w);
     }
 }
