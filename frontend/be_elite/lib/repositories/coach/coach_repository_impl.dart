@@ -57,7 +57,8 @@ class CoachRepositoryImpl extends CoachRepository {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     final response = await _client.post(
-      Uri.parse('$urlChrome/coach/coach1/weeks/new'),
+      //changed here, might break something
+      Uri.parse('$urlChrome/coach/${prefs.getString('username')}/weeks/new'),
       headers: <String, String>{
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ${prefs.getString('authToken')}'
@@ -77,7 +78,7 @@ class CoachRepositoryImpl extends CoachRepository {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     final response = await _client.put(
-      Uri.parse('$urlChrome/coach/coach1/weeks/edit'),
+      Uri.parse('$urlChrome/coach/${prefs.getString('username')}/weeks/edit'),
       headers: <String, String>{
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ${prefs.getString('authToken')}'
@@ -97,7 +98,7 @@ class CoachRepositoryImpl extends CoachRepository {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     final response = await _client.delete(
-      Uri.parse('$urlChrome/coach/coach1/$programName/weeks/$weekName/$weekNumber'),
+      Uri.parse('$urlChrome/coach/${prefs.getString('username')}/$programName/weeks/$weekName/$weekNumber'),
       headers: <String, String>{
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ${prefs.getString('authToken')}'

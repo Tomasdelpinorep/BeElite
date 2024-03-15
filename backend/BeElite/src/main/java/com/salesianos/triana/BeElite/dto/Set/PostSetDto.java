@@ -1,6 +1,7 @@
 package com.salesianos.triana.BeElite.dto.Set;
 
 import com.salesianos.triana.BeElite.dto.Block.PostBlockDto;
+import com.salesianos.triana.BeElite.model.Block;
 import com.salesianos.triana.BeElite.model.Composite_Ids.BlockId;
 import com.salesianos.triana.BeElite.model.Composite_Ids.SetId;
 import com.salesianos.triana.BeElite.model.Set;
@@ -18,6 +19,7 @@ public record PostSetDto(
                 .number_of_sets(postSet.number_of_sets)
                 .number_of_reps(postSet.number_of_reps)
                 .percentage(postSet.percentage)
+                .block(Block.builder().block_id(blockId).build())
                 .build();
     }
 }

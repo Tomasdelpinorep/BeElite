@@ -21,9 +21,15 @@ public class Block {
 
     @ManyToOne
     @MapsId("session_id")
+    @JoinColumns({
+            @JoinColumn(name = "session_number", referencedColumnName = "session_number"),
+            @JoinColumn(name = "week_number", referencedColumnName = "week_number"),
+            @JoinColumn(name = "week_name", referencedColumnName = "week_name"),
+            @JoinColumn(name = "program_id", referencedColumnName = "program_id")
+    })
     private Session session;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "block", cascade = CascadeType.ALL)
     private List<Set> sets;
 
     private Double rest_between_sets;

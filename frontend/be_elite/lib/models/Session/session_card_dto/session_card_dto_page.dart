@@ -1,5 +1,4 @@
-import 'package:be_elite/models/Session/SessionCardDto/session_card_dto.dart';
-
+import 'package:be_elite/models/Session/session_card_dto/session_card_dto.dart';
 import 'pageable.dart';
 import 'sort.dart';
 
