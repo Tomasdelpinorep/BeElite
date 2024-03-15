@@ -1,6 +1,7 @@
 package com.salesianos.triana.BeElite.repository;
 
 import com.salesianos.triana.BeElite.model.Composite_Ids.SessionId;
+import com.salesianos.triana.BeElite.model.Composite_Ids.WeekId;
 import com.salesianos.triana.BeElite.model.Session;
 import com.salesianos.triana.BeElite.model.Week;
 import org.springframework.data.domain.Page;
@@ -24,11 +25,10 @@ public interface SessionRepository extends JpaRepository<Session, SessionId> {
 //                                @Param("sessionNumber") int sessionNumber);
 
     @Query(value = "SELECT * FROM session s WHERE " +
-            "s.week_name = :#{#sessionId.week_id.week_name} " +
-            "AND s.week_number = :#{#sessionId.week_id.week_number} " +
-            "AND s.program_id = :#{#sessionId.week_id.program_id} " +
-            "AND s.session_number = :#{#sessionId.session_number}", nativeQuery = true)
-    Page<Session> findCardPageById(Pageable page, @Param("sessionId") SessionId sessionId);
+            "s.week_name = :#{#weekId.week_name} " +
+            "AND s.week_number = :#{#weekId.week_number} " +
+            "AND s.program_id = :#{#weekId.program_id} ", nativeQuery = true)
+    Page<Session> findSessionCardPageById(Pageable page, @Param("weekId") WeekId weekId);
 
 
 }

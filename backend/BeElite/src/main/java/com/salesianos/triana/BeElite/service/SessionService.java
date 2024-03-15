@@ -28,12 +28,12 @@ public class SessionService {
     private final SessionRepository sessionRepository;
 
     public Page<Session> findCardPageById(Pageable page, String coachName, String programName,
-                                         String weekName, Long weekNumber, Long sessionNumber){
+                                         String weekName, Long weekNumber){
 
         Coach c = coachRepository.findByUsername(coachName).orElseThrow(() -> new NotFoundException("coach"));
         Program p = programRepository.findByCoachAndProgramName(c.getId(), programName).orElseThrow(() -> new NotFoundException("program"));
 
-        Page<Session> pagedResult =  sessionRepository.findCardPageById(page, SessionId.of(sessionNumber, WeekId.of(weekNumber, weekName, p.getId())));
+        Page<Session> pagedResult =  sessionRepository.findSessionCardPageById(page, WeekId.of(weekNumber, weekName, p.getId()));
 
         if(pagedResult.isEmpty())
             throw new EntityNotFoundException("No sessions found in this page.");

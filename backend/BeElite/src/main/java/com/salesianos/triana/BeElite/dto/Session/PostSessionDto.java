@@ -4,6 +4,7 @@ import com.salesianos.triana.BeElite.dto.Block.PostBlockDto;
 import com.salesianos.triana.BeElite.model.Composite_Ids.SessionId;
 import com.salesianos.triana.BeElite.model.Composite_Ids.WeekId;
 import com.salesianos.triana.BeElite.model.Session;
+import com.salesianos.triana.BeElite.model.Week;
 import lombok.Builder;
 
 import java.time.LocalDate;
@@ -29,6 +30,7 @@ public record PostSessionDto(
                 .blocks(postSession.blocks.stream().map(
                         block -> PostBlockDto.toEntity(block, sessionId)).toList())
                 .same_day_session_number(postSession.same_day_session_number)
+                .week(Week.builder().id(weekId).build())
                 .build();
     }
 }

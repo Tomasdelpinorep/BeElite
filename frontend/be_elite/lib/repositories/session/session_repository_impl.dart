@@ -10,7 +10,7 @@ class SessionRepositoryImpl extends SessionRepository {
   final Client _client = Client();
 
   @override
-  Future<SessionDto> createNewSession(
+  Future<SessionDto> saveNewSession(
     PostSessionDto newSession, String coachUsername, String programName, String weekName, int weekNumber) async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
 

@@ -26,7 +26,7 @@ public class Week {
     @JoinColumn(name = "program_id")
     private Program program;
 
-    @OneToMany(cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "week", cascade = CascadeType.REMOVE)
     private List<Session> sessions;
 
     @CreatedDate

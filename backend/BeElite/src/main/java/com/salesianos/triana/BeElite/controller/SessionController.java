@@ -24,13 +24,12 @@ public class SessionController {
     private final SessionService sessionService;
 
     @GetMapping("/{coachUsername}/{programName}/{weekName}/{weekNumber}/sessions/{sessionNumber}")
-    public Page<SessionCardDto> getSessionDetails(@PageableDefault(page = 0, size = 10) Pageable page,
+    public Page<SessionCardDto> getSessionCardData(@PageableDefault(page = 0, size = 10) Pageable page,
                                                   @PathVariable String coachUsername,
                                                   @PathVariable String programName,
                                                   @PathVariable String weekName,
-                                                  @PathVariable Long weekNumber,
-                                                  @PathVariable Long sessionNumber){
-        Page<Session> pagedResult = sessionService.findCardPageById(page, coachUsername, programName, weekName, weekNumber,sessionNumber);
+                                                  @PathVariable Long weekNumber){
+        Page<Session> pagedResult = sessionService.findCardPageById(page, coachUsername, programName, weekName, weekNumber);
 
         return pagedResult.map(SessionCardDto::of);
     }
@@ -48,7 +47,6 @@ public class SessionController {
                 .buildAndExpand(s.getId()).toUri();
 
         return ResponseEntity.created(createdUri).body(SessionDto.of(s));
-
     }
 
 }

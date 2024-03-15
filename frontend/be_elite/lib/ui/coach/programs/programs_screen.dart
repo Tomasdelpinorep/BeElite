@@ -7,6 +7,7 @@ import 'package:be_elite/repositories/coach/coach_repository_impl.dart';
 import 'package:be_elite/styles/app_colors.dart';
 import 'package:be_elite/ui/coach/programs/add_program_screen.dart';
 import 'package:be_elite/ui/coach/programs/sessions/new_session_page.dart';
+import 'package:be_elite/ui/coach/programs/sessions/session_page.dart';
 import 'package:be_elite/ui/coach/programs/weeks/coach_add_week_screen.dart';
 import 'package:be_elite/ui/coach/coach_main_screen.dart';
 import 'package:be_elite/ui/coach/programs/weeks/edit_week_screen.dart';
@@ -471,76 +472,63 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(bottom: 12.0),
-                        child: Wrap(
+                          padding: const EdgeInsets.only(bottom: 12.0),
+                          child: Wrap(
                             alignment: WrapAlignment.spaceAround,
-                            children: week.sessions!.isNotEmpty
-                                ? week.sessions!.map((session) {
-                                    return Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                              horizontal: 4)
-                                          .copyWith(top: 12),
-                                      child: SizedBox(
-                                        width: 150,
-                                        child: OutlinedButton(
-                                          onPressed: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        CoachSessionPage(session: session)));
-                                          },
-                                          style: const ButtonStyle(
-                                              overlayColor:
-                                                  MaterialStatePropertyAll(
-                                                      Colors.black45)),
-                                          child: session.sessionNumber! > 1
-                                              ? Text(
-                                                  "${capitalizeFirstLetter(session.dayOfWeek!)} #${session.sessionNumber}",
-                                                  style: const TextStyle(
-                                                      color: Colors.white,
-                                                      fontWeight:
-                                                          FontWeight.w100))
-                                              : Text(
-                                                  capitalizeFirstLetter(
-                                                      session.dayOfWeek!),
-                                                  style: const TextStyle(
-                                                      color: Colors.white,
-                                                      fontWeight:
-                                                          FontWeight.w100)),
-                                        ),
-                                      ),
-                                    );
-                                  }).toList()
-                                : [
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                              horizontal: 4)
-                                          .copyWith(top: 12),
-                                      child: OutlinedButton.icon(
-                                        icon: const Icon(
-                                          Icons.add,
-                                          color: Colors.white,
-                                        ),
-                                        label: const Text('New session',
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w300)),
-                                        style: const ButtonStyle(
-                                            overlayColor:
-                                                MaterialStatePropertyAll(
-                                                    Colors.black45)),
+                            children: [
+                              if (week.sessions != null &&
+                                  week.sessions!.isNotEmpty)
+                                ...week.sessions!.map((session) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                            horizontal: 4)
+                                        .copyWith(top: 12),
+                                    child: SizedBox(
+                                      width: 150,
+                                      child: OutlinedButton(
                                         onPressed: () {
                                           Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      CoachNewSessionScreen(week: week)));
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  CoachSessionPage(
+                                                coachUsername: widget
+                                                    .coachDetails.username!,
+                                                programName: programName,
+                                                weekName: week.weekName!,
+                                                weekNumber: week.weekNumber!,
+                                              ),
+                                            ),
+                                          );
                                         },
+                                        style: ButtonStyle(
+                                          overlayColor:
+                                              MaterialStateProperty.all(
+                                                  Colors.black45),
+                                        ),
+                                        child: session.sessionNumber! > 1
+                                            ? Text(
+                                                "${capitalizeFirstLetter(session.dayOfWeek!)} #${session.sessionNumber}",
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w100,
+                                                ),
+                                              )
+                                            : Text(
+                                                capitalizeFirstLetter(
+                                                    session.dayOfWeek!),
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w100,
+                                                ),
+                                              ),
                                       ),
-                                    )
-                                  ]),
-                      )
+                                    ),
+                                  );
+                                }).toList(),
+                              _newSessionButton(week)
+                            ],
+                          ))
                     ],
                   ),
                 ),
@@ -548,6 +536,28 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
             );
           }).toList(),
         ),
+      ),
+    );
+  }
+
+  Widget _newSessionButton(week) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4).copyWith(top: 12),
+      child: OutlinedButton.icon(
+        icon: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
+        label: const Text('New session',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w300)),
+        style: const ButtonStyle(
+            overlayColor: MaterialStatePropertyAll(Colors.black45)),
+        onPressed: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => CoachNewSessionScreen(week: week)));
+        },
       ),
     );
   }

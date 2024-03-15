@@ -1,9 +1,10 @@
-import 'session.dart';
+import 'package:be_elite/models/Session/session_dto.dart';
+
 
 class WeekContent {
 	String? weekName;
 	String? description;
-	List<Session>? sessions;
+	List<SessionDto>? sessions;
 	int? weekNumber;
   String? created_at;
 
@@ -13,7 +14,7 @@ class WeekContent {
 				weekName: json['weekName'] as String?,
 				description: json['description'] as String?,
 				sessions: (json['sessions'] as List<dynamic>?)
-						?.map((e) => Session.fromJson(e as Map<String, dynamic>))
+						?.map((e) => SessionDto.fromJson(e as Map<String, dynamic>))
 						.toList(),
 				weekNumber: json['weekNumber'] as int?,
         created_at: json['created_at'] as String?,

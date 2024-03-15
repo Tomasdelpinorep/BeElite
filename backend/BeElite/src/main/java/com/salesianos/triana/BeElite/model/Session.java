@@ -23,6 +23,15 @@ public class Session{
     @OneToMany(mappedBy = "session", cascade = CascadeType.ALL)
     private List<Block> blocks;
 
+    @ManyToOne
+    @MapsId("week_id")
+    @JoinColumns({
+            @JoinColumn(name = "week_number", referencedColumnName = "week_number"),
+            @JoinColumn(name = "week_name", referencedColumnName = "week_name"),
+            @JoinColumn(name = "program_id", referencedColumnName = "program_id")
+    })
+    private Week week;
+
     private String title;
 
     private String subtitle;

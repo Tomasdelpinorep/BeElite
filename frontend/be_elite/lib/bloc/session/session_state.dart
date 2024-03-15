@@ -12,6 +12,7 @@ final class SessionErrorState extends SessionState{
   SessionErrorState(this.errorMessage);
 }
 
-final class saveNewSessionSuccessState{
-  
+final class SaveNewSessionSuccessState extends SessionState{
+  final SessionDto session;
+  SaveNewSessionSuccessState(this.session);
 }

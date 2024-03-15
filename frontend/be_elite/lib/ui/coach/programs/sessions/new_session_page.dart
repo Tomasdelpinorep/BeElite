@@ -29,7 +29,23 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
           radius: 0.5,
         ),
       ),
-      child: BlocProvider.value(value: _sessionBloc)
+      child: BlocProvider.value(value: _sessionBloc,
+      child: BlocBuilder<SessionBloc, SessionState>(
+        buildWhen: (context, state){
+          return state is SessionErrorState ||
+          state is SessionLoadingState ||
+          state is SaveNewSessionSuccessState;
+        },
+        builder: (context,state){
+          if (state is SessionErrorState){
+            return const Text('There was an error saving the session.');
+          }else if (state is SessionLoadingState){
+            return const CircularProgressIndicator();
+          }else if(state is SaveNewSessionSuccessState){
+            
+          }
+        },
+      ))
     );
   }
 }
