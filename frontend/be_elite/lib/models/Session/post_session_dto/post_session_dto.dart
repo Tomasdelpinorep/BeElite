@@ -1,11 +1,11 @@
-import 'block.dart';
+import 'post_block_dto.dart';
 
 class PostSessionDto {
 	int? sessionNumber;
 	String? date;
 	String? title;
 	String? subtitle;
-	List<Block>? blocks;
+	List<PostBlockDto>? blocks;
 	int? sameDaySessionNumber;
 
 	PostSessionDto({
@@ -24,7 +24,7 @@ class PostSessionDto {
 			title: json['title'] as String?,
 			subtitle: json['subtitle'] as String?,
 			blocks: (json['blocks'] as List<dynamic>?)
-						?.map((e) => Block.fromJson(e as Map<String, dynamic>))
+						?.map((e) => PostBlockDto.fromJson(e as Map<String, dynamic>))
 						.toList(),
 			sameDaySessionNumber: json['same_day_session_number'] as int?,
 		);

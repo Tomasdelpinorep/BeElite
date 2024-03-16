@@ -1,13 +1,13 @@
-import 'set.dart';
+import 'post_set_dto.dart';
 
-class Block {
+class PostBlockDto {
 	int? blockNumber;
 	String? movement;
 	String? blockInstructions;
 	int? restBetweenSets;
-	List<Set>? sets;
+	List<PostSetDto>? sets;
 
-	Block({
+	PostBlockDto({
 		this.blockNumber, 
 		this.movement, 
 		this.blockInstructions, 
@@ -15,13 +15,13 @@ class Block {
 		this.sets, 
 	});
 
-	factory Block.fromJson(Map<String, dynamic> json) => Block(
+	factory PostBlockDto.fromJson(Map<String, dynamic> json) => PostBlockDto(
 				blockNumber: json['block_number'] as int?,
 				movement: json['movement'] as String?,
 				blockInstructions: json['block_instructions'] as String?,
 				restBetweenSets: json['rest_between_sets'] as int?,
 				sets: (json['sets'] as List<dynamic>?)
-						?.map((e) => Set.fromJson(e as Map<String, dynamic>))
+						?.map((e) => PostSetDto.fromJson(e as Map<String, dynamic>))
 						.toList(),
 			);
 
