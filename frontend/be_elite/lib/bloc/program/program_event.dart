@@ -12,3 +12,9 @@ class CreateNewProgramEvent extends ProgramEvent{
   final PostProgramDto program;
   CreateNewProgramEvent(this.program);
 }
+
+class GetProgramIdEvent extends ProgramEvent{
+  final String programName;
+  final String coachUsername;
+  GetProgramIdEvent(this.programName, this.coachUsername);
+}

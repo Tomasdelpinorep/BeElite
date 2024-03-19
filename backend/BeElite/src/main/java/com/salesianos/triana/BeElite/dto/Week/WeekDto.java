@@ -5,6 +5,7 @@ import com.salesianos.triana.BeElite.model.Program;
 import com.salesianos.triana.BeElite.model.Week;
 import lombok.Builder;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -15,7 +16,8 @@ public record WeekDto(
         String description,
         List<SessionDto> sessions,
         Long weekNumber,
-        LocalDateTime created_at
+        LocalDateTime created_at,
+        List<LocalDate> span
 ) {
 
     public static WeekDto of(Week w){
@@ -27,6 +29,7 @@ public record WeekDto(
                         List.of())
                 .weekNumber(w.getId().getWeek_number())
                 .created_at(w.getCreatedAt())
+                .span(w.getSpan())
                 .build();
     }
 }

@@ -7,6 +7,7 @@ import com.salesianos.triana.BeElite.model.Composite_Ids.SetId;
 import com.salesianos.triana.BeElite.model.Set;
 import lombok.Builder;
 
+@Builder
 public record PostSetDto(
         Long set_number,
         int number_of_sets,
@@ -20,6 +21,15 @@ public record PostSetDto(
                 .number_of_reps(postSet.number_of_reps)
                 .percentage(postSet.percentage)
                 .block(Block.builder().block_id(blockId).build())
+                .build();
+    }
+
+    public static PostSetDto of(Set s){
+        return PostSetDto.builder()
+                .set_number(s.getSet_id().getSet_number())
+                .number_of_sets(s.getNumber_of_sets())
+                .number_of_reps(s.getNumber_of_reps())
+                .percentage(s.getPercentage())
                 .build();
     }
 }

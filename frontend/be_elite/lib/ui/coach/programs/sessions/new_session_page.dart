@@ -1,4 +1,7 @@
 import 'package:be_elite/bloc/session/session_bloc.dart';
+import 'package:be_elite/models/Session/post_session_dto/post_block_dto.dart';
+import 'package:be_elite/models/Session/post_session_dto/post_session_dto.dart';
+import 'package:be_elite/models/Session/post_session_dto/post_set_dto.dart';
 import 'package:be_elite/models/Week/content.dart';
 import 'package:be_elite/repositories/session/session_repository.dart';
 import 'package:be_elite/repositories/session/session_repository_impl.dart';
@@ -7,10 +10,17 @@ import 'package:be_elite/ui/coach/coach_main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 
 class CoachNewSessionScreen extends StatefulWidget {
   final WeekContent week;
-  const CoachNewSessionScreen({super.key, required this.week});
+  final String coachUsername;
+  final String programName;
+  const CoachNewSessionScreen(
+      {super.key,
+      required this.week,
+      required this.coachUsername,
+      required this.programName});
 
   @override
   State<CoachNewSessionScreen> createState() => _CoachNewSessionScreenState();
@@ -18,18 +28,35 @@ class CoachNewSessionScreen extends StatefulWidget {
 
 class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
   final formKey = GlobalKey<FormState>();
+  //Session controllers
   final titleTextController = TextEditingController();
   final subtitleTextController = TextEditingController();
-  final movementTextController = TextEditingController();
-  final blockInstructionsTextController = TextEditingController();
-  final restBetweenSetsTextController = TextEditingController();
-  final setNumberTextController = TextEditingController();
-  final numberOfSetsTextController = TextEditingController();
-  final numberOfRepsTextController = TextEditingController();
-  final percentageTextController = TextEditingController();
+
+  //Block controllers
+  List<TextEditingController> movementControllers = [];
+  List<TextEditingController> blockInstructionsTextControllers = [];
+  List<TextEditingController> restBetweenSetsTextControllers = [];
+
+  //Set controllers
+  List<TextEditingController> numberOfSetsTextControllers = [];
+  List<TextEditingController> numberOfRepsTextControllers = [];
+  List<TextEditingController> percentageTextControllers = [];
 
   List<String> blockLetters = ['A'];
   List<int> setsPerBlock = [1];
+  List<String> daysOfWeek = [
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sundary'
+  ];
+  // ignore: prefer_final_fields
+  int _selectedDayIndex = 0;
+  String? selectedDayString;
+  int totalNumberOfSets = 0;
 
   late SessionBloc _sessionBloc;
   late SessionRepository sessionRepository;
@@ -45,6 +72,7 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        width: double.infinity,
           height: double.infinity,
           decoration: BoxDecoration(
             gradient: RadialGradient(
@@ -74,7 +102,7 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
                             title: const Text('Success!',
                                 style: TextStyle(color: Colors.white)),
                             content: const Text(
-                                'New program has been successfully created.',
+                                'New session has been successfully created.',
                                 style: TextStyle(color: Colors.white)),
                             backgroundColor: AppColors.successGreen,
                           );
@@ -105,11 +133,15 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               //Session inputs
-              const Text('New Session',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 32,
-                      fontStyle: FontStyle.italic)),
+              const Center(
+                child: Text('New Session',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 32,
+                        fontStyle: FontStyle.italic)),
+              ),
+              const SizedBox(height: 30),
+              _sessionDayField(),
               const SizedBox(height: 30),
               _sessionTitleField(),
               const SizedBox(height: 30),
@@ -128,6 +160,63 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
               _saveSessionButton(),
               const SizedBox(height: 30),
             ]),
+      ),
+    );
+  }
+
+  Widget _sessionDayField() {
+    return SizedBox(
+      width: 400,
+      child: Column(
+        children: [
+          const Text('Session Date', style: TextStyle(fontSize: 16)),
+          const SizedBox(height: 10),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              children: List.generate(widget.week.span?.length ?? 7, (index) {
+                final dayName = _getDayName(index + 1);
+                return OutlinedButton(
+                  onPressed: () => _selectDay(index),
+                  style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.resolveWith<Color>((states) {
+                      return _selectedDayIndex == index
+                          ? AppColors.mainYellow
+                          : Colors.transparent;
+                    }),
+                    foregroundColor:
+                        MaterialStateProperty.resolveWith<Color>((states) {
+                      return _selectedDayIndex == index
+                          ? Colors.black
+                          : Colors.white;
+                    }),
+                    overlayColor:
+                        MaterialStateProperty.resolveWith<Color>((states) {
+                      return _selectedDayIndex == index
+                          ? AppColors.mainYellow.withOpacity(0.5)
+                          : Colors.white10;
+                    }),
+                    side:
+                        MaterialStateProperty.resolveWith<BorderSide>((states) {
+                      return BorderSide(
+                        color: _selectedDayIndex == index
+                            ? Colors.black
+                            : Colors.white,
+                      );
+                    }),
+                  ),
+                  child: Column(children: [
+                    Text(dayName),
+                    Text(widget.week.span?[index],
+                        style: const TextStyle(fontSize: 10))
+                  ]),
+                );
+              }),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -199,8 +288,22 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
 
   Widget _newBlockForm(String blockLetter, int blockIndex) {
     List<Widget> setForms = [];
+    int setsBeforeIndexed = 0;
+
+    //Gets the amount of sets before the new block being created
+    for (int i = 0; i < blockIndex; i++) {
+      setsBeforeIndexed += setsPerBlock[i];
+    }
+
     for (int i = 1; i <= setsPerBlock[blockIndex]; i++) {
-      setForms.add(_newSetForm(i));
+      setForms.add(_newSetForm(i, setsBeforeIndexed + i - 1));
+    }
+
+    // Create controllers for each block form
+    for (int i = 0; i < blockLetters.length; i++) {
+      movementControllers.add(TextEditingController());
+      blockInstructionsTextControllers.add(TextEditingController());
+      restBetweenSetsTextControllers.add(TextEditingController());
     }
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -211,20 +314,20 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
           child: Text('Block $blockLetter',
               style:
                   const TextStyle(fontSize: 24, fontStyle: FontStyle.italic))),
-      _blockMovementField(),
+      _blockMovementField(movementControllers[blockIndex]),
       const SizedBox(height: 30),
       ...setForms,
       const SizedBox(height: 30),
       _addSetButton(blockIndex),
       const SizedBox(height: 30),
-      _blockRestField(),
+      _blockRestField(restBetweenSetsTextControllers[blockIndex]),
       const SizedBox(height: 30),
-      _blockInstructionsField(),
+      _blockInstructionsField(blockInstructionsTextControllers[blockIndex]),
       const SizedBox(height: 30),
     ]);
   }
 
-  Widget _blockMovementField() {
+  Widget _blockMovementField(TextEditingController movementTextController) {
     return SizedBox(
       width: 400,
       child: Column(
@@ -257,7 +360,8 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
     );
   }
 
-  Widget _blockInstructionsField() {
+  Widget _blockInstructionsField(
+      TextEditingController blockInstructionsTextController) {
     return SizedBox(
       width: 400,
       child: Column(
@@ -289,7 +393,14 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
     );
   }
 
-  Widget _newSetForm(int setNumber) {
+  Widget _newSetForm(int setNumber, int totalSetIndex) {
+    // Create controllers for each set form
+    for (int i = 0; i < setNumber; i++) {
+      numberOfSetsTextControllers.add(TextEditingController());
+      numberOfRepsTextControllers.add(TextEditingController());
+      percentageTextControllers.add(TextEditingController());
+    }
+
     return SizedBox(
       width: 400,
       child: Column(
@@ -298,10 +409,10 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Text('Set #$setNumber', style: const TextStyle(fontSize: 16)),
-              _numberOfSetsField(),
+              _numberOfSetsField(numberOfSetsTextControllers[totalSetIndex]),
               const Text('x', style: TextStyle(fontSize: 20)),
-              _numberOfRepsField(),
-              _percentageField()
+              _numberOfRepsField(numberOfRepsTextControllers[totalSetIndex]),
+              _percentageField(percentageTextControllers[totalSetIndex])
             ],
           ),
         ],
@@ -309,10 +420,11 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
     );
   }
 
-  Widget _numberOfSetsField() {
+  Widget _numberOfSetsField(TextEditingController numberOfSetsTextController) {
     return SizedBox(
       width: 50,
       child: TextFormField(
+        controller: numberOfSetsTextController,
         decoration: const InputDecoration(
           labelText: 'Sets',
           enabledBorder: UnderlineInputBorder(
@@ -335,10 +447,11 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
     );
   }
 
-  Widget _numberOfRepsField() {
+  Widget _numberOfRepsField(TextEditingController numberOfRepsTextController) {
     return SizedBox(
       width: 50,
       child: TextFormField(
+        controller: numberOfRepsTextController,
         decoration: const InputDecoration(
           labelText: 'Reps',
           enabledBorder: UnderlineInputBorder(
@@ -361,10 +474,11 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
     );
   }
 
-  Widget _percentageField() {
+  Widget _percentageField(TextEditingController percentageTextController) {
     return SizedBox(
       width: 50,
       child: TextFormField(
+        controller: percentageTextController,
         decoration: const InputDecoration(
             labelText: '%',
             enabledBorder: UnderlineInputBorder(
@@ -374,7 +488,8 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
               borderSide:
                   BorderSide(color: Colors.white), // Focused underline color
             )),
-        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        keyboardType: TextInputType.number,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         validator: (value) {
           if (value == null || value.isEmpty) {
             return 'Obligatory';
@@ -410,16 +525,16 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
     );
   }
 
-  Widget _blockRestField() {
+  Widget _blockRestField(TextEditingController restBetweenSetsTextController) {
     return SizedBox(
-      width: 100,
+      width: 130,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TextFormField(
-            controller: titleTextController,
+            controller: restBetweenSetsTextController,
             decoration: const InputDecoration(
-              hintText: 'Rest',
+              hintText: 'Rest (Seconds)',
               hintStyle: TextStyle(color: Colors.white54),
               enabledBorder: UnderlineInputBorder(
                 borderSide:
@@ -430,6 +545,8 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
                     BorderSide(color: Colors.white), // Focused underline color
               ),
             ),
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             validator: (value) {
               if (value != null && value.length > 3) {
                 return 'Maximum allowed rest is 999';
@@ -478,7 +595,46 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
         child: FilledButton(
           onPressed: () {
             if (formKey.currentState!.validate()) {
-              //save logic
+              //Gets data from block forms and puts it into a list
+              List<PostBlockDto> blocks = List.generate(
+                  blockLetters.length,
+                  (blockIndex) => PostBlockDto(
+                      blockInstructions:
+                          blockInstructionsTextControllers[blockIndex].text,
+                      blockNumber: blockIndex + 1,
+                      movement: movementControllers[blockIndex].text,
+                      restBetweenSets:
+                          restBetweenSetsTextControllers[blockIndex].text.isEmpty
+                              ? 0
+                              : int.parse(
+                                  restBetweenSetsTextControllers[blockIndex].text),
+                      sets:
+                          //Gets data from sets forms and puts it into a list
+                          List.generate(
+                              setsPerBlock[blockIndex],
+                              (setIndex) => PostSetDto(
+                                  numberOfReps: int.parse(
+                                      numberOfRepsTextControllers[_getSetTextControllerIndex(blockIndex, setIndex)].text),
+                                  numberOfSets: int.parse(
+                                      numberOfSetsTextControllers[_getSetTextControllerIndex(blockIndex, setIndex)].text),
+                                  percentage: int.parse(
+                                      percentageTextControllers[_getSetTextControllerIndex(blockIndex, setIndex)].text),
+                                  setNumber: setIndex + 1))));
+
+              _sessionBloc.add(SaveNewSessionEvent(
+                  PostSessionDto(
+                      blocks: blocks,
+                      date: selectedDayString ?? widget.week.span!.first,
+                      title: titleTextController.text,
+                      subtitle: subtitleTextController.text,
+                      sessionNumber: getSessionNumber(),
+                      sameDaySessionNumber: getSameDaySessionNumber(
+                          DateFormat('EEEE').format(DateTime.parse(
+                              selectedDayString ?? widget.week.span!.first)))),
+                  widget.week.weekName!,
+                  widget.week.weekNumber!,
+                  widget.programName,
+                  widget.coachUsername));
             }
           },
           style: ElevatedButton.styleFrom(
@@ -494,5 +650,76 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
         ),
       ),
     );
+  }
+
+  void _selectDay(int dayIndex) {
+    setState(() {
+      _selectedDayIndex = dayIndex;
+      selectedDayString = widget.week.span![dayIndex];
+    });
+  }
+
+  String _getDayName(int dayIndex) {
+    if (widget.week.span != null && widget.week.span!.isNotEmpty) {
+      DateTime date = DateTime.parse(widget.week.span![dayIndex - 1]);
+
+      return DateFormat('EEEE').format(date);
+    } else {
+      switch (dayIndex) {
+        case 1:
+          return 'Monday';
+        case 2:
+          return 'Tuesday';
+        case 3:
+          return 'Wednesday';
+        case 4:
+          return 'Thursday';
+        case 5:
+          return 'Friday';
+        case 6:
+          return 'Saturday';
+        case 7:
+          return 'Sunday';
+        default:
+          return '';
+      }
+    }
+  }
+
+  //Sums up the numbers in a list of integers, used to get total number of sets
+  int getSumOfNumbers(List<int>? numbers) {
+    if (numbers == null) return 0;
+    return numbers.fold(
+        0, (int previousValue, int element) => previousValue + element);
+  }
+
+  int getSessionNumber() {
+    if (widget.week.sessions != null) {
+      return widget.week.sessions!.length + 1;
+    }
+    return 1;
+  }
+
+  int getSameDaySessionNumber(String dayName) {
+    int sameDaySessionNumber = 1;
+    if (widget.week.sessions == null) {
+      return sameDaySessionNumber;
+    }
+
+    for (var session in widget.week.sessions!) {
+      if (session.dayOfWeek!.toLowerCase() == dayName.toLowerCase()) {
+        sameDaySessionNumber++;
+      }
+    }
+
+    return sameDaySessionNumber;
+  }
+
+  int _getSetTextControllerIndex(int blockIndex, int setIndex){
+    int savedSets = 0;
+    for (int i = 0; i < blockIndex; i++){
+      savedSets += setsPerBlock[i];
+    }
+    return savedSets + setIndex;
   }
 }

@@ -8,7 +8,8 @@ import java.util.List;
 
 @Builder
 public record SessionDto(String dayOfWeek,
-                         int sessionNumber)
+                         Long sessionNumber,
+                         int sameDaySessionNumber)
 {
     public static SessionDto empty(){
         return SessionDto.builder().build();
@@ -16,7 +17,8 @@ public record SessionDto(String dayOfWeek,
     public static SessionDto of(Session s){
         return SessionDto.builder()
                 .dayOfWeek(s.getDate().getDayOfWeek().toString())
-                .sessionNumber(s.getSame_day_session_number())
+                .sessionNumber(s.getId().getSession_number())
+                .sameDaySessionNumber(s.getSame_day_session_number())
                 .build();
     }
 }

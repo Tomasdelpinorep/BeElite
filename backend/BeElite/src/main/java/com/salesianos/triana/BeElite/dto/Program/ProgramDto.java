@@ -17,4 +17,10 @@ public record ProgramDto(
     public static ProgramDto empty(){
         return ProgramDto.builder().build();
     }
+
+    public Program toEntity(ProgramDto pDto){
+        return Program.builder()
+
+                .build();
+    }
 }

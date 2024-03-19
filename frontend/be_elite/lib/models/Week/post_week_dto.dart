@@ -1,32 +1,35 @@
 import 'package:be_elite/models/Coach/program_dto.dart';
 
-
 class PostWeekDto {
-	String? week_name;
+	String? weekName;
 	String? description;
-	String? created_at;
+	String? createdAt;
 	ProgramDto? program;
+	List<String>? span;
 
 	PostWeekDto({
-		this.week_name, 
+		this.weekName, 
 		this.description, 
-		this.created_at, 
+		this.createdAt, 
 		this.program, 
+		this.span, 
 	});
 
 	factory PostWeekDto.fromJson(Map<String, dynamic> json) => PostWeekDto(
-				week_name: json['week_name'] as String?,
+				weekName: json['week_name'] as String?,
 				description: json['description'] as String?,
-				created_at: json['created_at'] as String?,
+				createdAt: json['created_at'] as String?,
 				program: json['program'] == null
 						? null
 						: ProgramDto.fromJson(json['program'] as Map<String, dynamic>),
+				span: json['span'] as List<String>?,
 			);
 
 	Map<String, dynamic> toJson() => {
-				'week_name': week_name,
+				'week_name': weekName,
 				'description': description,
-				'created_at': created_at,
+				'created_at': createdAt,
 				'program': program?.toJson(),
+				'span': span,
 			};
 }

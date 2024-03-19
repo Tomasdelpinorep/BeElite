@@ -20,6 +20,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -56,6 +57,11 @@ public class ProgramController {
     public ProgramDto getProgramDto(@AuthenticationPrincipal Coach coach,@PathVariable String coachUsername ,@PathVariable String programName){
         return ProgramDto.of(programService.findByCoachAndProgramName(coachUsername,programName));
     }
+
+//    @GetMapping("/coach/{coachUsername}/{programName}/id")
+//    public UUID getProgamId(@PathVariable String coachUsername ,@PathVariable String programName) {
+//        return programService.findByCoachAndProgramName(coachUsername, programName).getId();
+//    }
 
     @PostMapping("coach/program")
     @PreAuthorize("hasRole('COACH') and #coach.id == principal.id or hasRole('ADMIN')")

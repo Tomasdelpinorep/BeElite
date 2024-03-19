@@ -2,13 +2,13 @@ package com.salesianos.triana.BeElite.model;
 
 import com.salesianos.triana.BeElite.model.Composite_Ids.SetId;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 @Entity
 @RequiredArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Builder
 public class Set {
 

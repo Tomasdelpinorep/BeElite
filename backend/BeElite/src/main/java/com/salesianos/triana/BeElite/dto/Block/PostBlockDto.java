@@ -9,6 +9,7 @@ import lombok.Builder;
 
 import java.util.List;
 
+@Builder
 public record PostBlockDto(
         Long block_number,
         String movement,
@@ -27,6 +28,18 @@ public record PostBlockDto(
                 .sets(postBlock.sets.stream().map(set ->
                         PostSetDto.toEntity(set, blockId)).toList())
                 .session(Session.builder().id(sessionId).build())
+                .build();
+    }
+
+    public static PostBlockDto of(Block b){
+        return PostBlockDto.builder()
+                .block_number(b.getBlock_id().getBlock_number())
+                .movement(b.getMovement())
+                .block_instructions(b.getInstructions())
+                .rest_between_sets(b.getRest_between_sets())
+                .sets(b.getSets() != null ?
+                        b.getSets().stream().map(PostSetDto::of).toList() :
+                        List.of())
                 .build();
     }
 }

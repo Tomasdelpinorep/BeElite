@@ -5,9 +5,10 @@ INSERT INTO Usuario(id, username, password, email, name, profile_pic_url, accoun
 INSERT INTO Admin(id) VALUES ('3850cdb2-04a3-4642-bc12-58f01f7187c7');
 
 INSERT INTO Program(id, program_name, description, image, created_at, coach_id) VALUES ('7b4bfd75-ee79-4ee9-9aec-63d422aac614', 'FSC', 'Weightlifting by Tomas del Pino', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfHO2ecLdHGF3zLC5jIqNTdN-7QEXVAEUYIsLLyvAePG1WoMqMxsXDsmXNk-Bg-uzwRqI&usqp=CAU', current_timestamp, 'c62db400-22e3-4e92-94db-1447f5688f2c');
-INSERT INTO Week(week_number, program_id, week_name, description, created_at) VALUES (1, '7b4bfd75-ee79-4ee9-9aec-63d422aac614', 'High Volume Squat', 'Lets get those legs big.', '2024-02-19 12:00:00');
-INSERT INTO Week(week_number, program_id, week_name, description, created_at) VALUES (2, '7b4bfd75-ee79-4ee9-9aec-63d422aac614', 'High Volume Squat', 'Lets get those legs big.', '2024-02-26 12:00:00');
-INSERT INTO Week(week_number, program_id, week_name, description, created_at) VALUES (3, '7b4bfd75-ee79-4ee9-9aec-63d422aac614', 'High Volume Squat', 'Lets get those legs big.', '2024-03-04 12:00:00');
+
+INSERT INTO Week(week_number, program_id, week_name, description, created_at, span) VALUES (1, '7b4bfd75-ee79-4ee9-9aec-63d422aac614', 'High Volume Squat', 'Lets get those legs big.', '2024-02-19 12:00:00', ARRAY['2024-02-21'::date, '2024-02-22'::date, '2024-02-23'::date]);
+INSERT INTO Week(week_number, program_id, week_name, description, created_at, span) VALUES (2, '7b4bfd75-ee79-4ee9-9aec-63d422aac614', 'High Volume Squat', 'Lets get those legs big.', '2024-02-26 12:00:00', ARRAY['2024-02-26'::date, '2024-02-27'::date, '2024-02-28'::date]);
+INSERT INTO Week(week_number, program_id, week_name, description, created_at, span) VALUES (3, '7b4bfd75-ee79-4ee9-9aec-63d422aac614', 'High Volume Squat', 'Lets get those legs big.', '2024-03-04 12:00:00', ARRAY['2024-03-04'::date, '2024-03-05'::date, '2024-03-06'::date]);
 
 INSERT INTO Session(date, session_number, week_number, week_name, program_id, subtitle, title, same_day_session_number) VALUES ('2024-03-03', 1, 3, 'High Volume Squat', '7b4bfd75-ee79-4ee9-9aec-63d422aac614','Long ass session bruh', 'Muscle Monday', 1);
 INSERT INTO Session(date, session_number, week_number, week_name, program_id, subtitle, title, same_day_session_number) VALUES ('2024-03-03', 2, 3, 'High Volume Squat', '7b4bfd75-ee79-4ee9-9aec-63d422aac614', 'Long ass session bruh', 'Muscle Monday', 2);

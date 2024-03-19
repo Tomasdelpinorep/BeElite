@@ -23,7 +23,7 @@ public class SessionController {
 
     private final SessionService sessionService;
 
-    @GetMapping("/{coachUsername}/{programName}/{weekName}/{weekNumber}/sessions/{sessionNumber}")
+    @GetMapping("/{coachUsername}/{programName}/{weekName}/{weekNumber}/sessions")
     public Page<SessionCardDto> getSessionCardData(@PageableDefault(page = 0, size = 10) Pageable page,
                                                   @PathVariable String coachUsername,
                                                   @PathVariable String programName,
@@ -32,6 +32,17 @@ public class SessionController {
         Page<Session> pagedResult = sessionService.findCardPageById(page, coachUsername, programName, weekName, weekNumber);
 
         return pagedResult.map(SessionCardDto::of);
+    }
+
+    @GetMapping("/{coachUsername}/{programName}/{weekName}/{weekNumber}/sessions/{sessionNumber}")
+    public PostSessionDto getPostSessionDto(@PathVariable String coachUsername,
+                                                   @PathVariable String programName,
+                                                   @PathVariable String weekName,
+                                                   @PathVariable Long weekNumber,
+                                            @PathVariable Long sessionNumber){
+        Session s = sessionService.findPostDtoById(coachUsername, programName, weekName, weekNumber, sessionNumber);
+
+        return PostSessionDto.of(s);
     }
 
     @PostMapping("/{coachUsername}/{programName}/{weekName}/{weekNumber}/sessions/new")

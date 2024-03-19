@@ -34,6 +34,10 @@ class CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
   final weekNameTextController = TextEditingController();
   final weekDescriptionTextController = TextEditingController();
 
+  DateTimeRange? _selectedDateRange;
+  List<String> selectedDaysFormatted = [];
+  // ignore: prefer_final_fields
+  bool _dateRangeError = false;
   List<String> _suggestions = [];
   late CoachRepository coachRepository;
   late ProgramRepository programRepository;
@@ -129,10 +133,11 @@ class CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
 
                   programDto = state.programDto;
                   _weekBloc.add(SaveNewWeekEvent(PostWeekDto(
-                      created_at: formattedDateTime,
-                      week_name: weekNameTextController.text,
+                      createdAt: formattedDateTime,
+                      weekName: weekNameTextController.text,
                       description: weekDescriptionValue,
-                      program: programDto)));
+                      program: programDto,
+                      span: selectedDaysFormatted)));
                 }
                 return Container();
               },
@@ -159,6 +164,8 @@ class CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
                       weekPage: widget.weeksPage,
                       handleWeekDescriptionChanged:
                           handleWeekDescriptionChanged),
+                  const SizedBox(height: 30),
+                  _weekPicker(),
                   const SizedBox(height: 30),
                   _saveButton(),
                 ])),
@@ -229,13 +236,35 @@ class CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
     );
   }
 
+  Widget _weekPicker() {
+    return Center(
+      child: Column(
+        children: [
+          ElevatedButton(
+            onPressed: () => _selectDateRange(context),
+            child: const Text('Select Date Range'),
+          ),
+          _dateRangeError == false
+              ? Container()
+              : const Text('Please select a date range.',
+                  style: TextStyle(color: Colors.red))
+        ],
+      ),
+    );
+  }
+
   Widget _saveButton() {
     return Container(
       decoration: const BoxDecoration(
           boxShadow: [BoxShadow(color: Color(0xFFD6CD0B), blurRadius: 5)]),
       child: FilledButton(
         onPressed: () {
-          if (formKey.currentState!.validate()) {
+          if (selectedDaysFormatted.isEmpty) {
+            setState(() {
+              _dateRangeError = true;
+            });
+          }
+          if (formKey.currentState!.validate() && _dateRangeError == false) {
             _programBloc.add(GetProgramDtoEvent(widget.programName));
           }
         },
@@ -272,5 +301,36 @@ class CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
     weekDescription != null
         ? weekDescriptionValue = weekDescription
         : weekDescriptionValue = "";
+  }
+
+  void _selectDateRange(BuildContext context) async {
+    final initialDateRange = DateTimeRange(
+      start: DateTime.now(),
+      end: DateTime.now().add(const Duration(days: 7)), // Initial range is 7 days
+    );
+
+    final newDateRange = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(DateTime.now().year),
+      lastDate: DateTime(DateTime.now().year + 1),
+      initialDateRange: _selectedDateRange ?? initialDateRange,
+    );
+
+    if (newDateRange != null) {
+      setState(() {
+        _selectedDateRange = newDateRange;
+        _dateRangeError = false;
+      });
+
+      // Extract individual days from the selected range
+      DateTime currentDate = newDateRange.start;
+      while (currentDate.isBefore(newDateRange.end) ||
+          currentDate.isAtSameMomentAs(newDateRange.end)) {
+        final formattedDate = DateFormat('yyyy-MM-dd')
+            .format(currentDate); // Format to match Java's LocalDate format
+        selectedDaysFormatted.add(formattedDate);
+        currentDate = currentDate.add(const Duration(days: 1));
+      }
+    }
   }
 }

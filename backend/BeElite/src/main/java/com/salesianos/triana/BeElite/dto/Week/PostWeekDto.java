@@ -7,7 +7,9 @@ import com.salesianos.triana.BeElite.model.Composite_Ids.WeekId;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 public record PostWeekDto(
@@ -17,7 +19,10 @@ public record PostWeekDto(
         @NotNull(message = "Week must have creation date and time.")
         LocalDateTime created_at,
         @NotNull(message = "Week must be part of a program.")
-        ProgramDto program
+        ProgramDto program,
+
+        @NotNull(message = "Week must have a valid span.")
+        List<LocalDate>span
 ) {
 
         public static Week toEntity(PostWeekDto newWeek, UUID p_id, Long weekNumber){
@@ -25,6 +30,8 @@ public record PostWeekDto(
                         .id(WeekId.of(weekNumber, newWeek.week_name, p_id))
                         .createdAt(newWeek.created_at)
                         .description(newWeek.description())
+                        .span(newWeek.span)
+                        .program(Program.builder().id(p_id).build())
                         .build();
         }
 }

@@ -49,4 +49,23 @@ class ProgramRepositoryImpl implements ProgramRepository{
     }
   }
   
+  // @override
+  // Future<String> getProgramId(String programName, String coachUsername) async{
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  //   final response = await _client.get(
+  //     Uri.parse('$urlChrome/coach/$coachUsername/$programName/id'),
+  //     headers: <String, String>{
+  //       'Content-Type': 'application/json',
+  //       'Authorization': 'Bearer ${prefs.getString('authToken')}'
+  //     },
+  //   );
+
+  //   if (response.statusCode == 200) {
+  //     return json.decode(response.body);
+  //   } else {
+  //     throw Exception('Failed to get program dto.');
+  //   }
+  // }
+  
 }

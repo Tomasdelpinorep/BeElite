@@ -38,4 +38,14 @@ class ProgramBloc extends Bloc<ProgramEvent, ProgramState> {
       emit(ProgramErrorState(e.toString()));
     }
   }
+
+  // FutureOr<void> _getProgramId(GetProgramIdEvent event, Emitter<ProgramState> emit) async{
+  //   try{
+  //     final response = await programRepository.getProgramId(event.programName);
+
+  //     emit(GetProgramDtoSuccessState(response));
+  //   }on Exception catch(e){
+  //     emit(ProgramErrorState(e.toString()));
+  //   }
+  // }
 }

@@ -27,10 +27,10 @@ public class SessionService {
     private final WeekRepository weekRepository;
     private final SessionRepository sessionRepository;
 
-    public Page<Session> findCardPageById(Pageable page, String coachName, String programName,
+    public Page<Session> findCardPageById(Pageable page, String coachUsername, String programName,
                                          String weekName, Long weekNumber){
 
-        Coach c = coachRepository.findByUsername(coachName).orElseThrow(() -> new NotFoundException("coach"));
+        Coach c = coachRepository.findByUsername(coachUsername).orElseThrow(() -> new NotFoundException("coach"));
         Program p = programRepository.findByCoachAndProgramName(c.getId(), programName).orElseThrow(() -> new NotFoundException("program"));
 
         Page<Session> pagedResult =  sessionRepository.findSessionCardPageById(page, WeekId.of(weekNumber, weekName, p.getId()));
@@ -39,6 +39,14 @@ public class SessionService {
             throw new EntityNotFoundException("No sessions found in this page.");
 
         return pagedResult;
+    }
+
+    public Session findPostDtoById(String coachUsername, String programName,
+                                          String weekName, Long weekNumber, Long sessionNumber){
+        Coach c = coachRepository.findByUsername(coachUsername).orElseThrow(() -> new NotFoundException("coach"));
+        Program p = programRepository.findByCoachAndProgramName(c.getId(), programName).orElseThrow(() -> new NotFoundException("program"));
+
+        return sessionRepository.findById(SessionId.of(sessionNumber, WeekId.of(weekNumber, weekName, p.getId()))).orElseThrow(() -> new NotFoundException("session"));
     }
 
     public Session save(String coachUsername, String programName, String weekName, Long weekNumber, PostSessionDto postSession){

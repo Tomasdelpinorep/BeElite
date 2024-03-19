@@ -355,8 +355,9 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                             fontWeight: FontWeight.bold,
                                             fontSize: 22)),
                                     Text(
-                                        capitalizeFirstLetter(
-                                            week.description!),
+                                        week.span != null
+                                            ? '${week.span!.first} - ${week.span!.last}'
+                                            : week.description!,
                                         style: TextStyle(
                                             color: Colors.grey[800],
                                             fontWeight: FontWeight.normal,
@@ -497,6 +498,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                                 programName: programName,
                                                 weekName: week.weekName!,
                                                 weekNumber: week.weekNumber!,
+                                                sessionNumber: session.sessionNumber!,
                                               ),
                                             ),
                                           );
@@ -506,9 +508,9 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                               MaterialStateProperty.all(
                                                   Colors.black45),
                                         ),
-                                        child: session.sessionNumber! > 1
+                                        child: session.sameDaySessionNumber! > 1
                                             ? Text(
-                                                "${capitalizeFirstLetter(session.dayOfWeek!)} #${session.sessionNumber}",
+                                                "${capitalizeFirstLetter(session.dayOfWeek!)} #${session.sameDaySessionNumber}",
                                                 style: const TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.w100,
@@ -556,7 +558,8 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => CoachNewSessionScreen(week: week)));
+                  builder: (context) => CoachNewSessionScreen(
+                    week: week, coachUsername : widget.coachDetails.username!, programName : programName)));
         },
       ),
     );
