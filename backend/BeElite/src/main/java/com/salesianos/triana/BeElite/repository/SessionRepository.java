@@ -6,10 +6,13 @@ import com.salesianos.triana.BeElite.model.Session;
 import com.salesianos.triana.BeElite.model.Week;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface SessionRepository extends JpaRepository<Session, SessionId> {
@@ -30,5 +33,6 @@ public interface SessionRepository extends JpaRepository<Session, SessionId> {
             "AND s.program_id = :#{#weekId.program_id} ", nativeQuery = true)
     Page<Session> findSessionCardPageById(Pageable page, @Param("weekId") WeekId weekId);
 
-
+    @Query("SELECT s FROM Session s LEFT JOIN FETCH s.blocks b WHERE s.id = :sessionId ORDER BY b.block_id.block_number ASC")
+    Optional<Session> findByIdOrderedByBlockNumberAsc(SessionId sessionId);
 }

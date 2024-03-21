@@ -1,5 +1,6 @@
 package com.salesianos.triana.BeElite.service;
 
+import com.salesianos.triana.BeElite.dto.Block.PostBlockDto;
 import com.salesianos.triana.BeElite.dto.Session.PostSessionDto;
 import com.salesianos.triana.BeElite.exception.NotFoundException;
 import com.salesianos.triana.BeElite.model.Coach;
@@ -16,7 +17,11 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -46,7 +51,8 @@ public class SessionService {
         Coach c = coachRepository.findByUsername(coachUsername).orElseThrow(() -> new NotFoundException("coach"));
         Program p = programRepository.findByCoachAndProgramName(c.getId(), programName).orElseThrow(() -> new NotFoundException("program"));
 
-        return sessionRepository.findById(SessionId.of(sessionNumber, WeekId.of(weekNumber, weekName, p.getId()))).orElseThrow(() -> new NotFoundException("session"));
+        SessionId sessionId = SessionId.of(sessionNumber, WeekId.of(weekNumber, weekName, p.getId()));
+        return sessionRepository.findByIdOrderedByBlockNumberAsc(sessionId).orElseThrow(() -> new NotFoundException("session"));
     }
 
     public Session save(String coachUsername, String programName, String weekName, Long weekNumber, PostSessionDto postSession){
@@ -55,5 +61,34 @@ public class SessionService {
         WeekId weekId = WeekId.of(weekNumber, weekName, p.getId());
 
         return sessionRepository.save(PostSessionDto.toEntity(postSession, weekId));
+    }
+
+    public Session edit(PostSessionDto editedSession, String coachUsername,String programName, String weekName, Long weekNumber){
+        Coach c = coachRepository.findByUsername(coachUsername).orElseThrow(() -> new NotFoundException("coach"));
+        Program p = programRepository.findByCoachAndProgramName(c.getId(), programName).orElseThrow(() -> new NotFoundException("program"));
+        WeekId weekId = WeekId.of(weekNumber, weekName, p.getId());
+
+        Session originalSession = sessionRepository.findById(SessionId.of(editedSession.session_number(), weekId))
+                .orElseThrow(() -> new NotFoundException("session"));
+
+        originalSession.setDate(editedSession.date());
+        originalSession.setTitle(editedSession.title());
+        originalSession.setSubtitle(editedSession.subtitle());
+        //Must return mutable ArrayList or else throws UnsupportedOperationException
+        originalSession.setBlocks(editedSession.blocks().stream()
+                .map(block -> PostBlockDto.toEntity(block, originalSession.getId()))
+                .collect(Collectors.toCollection(ArrayList::new)));
+        originalSession.setSame_day_session_number(editedSession.same_day_session_number());
+
+        return sessionRepository.save(originalSession);
+    }
+
+    public void delete(String coachUsername,String programName, String weekName, Long weekNumber, Long sessionNumber){
+        Coach c = coachRepository.findByUsername(coachUsername).orElseThrow(() -> new NotFoundException("coach"));
+        Program p = programRepository.findByCoachAndProgramName(c.getId(), programName).orElseThrow(() -> new NotFoundException("program"));
+        WeekId weekId = WeekId.of(weekNumber, weekName, p.getId());
+
+        Session s = sessionRepository.findById(SessionId.of(sessionNumber, weekId)).orElseThrow(() -> new NotFoundException("session"));
+        sessionRepository.delete(s);
     }
 }

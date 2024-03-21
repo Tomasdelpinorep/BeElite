@@ -32,6 +32,26 @@ class SessionRepositoryImpl extends SessionRepository {
   }
 
   @override
+  Future<SessionDto> saveEditedSession(PostSessionDto editedSession, String coachUsername, String programName, String weekName, int weekNumber) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    final response = await _client.put(
+      Uri.parse('$urlChrome/$coachUsername/$programName/$weekName/$weekNumber/sessions/edit'),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${prefs.getString('authToken')}'
+      },
+      body: jsonEncode(editedSession.toJson())
+    );
+
+    if(response.statusCode == 200){
+      return SessionDto.fromJson(json.decode(response.body));
+    }else{
+      throw Exception("There was an error updating existing session.");
+    }
+  }
+
+  @override
   Future<SessionCardDto> getSessionCardData(
     String coachUsername, String programName, String weekName, int weekNumber) async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -52,11 +72,11 @@ class SessionRepositoryImpl extends SessionRepository {
   }
   
   @override
-  Future<PostSessionDto> getPostSessionDto(String coachUsername, String programName, String weekName, int weekNumber) async{
+  Future<PostSessionDto> getPostSessionDto(String coachUsername, String programName, String weekName, int weekNumber, int sessionNumber) async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     final response = await _client.get(
-      Uri.parse('$urlChrome/$coachUsername/$programName/$weekName/$weekNumber/sessions/edit'),
+      Uri.parse('$urlChrome/$coachUsername/$programName/$weekName/$weekNumber/sessions/$sessionNumber'),
       headers: <String, String>{
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ${prefs.getString('authToken')}'
@@ -67,6 +87,23 @@ class SessionRepositoryImpl extends SessionRepository {
       return PostSessionDto.fromJson(json.decode(response.body));
     }else{
       throw Exception("There was an error fetching session data.");
+    }
+  }
+  
+  @override
+  Future<void> deleteSession(String coachUsername, String programName, String weekName, int weekNumber, int sessionNumber) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    final response = await _client.delete(
+      Uri.parse('$urlChrome/$coachUsername/$programName/$weekName/$weekNumber/sessions/$sessionNumber/delete'),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${prefs.getString('authToken')}'
+      },
+    );
+
+    if(response.statusCode != 204){
+      throw Exception("There was an error deleting the session."); 
     }
   }
 }

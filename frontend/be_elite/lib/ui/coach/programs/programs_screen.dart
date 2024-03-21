@@ -1,20 +1,21 @@
 import 'package:be_elite/bloc/Week/week_bloc.dart';
 import 'package:be_elite/models/Coach/coach_details.dart';
 import 'package:be_elite/models/Coach/program_dto.dart';
+import 'package:be_elite/models/Week/content.dart';
 import 'package:be_elite/models/Week/week_dto.dart';
 import 'package:be_elite/repositories/coach/coach_repository.dart';
 import 'package:be_elite/repositories/coach/coach_repository_impl.dart';
 import 'package:be_elite/styles/app_colors.dart';
 import 'package:be_elite/ui/coach/programs/add_program_screen.dart';
-import 'package:be_elite/ui/coach/programs/sessions/new_session_page.dart';
-import 'package:be_elite/ui/coach/programs/sessions/session_page.dart';
+import 'package:be_elite/ui/coach/programs/sessions/create_edit_session.dart';
 import 'package:be_elite/ui/coach/programs/weeks/coach_add_week_screen.dart';
 import 'package:be_elite/ui/coach/coach_main_screen.dart';
 import 'package:be_elite/ui/coach/programs/weeks/edit_week_screen.dart';
-import 'package:be_elite/widgets/beElite_logo.dart';
-import 'package:be_elite/widgets/circular_avatar.dart';
+import 'package:be_elite/misc/Widgets/beElite_logo.dart';
+import 'package:be_elite/misc/Widgets/circular_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProgramsScreen extends StatefulWidget {
@@ -492,13 +493,15 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                             context,
                                             MaterialPageRoute(
                                               builder: (context) =>
-                                                  CoachSessionPage(
+                                                  CoachCreateOrEditSessionScreen(
+                                                week: week,
                                                 coachUsername: widget
                                                     .coachDetails.username!,
                                                 programName: programName,
                                                 weekName: week.weekName!,
                                                 weekNumber: week.weekNumber!,
-                                                sessionNumber: session.sessionNumber!,
+                                                sessionNumber:
+                                                    session.sessionNumber!,
                                               ),
                                             ),
                                           );
@@ -510,15 +513,14 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                                         ),
                                         child: session.sameDaySessionNumber! > 1
                                             ? Text(
-                                                "${capitalizeFirstLetter(session.dayOfWeek!)} #${session.sameDaySessionNumber}",
+                                                "${DateFormat('EEEE').format(DateTime.parse(session.date!))} #${session.sameDaySessionNumber}",
                                                 style: const TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.w100,
                                                 ),
                                               )
                                             : Text(
-                                                capitalizeFirstLetter(
-                                                    session.dayOfWeek!),
+                                                    DateFormat('EEEE').format(DateTime.parse(session.date!)),
                                                 style: const TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.w100,
@@ -542,7 +544,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
     );
   }
 
-  Widget _newSessionButton(week) {
+  Widget _newSessionButton(WeekContent week) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4).copyWith(top: 12),
       child: OutlinedButton.icon(
@@ -558,8 +560,12 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => CoachNewSessionScreen(
-                    week: week, coachUsername : widget.coachDetails.username!, programName : programName)));
+                  builder: (context) => CoachCreateOrEditSessionScreen(
+                      week: week,
+                      coachUsername: widget.coachDetails.username!,
+                      programName: programName,
+                      weekName: week.weekName!,
+                      weekNumber: week.weekNumber!)));
         },
       ),
     );

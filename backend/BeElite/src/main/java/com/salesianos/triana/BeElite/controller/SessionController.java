@@ -60,4 +60,24 @@ public class SessionController {
         return ResponseEntity.created(createdUri).body(SessionDto.of(s));
     }
 
+    @PutMapping("/{coachUsername}/{programName}/{weekName}/{weekNumber}/sessions/edit")
+    public SessionDto editSession(@PathVariable String coachUsername,
+                                  @PathVariable String programName,
+                                  @PathVariable String weekName,
+                                  @PathVariable Long weekNumber,
+                                  @RequestBody @Valid PostSessionDto editedSession){
+        Session s = sessionService.edit(editedSession, coachUsername, programName, weekName, weekNumber);
+        return SessionDto.of(s);
+    }
+
+    @DeleteMapping("/{coachUsername}/{programName}/{weekName}/{weekNumber}/sessions/{sessionNumber}/delete")
+    public ResponseEntity<?> deleteSession(@PathVariable String coachUsername,
+                                           @PathVariable String programName,
+                                           @PathVariable String weekName,
+                                           @PathVariable Long weekNumber,
+                                           @PathVariable Long sessionNumber){
+        sessionService.delete(coachUsername, programName, weekName, weekNumber, sessionNumber);
+        return ResponseEntity.noContent().build();
+    }
+
 }

@@ -17,6 +17,11 @@ final class SaveNewSessionSuccessState extends SessionState{
   SaveNewSessionSuccessState(this.session);
 }
 
+final class SaveEditedSessionSuccessState extends SessionState{
+  final SessionDto session;
+  SaveEditedSessionSuccessState(this.session);
+}
+
 final class GetSessionCardDataSuccessState extends SessionState{
   final SessionCardDto session;
   GetSessionCardDataSuccessState(this.session);
@@ -26,3 +31,7 @@ final class GetPostSessionDtoSuccessState extends SessionState{
   final PostSessionDto session;
   GetPostSessionDtoSuccessState(this.session);
 }
+
+final class LoadNewSessionSuccessState extends SessionState{}
+
+final class DeleteSessionSuccessState extends SessionState{}

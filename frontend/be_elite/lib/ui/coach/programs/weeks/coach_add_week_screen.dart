@@ -11,7 +11,7 @@ import 'package:be_elite/repositories/coach/coach_repository_impl.dart';
 import 'package:be_elite/repositories/program/program_repository.dart';
 import 'package:be_elite/repositories/program/program_repository_impl.dart';
 import 'package:be_elite/styles/app_colors.dart';
-import 'package:be_elite/widgets/_weekDescriptionField.dart';
+import 'package:be_elite/misc/Widgets/_weekDescriptionField.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

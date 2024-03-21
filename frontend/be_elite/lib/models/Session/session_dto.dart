@@ -1,18 +1,18 @@
 class SessionDto {
-	String? dayOfWeek;
+	String? date;
 	int? sessionNumber;
   int? sameDaySessionNumber;
 
-	SessionDto({this.dayOfWeek, this.sessionNumber, this.sameDaySessionNumber});
+	SessionDto({this.date, this.sessionNumber, this.sameDaySessionNumber});
 
 	factory SessionDto.fromJson(Map<String, dynamic> json) => SessionDto(
-				dayOfWeek: json['dayOfWeek'] as String?,
+				date: json['date'] as String?,
 				sessionNumber: json['sessionNumber'] as int?,
         sameDaySessionNumber: json['sameDaySessionNumber'] as int?
 			);
 
 	Map<String, dynamic> toJson() => {
-				'dayOfWeek': dayOfWeek,
+				'date': date,
 				'sessionNumber': sessionNumber,
         'sameDaySessionNumber' : sameDaySessionNumber,
 			};

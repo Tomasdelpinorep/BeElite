@@ -7,7 +7,7 @@ import java.time.DayOfWeek;
 import java.util.List;
 
 @Builder
-public record SessionDto(String dayOfWeek,
+public record SessionDto(String date,
                          Long sessionNumber,
                          int sameDaySessionNumber)
 {
@@ -16,7 +16,7 @@ public record SessionDto(String dayOfWeek,
     }
     public static SessionDto of(Session s){
         return SessionDto.builder()
-                .dayOfWeek(s.getDate().getDayOfWeek().toString())
+                .date(s.getDate().toString())
                 .sessionNumber(s.getId().getSession_number())
                 .sameDaySessionNumber(s.getSame_day_session_number())
                 .build();

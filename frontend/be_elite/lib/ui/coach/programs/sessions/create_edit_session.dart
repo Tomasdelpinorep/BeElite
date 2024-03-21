@@ -1,4 +1,5 @@
 import 'package:be_elite/bloc/session/session_bloc.dart';
+import 'package:be_elite/misc/Method_Classes/edit_session_methods.dart';
 import 'package:be_elite/models/Session/post_session_dto/post_block_dto.dart';
 import 'package:be_elite/models/Session/post_session_dto/post_session_dto.dart';
 import 'package:be_elite/models/Session/post_session_dto/post_set_dto.dart';
@@ -12,22 +13,32 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
-class CoachNewSessionScreen extends StatefulWidget {
+class CoachCreateOrEditSessionScreen extends StatefulWidget {
   final WeekContent week;
   final String coachUsername;
   final String programName;
-  const CoachNewSessionScreen(
+  final String weekName;
+  final int weekNumber;
+  final int? sessionNumber;
+  const CoachCreateOrEditSessionScreen(
       {super.key,
       required this.week,
       required this.coachUsername,
-      required this.programName});
+      required this.programName,
+      required this.weekName,
+      required this.weekNumber,
+      this.sessionNumber});
 
   @override
-  State<CoachNewSessionScreen> createState() => _CoachNewSessionScreenState();
+  State<CoachCreateOrEditSessionScreen> createState() =>
+      _CoachCreateOrEditSessionScreenState();
 }
 
-class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
+class _CoachCreateOrEditSessionScreenState
+    extends State<CoachCreateOrEditSessionScreen> {
   final formKey = GlobalKey<FormState>();
+  final editMethods = EditSessionMethods();
+
   //Session controllers
   final titleTextController = TextEditingController();
   final subtitleTextController = TextEditingController();
@@ -44,19 +55,11 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
 
   List<String> blockLetters = ['A'];
   List<int> setsPerBlock = [1];
-  List<String> daysOfWeek = [
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-    'Sundary'
-  ];
   // ignore: prefer_final_fields
   int _selectedDayIndex = 0;
   String? selectedDayString;
   int totalNumberOfSets = 0;
+  String? uneditedDateString;
 
   late SessionBloc _sessionBloc;
   late SessionRepository sessionRepository;
@@ -64,7 +67,14 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
   @override
   void initState() {
     sessionRepository = SessionRepositoryImpl();
-    _sessionBloc = SessionBloc(sessionRepository);
+    if (widget.sessionNumber != null && widget.sessionNumber! > 0) {
+      _sessionBloc = SessionBloc(sessionRepository)
+        ..add(GetPostSessionDtoEvent(widget.coachUsername, widget.weekName,
+            widget.programName, widget.weekNumber, widget.sessionNumber!));
+    } else {
+      //I found this necessary to be able to load the controllers for an existing session before the form loads and throws errors.
+      _sessionBloc = SessionBloc(sessionRepository)..add(LoadNewSessionEvent());
+    }
     super.initState();
   }
 
@@ -72,7 +82,7 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        width: double.infinity,
+          width: double.infinity,
           height: double.infinity,
           decoration: BoxDecoration(
             gradient: RadialGradient(
@@ -82,18 +92,22 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
           ),
           child: BlocProvider.value(
               value: _sessionBloc,
-              child: BlocBuilder<SessionBloc, SessionState>(
+              child: BlocConsumer<SessionBloc, SessionState>(
                 buildWhen: (context, state) {
                   return state is SessionErrorState ||
                       state is SessionLoadingState ||
-                      state is SaveNewSessionSuccessState;
+                      state is SaveNewSessionSuccessState ||
+                      state is GetPostSessionDtoSuccessState ||
+                      state is LoadNewSessionSuccessState ||
+                      state is SaveEditedSessionSuccessState;
                 },
                 builder: (context, state) {
                   if (state is SessionErrorState) {
                     return const Text('There was an error saving the session.');
                   } else if (state is SessionLoadingState) {
-                    return const CircularProgressIndicator();
-                  } else if (state is SaveNewSessionSuccessState) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (state is SaveNewSessionSuccessState ||
+                      state is SaveEditedSessionSuccessState) {
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       showDialog(
                         context: context,
@@ -101,9 +115,13 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
                           return AlertDialog(
                             title: const Text('Success!',
                                 style: TextStyle(color: Colors.white)),
-                            content: const Text(
-                                'New session has been successfully created.',
-                                style: TextStyle(color: Colors.white)),
+                            content: state is SaveNewSessionSuccessState
+                                ? const Text(
+                                    'New session has been successfully created.',
+                                    style: TextStyle(color: Colors.white))
+                                : const Text(
+                                    'Session has been successfully updated.',
+                                    style: TextStyle(color: Colors.white)),
                             backgroundColor: AppColors.successGreen,
                           );
                         },
@@ -116,14 +134,46 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
                         );
                       });
                     });
+                  } else if (state is GetPostSessionDtoSuccessState) {
+                    return SingleChildScrollView(child: newSessionForm());
+                  } else if (state is LoadNewSessionSuccessState) {
+                    return SingleChildScrollView(child: newSessionForm());
                   }
-                  return SingleChildScrollView(child: _newSessionForm());
+                  return Container();
+                },
+                listenWhen: (context, state) =>
+                    state is GetPostSessionDtoSuccessState ||
+                    state is DeleteSessionSuccessState,
+                listener: (context, state) {
+                  if (state is GetPostSessionDtoSuccessState) {
+                    setsPerBlock = editMethods.getSetsPerBlock(state.session);
+                    blockLetters =
+                        editMethods.setBlockLetters(state.session.blocks!);
+                    editMethods.setSessionControllerValues(state.session,
+                        titleTextController, subtitleTextController);
+                    editMethods.setBlockAndSetControllerValues(
+                        state.session,
+                        movementControllers,
+                        blockInstructionsTextControllers,
+                        restBetweenSetsTextControllers,
+                        numberOfSetsTextControllers,
+                        numberOfRepsTextControllers,
+                        percentageTextControllers);
+                    _selectDay(editMethods.getDayIndex(
+                        widget.week.span!, state.session.date!));
+                    uneditedDateString = selectedDayString;
+                  } else if (state is DeleteSessionSuccessState) {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const CoachMainScreen()));
+                  }
                 },
               ))),
     );
   }
 
-  Widget _newSessionForm() {
+  Widget newSessionForm() {
     return Form(
       key: formKey,
       child: Padding(
@@ -133,12 +183,18 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               //Session inputs
-              const Center(
-                child: Text('New Session',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 32,
-                        fontStyle: FontStyle.italic)),
+              Center(
+                child: widget.sessionNumber == null
+                    ? const Text('New Session',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 32,
+                            fontStyle: FontStyle.italic))
+                    : const Text('Edit Session',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 32,
+                            fontStyle: FontStyle.italic)),
               ),
               const SizedBox(height: 30),
               _sessionDayField(),
@@ -157,7 +213,13 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
 
               _addBlockButton(),
               const SizedBox(height: 30),
-              _saveSessionButton(),
+              widget.sessionNumber != null
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [_deleteSessionButton(), _saveSessionButton()],
+                    )
+                  : Align(
+                      alignment: Alignment.center, child: _saveSessionButton()),
               const SizedBox(height: 30),
             ]),
       ),
@@ -299,11 +361,14 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
       setForms.add(_newSetForm(i, setsBeforeIndexed + i - 1));
     }
 
-    // Create controllers for each block form
-    for (int i = 0; i < blockLetters.length; i++) {
-      movementControllers.add(TextEditingController());
-      blockInstructionsTextControllers.add(TextEditingController());
-      restBetweenSetsTextControllers.add(TextEditingController());
+    // Create controllers for each block form if its a new session, or if user requests a new block in an existing session
+    if (widget.sessionNumber == null ||
+        movementControllers.length < blockLetters.length) {
+      for (int i = 0; i < blockLetters.length; i++) {
+        movementControllers.add(TextEditingController());
+        blockInstructionsTextControllers.add(TextEditingController());
+        restBetweenSetsTextControllers.add(TextEditingController());
+      }
     }
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -318,7 +383,16 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
       const SizedBox(height: 30),
       ...setForms,
       const SizedBox(height: 30),
-      _addSetButton(blockIndex),
+      setsPerBlock[blockIndex] > 1
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _deleteSetButton(blockIndex),
+                _addSetButton(blockIndex)
+              ],
+            )
+          : Align(
+              alignment: Alignment.center, child: _addSetButton(blockIndex)),
       const SizedBox(height: 30),
       _blockRestField(restBetweenSetsTextControllers[blockIndex]),
       const SizedBox(height: 30),
@@ -394,8 +468,8 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
   }
 
   Widget _newSetForm(int setNumber, int totalSetIndex) {
-    // Create controllers for each set form
-    for (int i = 0; i < setNumber; i++) {
+    // Create controllers for each new set form
+    if (setNumber > numberOfSetsTextControllers.length) {
       numberOfSetsTextControllers.add(TextEditingController());
       numberOfRepsTextControllers.add(TextEditingController());
       percentageTextControllers.add(TextEditingController());
@@ -525,6 +599,37 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
     );
   }
 
+  Widget _deleteSetButton(int blockIndex) {
+    return GestureDetector(
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.remove_circle_outline, color: Colors.white),
+          SizedBox(width: 8),
+          Text(
+            'Remove set',
+            style: TextStyle(
+                fontSize: 14,
+                color: Colors.white,
+                fontWeight: FontWeight.normal,
+                fontStyle: FontStyle.italic),
+          ),
+        ],
+      ),
+      onTap: () {
+        setState(() {
+          numberOfSetsTextControllers
+              .removeAt(numberOfSetsTextControllers.length - 1);
+          numberOfRepsTextControllers
+              .removeAt(numberOfSetsTextControllers.length - 1);
+          percentageTextControllers
+              .removeAt(numberOfSetsTextControllers.length - 1);
+          setsPerBlock[blockIndex] -= 1;
+        });
+      },
+    );
+  }
+
   Widget _blockRestField(TextEditingController restBetweenSetsTextController) {
     return SizedBox(
       width: 130,
@@ -578,49 +683,70 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
       ),
       onTap: () {
         setState(() {
-          blockLetters
-              .add(String.fromCharCode(blockLetters.last.codeUnitAt(0) + 1));
-          setsPerBlock.add(1);
+          if (blockLetters.isEmpty) {
+            blockLetters.add('A');
+            setsPerBlock.add(1);
+          } else {
+            blockLetters
+                .add(String.fromCharCode(blockLetters.last.codeUnitAt(0) + 1));
+            setsPerBlock.add(1);
+          }
         });
       },
     );
   }
 
   Widget _saveSessionButton() {
-    return Align(
-      alignment: Alignment.center,
-      child: Container(
-        decoration: const BoxDecoration(
-            boxShadow: [BoxShadow(color: Color(0xFFD6CD0B), blurRadius: 5)]),
-        child: FilledButton(
-          onPressed: () {
-            if (formKey.currentState!.validate()) {
-              //Gets data from block forms and puts it into a list
-              List<PostBlockDto> blocks = List.generate(
-                  blockLetters.length,
-                  (blockIndex) => PostBlockDto(
-                      blockInstructions:
-                          blockInstructionsTextControllers[blockIndex].text,
-                      blockNumber: blockIndex + 1,
-                      movement: movementControllers[blockIndex].text,
-                      restBetweenSets:
-                          restBetweenSetsTextControllers[blockIndex].text.isEmpty
-                              ? 0
-                              : int.parse(
-                                  restBetweenSetsTextControllers[blockIndex].text),
-                      sets:
-                          //Gets data from sets forms and puts it into a list
-                          List.generate(
-                              setsPerBlock[blockIndex],
-                              (setIndex) => PostSetDto(
-                                  numberOfReps: int.parse(
-                                      numberOfRepsTextControllers[_getSetTextControllerIndex(blockIndex, setIndex)].text),
-                                  numberOfSets: int.parse(
-                                      numberOfSetsTextControllers[_getSetTextControllerIndex(blockIndex, setIndex)].text),
-                                  percentage: int.parse(
-                                      percentageTextControllers[_getSetTextControllerIndex(blockIndex, setIndex)].text),
-                                  setNumber: setIndex + 1))));
+    return Container(
+      decoration: const BoxDecoration(
+          boxShadow: [BoxShadow(color: Color(0xFFD6CD0B), blurRadius: 5)]),
+      child: FilledButton(
+        onPressed: () {
+          if (formKey.currentState!.validate()) {
+            //Gets data from block forms and puts it into a list
+            List<PostBlockDto> blocks = List.generate(
+                blockLetters.length,
+                (blockIndex) => PostBlockDto(
+                    blockInstructions:
+                        blockInstructionsTextControllers[blockIndex].text,
+                    blockNumber: blockIndex + 1,
+                    movement: movementControllers[blockIndex].text,
+                    restBetweenSets: restBetweenSetsTextControllers[blockIndex]
+                            .text
+                            .isEmpty
+                        ? 0
+                        : int.parse(
+                            restBetweenSetsTextControllers[blockIndex].text),
+                    sets:
+                        //Gets data from sets forms and puts it into a list
+                        List.generate(
+                            setsPerBlock[blockIndex],
+                            (setIndex) => PostSetDto(
+                                numberOfReps: int.parse(numberOfRepsTextControllers[
+                                        _getSetTextControllerIndex(
+                                            blockIndex, setIndex)]
+                                    .text),
+                                numberOfSets: int.parse(
+                                    numberOfSetsTextControllers[_getSetTextControllerIndex(blockIndex, setIndex)]
+                                        .text),
+                                percentage: int.parse(percentageTextControllers[_getSetTextControllerIndex(blockIndex, setIndex)].text),
+                                setNumber: setIndex + 1))));
 
+            if (widget.sessionNumber != null) {
+              _sessionBloc.add(SaveEditedSessionEvent(
+                  PostSessionDto(
+                      blocks: blocks,
+                      date: selectedDayString ?? widget.week.span!.first,
+                      title: titleTextController.text,
+                      subtitle: subtitleTextController.text,
+                      sessionNumber: widget.sessionNumber,
+                      sameDaySessionNumber: getSameDaySessionNumber(
+                          selectedDayString ?? widget.week.span!.first)),
+                  widget.week.weekName!,
+                  widget.week.weekNumber!,
+                  widget.programName,
+                  widget.coachUsername));
+            } else {
               _sessionBloc.add(SaveNewSessionEvent(
                   PostSessionDto(
                       blocks: blocks,
@@ -629,24 +755,85 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
                       subtitle: subtitleTextController.text,
                       sessionNumber: getSessionNumber(),
                       sameDaySessionNumber: getSameDaySessionNumber(
-                          DateFormat('EEEE').format(DateTime.parse(
-                              selectedDayString ?? widget.week.span!.first)))),
+                          selectedDayString ?? widget.week.span!.first)),
                   widget.week.weekName!,
                   widget.week.weekNumber!,
                   widget.programName,
                   widget.coachUsername));
             }
-          },
-          style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.mainYellow,
-              fixedSize: const Size(200, 50),
-              shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.elliptical(5, 5)))),
-          child: const Text(
-            "Save Session",
-            style: TextStyle(
-                color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
-          ),
+          }
+        },
+        style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.mainYellow,
+            fixedSize: const Size(150, 50),
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.elliptical(5, 5)))),
+        child: const Text(
+          "Save",
+          style: TextStyle(
+              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
+        ),
+      ),
+    );
+  }
+
+  Widget _deleteSessionButton() {
+    return OutlinedButton(
+      onPressed: () {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text(
+                  'Warning!',
+                  style: TextStyle(color: Colors.white),
+                  textAlign: TextAlign.center,
+                ),
+                content:
+                    const Text('Are you sure you want to delete this session?'),
+                actions: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text('No',
+                              style: TextStyle(color: Colors.white))),
+                      TextButton(
+                          onPressed: () {
+                            _sessionBloc.add(DeleteSessionEvent(
+                                widget.coachUsername,
+                                widget.weekName,
+                                widget.programName,
+                                widget.weekNumber,
+                                widget.sessionNumber!));
+                          },
+                          child: const Text('Yes',
+                              style: TextStyle(color: Colors.white))),
+                    ],
+                  )
+                ],
+                backgroundColor: AppColors.errorRed,
+              );
+            },
+          );
+        });
+      },
+      style: ButtonStyle(
+          fixedSize: MaterialStateProperty.all(const Size(150, 50)),
+          shape: MaterialStateProperty.all(const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.elliptical(5, 5)))),
+          side: MaterialStateProperty.all(
+              const BorderSide(width: 2, color: Colors.white54))),
+      child: const Text(
+        "Delete",
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 20,
         ),
       ),
     );
@@ -700,24 +887,29 @@ class _CoachNewSessionScreenState extends State<CoachNewSessionScreen> {
     return 1;
   }
 
-  int getSameDaySessionNumber(String dayName) {
+  int getSameDaySessionNumber(String dateString) {
     int sameDaySessionNumber = 1;
     if (widget.week.sessions == null) {
       return sameDaySessionNumber;
     }
 
     for (var session in widget.week.sessions!) {
-      if (session.dayOfWeek!.toLowerCase() == dayName.toLowerCase()) {
+      if (session.date!.toLowerCase() == dateString.toLowerCase()) {
         sameDaySessionNumber++;
       }
     }
 
+    if (widget.sessionNumber != null &&
+        uneditedDateString != null &&
+        uneditedDateString!.toLowerCase() == dateString.toLowerCase()) {
+      return sameDaySessionNumber - 1;
+    }
     return sameDaySessionNumber;
   }
 
-  int _getSetTextControllerIndex(int blockIndex, int setIndex){
+  int _getSetTextControllerIndex(int blockIndex, int setIndex) {
     int savedSets = 0;
-    for (int i = 0; i < blockIndex; i++){
+    for (int i = 0; i < blockIndex; i++) {
       savedSets += setsPerBlock[i];
     }
     return savedSets + setIndex;

@@ -5,8 +5,13 @@ import 'package:be_elite/models/Session/session_dto.dart';
 abstract class SessionRepository{
   Future<SessionDto> saveNewSession(
     PostSessionDto newSession, String coachUsername, String programName, String weekName, int weekNumber);
+  
+  Future<SessionDto> saveEditedSession(
+    PostSessionDto editedSession, String coachUsername, String programName, String weekName, int weekNumber);
 
   Future<SessionCardDto> getSessionCardData(String coachUsername, String programName, String weekName, int weekNumber);
 
-  Future<PostSessionDto> getPostSessionDto(String coachUsername, String programName, String weekName, int weekNumber);
+  Future<PostSessionDto> getPostSessionDto(String coachUsername, String programName, String weekName, int weekNumber, int sessionNumber);
+
+  Future<void> deleteSession(String coachUsername, String programName, String weekName, int weekNumber, int sessionNumber);
 }

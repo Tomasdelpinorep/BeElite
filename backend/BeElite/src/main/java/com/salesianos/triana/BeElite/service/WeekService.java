@@ -76,7 +76,7 @@ public class WeekService {
             // Must save the new Week entity before updating sessions
             editedWeekEntity = weekRepository.save(editedWeekEntity);
 
-            // Here I update both the embedded session id to its new week
+            // Here I update the week's sessions, so they reference the newly created week
             for (Session session : originalWeekEntity.getSessions()) {
                 SessionId sessionId = session.getId();
                 if (sessionId != null) {
