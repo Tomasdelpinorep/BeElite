@@ -621,9 +621,9 @@ class _CoachCreateOrEditSessionScreenState
           numberOfSetsTextControllers
               .removeAt(numberOfSetsTextControllers.length - 1);
           numberOfRepsTextControllers
-              .removeAt(numberOfSetsTextControllers.length - 1);
+              .removeAt(numberOfRepsTextControllers.length - 1);
           percentageTextControllers
-              .removeAt(numberOfSetsTextControllers.length - 1);
+              .removeAt(percentageTextControllers.length - 1);
           setsPerBlock[blockIndex] -= 1;
         });
       },
