@@ -351,14 +351,17 @@ class _CoachCreateOrEditSessionScreenState
   Widget _newBlockForm(String blockLetter, int blockIndex) {
     List<Widget> setForms = [];
     int setsBeforeIndexed = 0;
+    bool isNewBlock;
 
     //Gets the amount of sets before the new block being created
     for (int i = 0; i < blockIndex; i++) {
       setsBeforeIndexed += setsPerBlock[i];
     }
 
+    setsPerBlock[blockIndex] == 1 ? isNewBlock = true : isNewBlock = false;
+
     for (int i = 1; i <= setsPerBlock[blockIndex]; i++) {
-      setForms.add(_newSetForm(i, setsBeforeIndexed + i - 1));
+      setForms.add(_newSetForm(i, setsBeforeIndexed + i - 1, isNewBlock));
     }
 
     // Create controllers for each block form if its a new session, or if user requests a new block in an existing session
@@ -387,12 +390,12 @@ class _CoachCreateOrEditSessionScreenState
           ? Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _deleteSetButton(blockIndex),
-                _addSetButton(blockIndex)
+                _deleteSetButton(blockIndex, getSumOfNumbersUpUntilIndex(setsPerBlock, blockIndex) - 1),
+                _addSetButton(blockIndex, getSumOfNumbersUpUntilIndex(setsPerBlock, blockIndex) - 1)
               ],
             )
           : Align(
-              alignment: Alignment.center, child: _addSetButton(blockIndex)),
+              alignment: Alignment.center, child: _addSetButton(blockIndex, getSumOfNumbersUpUntilIndex(setsPerBlock, blockIndex) - 1)),
       const SizedBox(height: 30),
       _blockRestField(restBetweenSetsTextControllers[blockIndex]),
       const SizedBox(height: 30),
@@ -467,9 +470,9 @@ class _CoachCreateOrEditSessionScreenState
     );
   }
 
-  Widget _newSetForm(int setNumber, int totalSetIndex) {
+  Widget _newSetForm(int setNumber, int totalSetIndex, bool isNewBlock) {
     // Create controllers for each new set form
-    if (setNumber > numberOfSetsTextControllers.length) {
+    if(isNewBlock) {
       numberOfSetsTextControllers.add(TextEditingController());
       numberOfRepsTextControllers.add(TextEditingController());
       percentageTextControllers.add(TextEditingController());
@@ -574,7 +577,7 @@ class _CoachCreateOrEditSessionScreenState
     );
   }
 
-  Widget _addSetButton(int blockIndex) {
+  Widget _addSetButton(int blockIndex, int setIndex) {
     return GestureDetector(
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -593,13 +596,19 @@ class _CoachCreateOrEditSessionScreenState
       ),
       onTap: () {
         setState(() {
-          setsPerBlock[blockIndex] += 1;
+          numberOfSetsTextControllers
+              .insert(setIndex + 1, TextEditingController());
+          numberOfRepsTextControllers
+              .insert(setIndex + 1, TextEditingController());
+          percentageTextControllers
+              .insert(setIndex + 1, TextEditingController());
+          setsPerBlock[blockIndex] ++;
         });
       },
     );
   }
 
-  Widget _deleteSetButton(int blockIndex) {
+  Widget _deleteSetButton(int blockIndex, int setIndex) {
     return GestureDetector(
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -617,13 +626,15 @@ class _CoachCreateOrEditSessionScreenState
         ],
       ),
       onTap: () {
+        // Deletes the appropriate controller by counting the sets in each block up until the block that has had a set removed
+        // Since only the last set of the block can be removed, that's the correct one. -1 to get the actual position within the list. 
         setState(() {
           numberOfSetsTextControllers
-              .removeAt(numberOfSetsTextControllers.length - 1);
+              .removeAt(setIndex);
           numberOfRepsTextControllers
-              .removeAt(numberOfRepsTextControllers.length - 1);
+              .removeAt(setIndex);
           percentageTextControllers
-              .removeAt(percentageTextControllers.length - 1);
+              .removeAt(setIndex);
           setsPerBlock[blockIndex] -= 1;
         });
       },
@@ -683,6 +694,11 @@ class _CoachCreateOrEditSessionScreenState
       ),
       onTap: () {
         setState(() {
+          //Create a new set of controllers for the set form that is rendered by default when new block is created
+          numberOfSetsTextControllers.add(TextEditingController());
+          numberOfRepsTextControllers.add(TextEditingController());
+          percentageTextControllers.add(TextEditingController());
+
           if (blockLetters.isEmpty) {
             blockLetters.add('A');
             setsPerBlock.add(1);
@@ -878,6 +894,14 @@ class _CoachCreateOrEditSessionScreenState
     if (numbers == null) return 0;
     return numbers.fold(
         0, (int previousValue, int element) => previousValue + element);
+  }
+
+  int getSumOfNumbersUpUntilIndex(List<int> numbers, int index){
+    int counter = 0;
+    for(int i = 0; i <= index;i++){
+      counter += numbers[i];
+    }
+    return counter;
   }
 
   int getSessionNumber() {
