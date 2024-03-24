@@ -4,6 +4,7 @@ import com.salesianos.triana.BeElite.model.Composite_Ids.BlockId;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -29,8 +30,8 @@ public class Block {
     })
     private Session session;
 
-    @OneToMany(mappedBy = "block", cascade = CascadeType.ALL)
-    private List<Set> sets;
+    @OneToMany(mappedBy = "block", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Set> sets = new ArrayList<>();
 
     private Double rest_between_sets;
 

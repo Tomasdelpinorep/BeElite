@@ -20,7 +20,7 @@ public class Session{
 
     private LocalDate date;
 
-    @OneToMany(mappedBy = "session", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Block> blocks;
 
     @ManyToOne
