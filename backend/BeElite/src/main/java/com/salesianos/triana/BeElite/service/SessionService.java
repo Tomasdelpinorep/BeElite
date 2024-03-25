@@ -69,10 +69,8 @@ public class SessionService {
         Session originalSession = sessionRepository.findById(SessionId.of(editedSession.session_number(), weekId))
                 .orElseThrow(() -> new NotFoundException("session"));
 
-        // Clear existing blocks and sets
         originalSession.getBlocks().clear();
 
-        // Add blocks and sets from edited session
         for (PostBlockDto editedBlock : editedSession.blocks()) {
             Block newBlock = new Block();
             newBlock.setBlock_id(BlockId.of(originalSession.getId(), editedBlock.block_number()));
@@ -94,7 +92,6 @@ public class SessionService {
             originalSession.getBlocks().add(newBlock);
         }
 
-        // Update session properties
         originalSession.setDate(editedSession.date());
         originalSession.setTitle(editedSession.title());
         originalSession.setSubtitle(editedSession.subtitle());

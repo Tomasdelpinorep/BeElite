@@ -1,44 +1,40 @@
 package com.salesianos.triana.BeElite.controller;
 
-import com.salesianos.triana.BeElite.dto.User.AddUser;
 import com.salesianos.triana.BeElite.dto.User.AthleteDetailsDto;
-import com.salesianos.triana.BeElite.dto.User.CoachDetailsDto;
-import com.salesianos.triana.BeElite.model.Athlete;
-import com.salesianos.triana.BeElite.model.Coach;
-import com.salesianos.triana.BeElite.security.jwt.JwtProvider;
-import com.salesianos.triana.BeElite.security.jwt.JwtUserResponse;
+import com.salesianos.triana.BeElite.dto.User.UserDto;
 import com.salesianos.triana.BeElite.service.AthleteService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/athlete")
 @Tag(name = "Athlete Controller", description = "Handles registration and all endpoints for athletes.")
 public class AthleteController {
 
     private final AthleteService athleteService;
 
-    @GetMapping("/{athleteUsername}")
-    public ResponseEntity<AthleteDetailsDto> getCoachDetails(@PathVariable String athleteUsername){
-        return ResponseEntity.ok(AthleteDetailsDto.of(athleteService.findByName(athleteUsername)));
+    @GetMapping("/athlete/{athleteUsername}")
+    public AthleteDetailsDto getAthleteDetails(@PathVariable String athleteUsername){
+        return AthleteDetailsDto.of(athleteService.findByName(athleteUsername));
     }
+
+    @GetMapping("/{coachUsername}/{programName}/athletes")
+    public ResponseEntity<List<UserDto>> getAthletesByProgram(@PathVariable String coachUsername, @PathVariable String programName){
+        List<UserDto> athletes = athleteService.findAthletesByProgram(coachUsername, programName).stream().map(UserDto::of).toList();
+
+        if (athletes.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } else {
+            return ResponseEntity.status(HttpStatus.OK).body(athletes);
+        }
+
+    }
+
+
 }

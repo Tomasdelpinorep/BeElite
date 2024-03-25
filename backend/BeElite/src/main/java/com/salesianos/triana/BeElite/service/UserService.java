@@ -23,4 +23,6 @@ public class UserService {
     public boolean userExists(String username) {
         return userRepository.existsByUsernameIgnoreCase(username);
     }
+
+    public boolean isEmailInUse(String email){return userRepository.existsByEmailIgnoreCase(email);}
 }

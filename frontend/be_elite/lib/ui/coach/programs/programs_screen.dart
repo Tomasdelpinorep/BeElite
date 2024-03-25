@@ -23,10 +23,10 @@ class ProgramsScreen extends StatefulWidget {
   const ProgramsScreen({super.key, required this.coachDetails});
 
   @override
-  State<ProgramsScreen> createState() => _ProgramsScreenState();
+  State<ProgramsScreen> createState() => ProgramsScreenState();
 }
 
-class _ProgramsScreenState extends State<ProgramsScreen> {
+class ProgramsScreenState extends State<ProgramsScreen> {
   late String dropDownValue;
   late CoachRepository _coachRepository;
   late WeekBloc _weekBloc;
@@ -41,11 +41,11 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
     super.initState();
   }
 
-  // Method to load the dropdown value from shared preferences
+  // loads the dropdown value from shared preferences
   Future<void> _loadDropDownValue() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      dropDownValue = (prefs.getString('selectedValue') ??
+      dropDownValue = (prefs.getString('selectedProgramName') ??
           widget.coachDetails.programs?.first.program_name)!;
       programName = dropDownValue;
     });
@@ -53,10 +53,10 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
     _weekBloc.add(GetWeeksEvent(dropDownValue));
   }
 
-  //Method to save the selected value to shared preferences
+  // saves the selected value to shared preferences
   Future<void> _saveDropDownValue(String value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('selectedValue', value);
+    await prefs.setString('selectedProgramName', value);
   }
 
   @override
@@ -128,7 +128,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _topBarWidget(),
+          _topBarWidget(widget.coachDetails),
           Expanded(
             child: Stack(
               children: [
@@ -149,7 +149,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _topBarWidget(),
+          _topBarWidget(widget.coachDetails),
           Expanded(
             child: Stack(
               children: [
@@ -163,7 +163,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
     );
   }
 
-  Widget _topBarWidget() {
+  Widget _topBarWidget(CoachDetails coachDetails) {
     return Column(
       children: [
         SizedBox(
@@ -172,7 +172,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
           child: Row(
             children: [
               CircularProfileAvatar(
-                  imageUrl: widget.coachDetails.profilePicUrl ??
+                  imageUrl: coachDetails.profilePicUrl ??
                       'https://i.imgur.com/jNNT4LE.png'),
               Expanded(
                 child: Padding(
@@ -181,7 +181,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                           40), //This centers the welcome message over the program selector, 40 is avatar's radius
                   child: Column(
                     children: [
-                      Text('Hello ${widget.coachDetails.name}'),
+                      Text('Hello ${coachDetails.name}'),
                       const Text(
                         'Welcome Back!',
                         style: TextStyle(
@@ -202,21 +202,17 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
           width: double.infinity,
           height: 50,
           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            _programSelectorWidget(),
+            _programSelectorWidget(coachDetails),
           ]),
         ),
       ],
     );
   }
 
-  Widget _programSelectorWidget() {
-    List<ProgramDto> programs = [];
+  Widget _programSelectorWidget(CoachDetails coachDetails) {
+    List<ProgramDto>? programs = coachDetails.programs;
 
-    if (widget.coachDetails.programs != null) {
-      for (ProgramDto program in widget.coachDetails.programs!) {
-        programs.add(program);
-      }
-    }
+    programs ??= [];
 
     return Container(
       width: 472,
@@ -297,7 +293,7 @@ class _ProgramsScreenState extends State<ProgramsScreen> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => CoachAddProgramScreen(
-                              coachDetails: widget.coachDetails)));
+                              coachDetails: coachDetails)));
                   break;
               }
 

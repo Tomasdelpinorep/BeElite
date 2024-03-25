@@ -12,5 +12,6 @@ public interface UserRepository extends JpaRepository<Usuario, UUID> {
 
     Optional<Usuario> findFirstByUsername(String username);
     boolean existsByUsernameIgnoreCase(String username);
+    boolean existsByEmailIgnoreCase(String username);
 
 }

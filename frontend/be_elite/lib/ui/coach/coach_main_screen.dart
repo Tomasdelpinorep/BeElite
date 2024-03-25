@@ -1,4 +1,4 @@
-import 'package:be_elite/bloc/coach_details/coach_details_bloc.dart';
+import 'package:be_elite/bloc/coach/coach_details_bloc.dart';
 import 'package:be_elite/repositories/user/user_repository.dart';
 import 'package:be_elite/repositories/user/user_repository_impl.dart';
 import 'package:be_elite/styles/app_colors.dart';
@@ -50,8 +50,8 @@ class _CoachMainScreenState extends State<CoachMainScreen> {
               } else if (state is CoachDetailsSuccessState) {
                 widgetList = [
                   ProgramsScreen(coachDetails: state.coachDetails),
-                  const AthletesScreen(),
-                  const CoachProfileScreen()
+                  AthletesScreen(coachDetails: state.coachDetails),
+                  CoachProfileScreen(coachDetails: state.coachDetails)
                 ];
 
                 return widgetList[myIndex];

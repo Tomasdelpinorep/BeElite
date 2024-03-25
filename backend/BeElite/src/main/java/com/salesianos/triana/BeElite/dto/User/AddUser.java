@@ -1,5 +1,6 @@
 package com.salesianos.triana.BeElite.dto.User;
 
+import com.salesianos.triana.BeElite.validation.annotation.UniqueEmail;
 import com.salesianos.triana.BeElite.validation.annotation.UniqueUsername;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -20,6 +21,7 @@ public record AddUser(
 
         @NotBlank(message = "Email cannot be blank")
         @Email(message = "Must be a valid email address.")
+        @UniqueEmail(message = "Email already in use.")
         String email,
 
         @NotBlank(message = "Name cannot be blank.")

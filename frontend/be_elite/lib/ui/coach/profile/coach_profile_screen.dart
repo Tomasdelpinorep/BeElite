@@ -1,7 +1,9 @@
+import 'package:be_elite/models/Coach/coach_details.dart';
 import 'package:flutter/material.dart';
 
 class CoachProfileScreen extends StatefulWidget {
-  const CoachProfileScreen({super.key});
+  final CoachDetails coachDetails;
+  const CoachProfileScreen({super.key, required this.coachDetails});
 
   @override
   State<CoachProfileScreen> createState() => _CoachProfileScreenState();
