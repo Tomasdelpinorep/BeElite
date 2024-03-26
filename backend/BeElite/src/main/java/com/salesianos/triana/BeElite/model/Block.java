@@ -36,6 +36,4 @@ public class Block {
     private Double rest_between_sets;
 
     private String instructions;
-
-    private boolean  is_completed;
 }

@@ -13,7 +13,6 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
-@ToString
 @RequiredArgsConstructor
 public class Athlete extends Usuario {
 
@@ -25,6 +24,9 @@ public class Athlete extends Usuario {
 
     @ManyToOne
     private Program program;
+
+    @OneToMany(mappedBy = "athlete", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AthleteSession> athleteSessions;
 
     public Athlete(UUID id, String username, String password, String email, String name, String profilePicUrl,
                    boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled,

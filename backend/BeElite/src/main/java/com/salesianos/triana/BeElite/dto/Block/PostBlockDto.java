@@ -2,6 +2,7 @@ package com.salesianos.triana.BeElite.dto.Block;
 
 import com.salesianos.triana.BeElite.dto.Set.PostSetDto;
 import com.salesianos.triana.BeElite.model.Block;
+import com.salesianos.triana.BeElite.model.Composite_Ids.AthleteSessionId;
 import com.salesianos.triana.BeElite.model.Composite_Ids.BlockId;
 import com.salesianos.triana.BeElite.model.Composite_Ids.SessionId;
 import com.salesianos.triana.BeElite.model.Session;

@@ -22,11 +22,8 @@ class SaveEditedSessionEvent extends SessionEvent{
 }
 
 class GetSessionCardDataEvent extends SessionEvent{
-  final String coachUsername;
-  final String weekName;
-  final String programName;
-  final int weekNumber;
-  GetSessionCardDataEvent(this.coachUsername, this.weekName, this.programName, this.weekNumber);
+  final String athleteUsername;
+  GetSessionCardDataEvent(this.athleteUsername);
 }
 
 class GetPostSessionDtoEvent extends SessionEvent{

@@ -1,7 +1,6 @@
 import 'dart:async';
-
 import 'package:be_elite/models/Session/post_session_dto/post_session_dto.dart';
-import 'package:be_elite/models/Session/session_card_dto/session_card_dto.dart';
+import 'package:be_elite/models/Session/session_card_dto/session_card_dto_page.dart';
 import 'package:be_elite/models/Session/session_dto.dart';
 import 'package:be_elite/repositories/session/session_repository.dart';
 import 'package:bloc/bloc.dart';
@@ -50,8 +49,7 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
     emit(SessionLoadingState());
 
     try{
-      final response = await sessionRepository
-      .getSessionCardData(event.coachUsername, event.programName, event.weekName, event.weekNumber);
+      final response = await sessionRepository.getSessionCardDataUpUntilToday(event.athleteUsername);
 
       emit(GetSessionCardDataSuccessState(response));
     }on Exception catch(e){

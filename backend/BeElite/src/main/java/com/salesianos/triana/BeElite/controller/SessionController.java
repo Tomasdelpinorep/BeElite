@@ -3,6 +3,7 @@ package com.salesianos.triana.BeElite.controller;
 import com.salesianos.triana.BeElite.dto.Session.PostSessionDto;
 import com.salesianos.triana.BeElite.dto.Session.SessionCardDto;
 import com.salesianos.triana.BeElite.dto.Session.SessionDto;
+import com.salesianos.triana.BeElite.model.AthleteSession;
 import com.salesianos.triana.BeElite.model.Session;
 import com.salesianos.triana.BeElite.service.SessionService;
 import jakarta.validation.Valid;
@@ -23,13 +24,10 @@ public class SessionController {
 
     private final SessionService sessionService;
 
-    @GetMapping("/{coachUsername}/{programName}/{weekName}/{weekNumber}/sessions")
-    public Page<SessionCardDto> getSessionCardData(@PageableDefault(page = 0, size = 10) Pageable page,
-                                                  @PathVariable String coachUsername,
-                                                  @PathVariable String programName,
-                                                  @PathVariable String weekName,
-                                                  @PathVariable Long weekNumber){
-        Page<Session> pagedResult = sessionService.findCardPageById(page, coachUsername, programName, weekName, weekNumber);
+    @GetMapping("/{athleteUsername}/sessions")
+    public Page<SessionCardDto> getSessionCardDataByAthlete(@PageableDefault(page = 0, size = 20) Pageable page,
+                                                  @PathVariable String athleteUsername){
+        Page<AthleteSession> pagedResult = sessionService.findSessionCardPageByIdAndAthleteUsername(page, athleteUsername);
 
         return pagedResult.map(SessionCardDto::of);
     }

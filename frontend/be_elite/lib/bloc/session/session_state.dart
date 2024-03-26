@@ -23,8 +23,8 @@ final class SaveEditedSessionSuccessState extends SessionState{
 }
 
 final class GetSessionCardDataSuccessState extends SessionState{
-  final SessionCardDto session;
-  GetSessionCardDataSuccessState(this.session);
+  final SessionCardDtoPage sessionPage;
+  GetSessionCardDataSuccessState(this.sessionPage);
 }
 
 final class GetPostSessionDtoSuccessState extends SessionState{

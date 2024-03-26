@@ -1,11 +1,16 @@
 import 'package:be_elite/bloc/athlete/athlete_bloc.dart';
+import 'package:be_elite/bloc/session/session_bloc.dart';
 import 'package:be_elite/misc/Widgets/beElite_logo.dart';
 import 'package:be_elite/misc/Widgets/circular_avatar.dart';
 import 'package:be_elite/models/Coach/coach_details.dart';
 import 'package:be_elite/models/Coach/program_dto.dart';
 import 'package:be_elite/models/Coach/user_dto.dart';
+import 'package:be_elite/models/Session/session_card_dto/session_card_dto.dart';
 import 'package:be_elite/repositories/athlete/athlete_repository.dart';
 import 'package:be_elite/repositories/athlete/athlete_repository_impl.dart';
+import 'package:be_elite/repositories/session/session_repository.dart';
+import 'package:be_elite/repositories/session/session_repository_impl.dart';
+import 'package:be_elite/styles/app_colors.dart';
 import 'package:be_elite/ui/coach/programs/add_program_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,15 +25,22 @@ class AthletesScreen extends StatefulWidget {
 }
 
 class _AthletesScreenState extends State<AthletesScreen> {
+  String? selectedAthleteUsername;
+  List<SessionCardDto> athleteSessions = [];
+
   late String selectedProgramName;
   late AthleteBloc _athleteBLoc;
   late AthleteRepository athleteRepository;
   late List<UserDto> athletes;
+  late SessionBloc _sessionBloc;
+  late SessionRepository sessionRepository;
 
   @override
   void initState() {
     athleteRepository = AthleteRepositoryImpl();
     _athleteBLoc = AthleteBloc(athleteRepository);
+    sessionRepository = SessionRepositoryImpl();
+    _sessionBloc = SessionBloc(sessionRepository);
     _loadDropDownValue();
     super.initState();
   }
@@ -63,6 +75,7 @@ class _AthletesScreenState extends State<AthletesScreen> {
         ),
         child: MultiBlocProvider(providers: [
           BlocProvider.value(value: _athleteBLoc),
+          BlocProvider.value(value: _sessionBloc),
         ], child: _blocManager()),
       ),
     );
@@ -71,57 +84,88 @@ class _AthletesScreenState extends State<AthletesScreen> {
   Widget _blocManager() {
     return Column(
       children: [
+        BlocConsumer<AthleteBloc, AthleteState>(
+          buildWhen: (context, state) {
+            return state is AthleteLoadingState ||
+                state is AthleteErrorState ||
+                state is GetAthletesByProgramEmptyState ||
+                state is GetAthletesByProgramSuccessState;
+          },
+          builder: (context, state) {
+            if (state is AthleteLoadingState) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is AthleteErrorState) {
+              return Text(
+                  'Error fetching athletes for program with name: $selectedProgramName.');
+            } else if (state is GetAthletesByProgramEmptyState) {
+              athletes = [];
+              return _buildEmptyHome();
+            } else if (state is GetAthletesByProgramSuccessState) {
+              athletes = state.athletes;
+              return _buildHome();
+            } else {
+              return const Placeholder();
+            }
+          },
+          listener: (context, state) {},
+        ),
         Expanded(
-          child: BlocConsumer<AthleteBloc, AthleteState>(
+          child: BlocConsumer<SessionBloc, SessionState>(
             buildWhen: (context, state) {
-              return state is AthleteLoadingState ||
-                  state is AthleteErrorState ||
-                  state is GetAthletesByProgramEmptyState ||
-                  state is GetAthletesByProgramSuccessState;
+              return state is SessionLoadingState ||
+                  state is SessionErrorState ||
+                  state is GetSessionCardDataSuccessState;
             },
             builder: (context, state) {
-              if (state is AthleteLoadingState) {
+              if (state is SessionLoadingState) {
                 return const Center(child: CircularProgressIndicator());
-              } else if (state is AthleteErrorState) {
-                return Text(
-                    'Error fetching athletes for program with name: $selectedProgramName.');
-              } else if (state is GetAthletesByProgramEmptyState) {
-                athletes = [];
-                return _buildEmptyHome();
-              } else if (state is GetAthletesByProgramSuccessState) {
-                athletes = state.athletes;
-                return _buildHome();
-              } else {
-                return const Placeholder();
+              } else if (state is SessionErrorState) {
+                return Text(state.errorMessage);
+              } else if (state is GetSessionCardDataSuccessState) {
+                athleteSessions = state.sessionPage.sessionCardDto!;
+                return _athleteSessionCardsWidget(athleteSessions);
               }
+              return const SizedBox(height: 0);
             },
-            // listenWhen: (context,state){},
             listener: (context, state) {},
           ),
-        )
+        ),
       ],
     );
   }
 
   Widget _buildHome() {
-    return Padding(
+    return Container(
       padding: const EdgeInsets.all(8.0),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           _topBarWidget(widget.coachDetails),
-          Expanded(
-            child: Stack(
-              children: [],
+          const SizedBox(height: 20),
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: SizedBox(
+              height: 100,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [_inviteAthleteButton()]),
+                  _athleteSelectorWidget(athletes),
+                ],
+              ),
             ),
           ),
+          const SizedBox(height: 20),
         ],
       ),
     );
   }
 
   Widget _buildEmptyHome() {
-    return Padding(
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.8,
       padding: const EdgeInsets.all(8.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -153,20 +197,12 @@ class _AthletesScreenState extends State<AthletesScreen> {
                       'https://i.imgur.com/jNNT4LE.png'),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.only(
-                      right:
-                          40), //This centers the welcome message over the program selector, 40 is avatar's radius
-                  child: Column(
-                    children: [
-                      Text('Hello ${coachDetails.name}'),
-                      const Text(
-                        'Welcome Back!',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w700, fontSize: 18),
-                      )
-                    ],
-                  ),
-                ),
+                    padding: const EdgeInsets.only(
+                        right:
+                            40), //This centers the welcome message over the program selector, 40 is avatar's radius
+                    child: SizedBox(
+                        height: 100,
+                        child: _programSelectorWidget(coachDetails))),
               ),
               const BeEliteLogo()
             ],
@@ -174,13 +210,6 @@ class _AthletesScreenState extends State<AthletesScreen> {
         ),
         const SizedBox(
           height: 10,
-        ),
-        SizedBox(
-          width: double.infinity,
-          height: 50,
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            _programSelectorWidget(coachDetails),
-          ]),
         ),
       ],
     );
@@ -237,7 +266,8 @@ class _AthletesScreenState extends State<AthletesScreen> {
                   ),
                 ),
                 onTap: () {
-                  _athleteBLoc.add(GetAthletesByProgramEvent(program.program_name!, coachDetails.username!));
+                  _athleteBLoc.add(GetAthletesByProgramEvent(
+                      program.program_name!, coachDetails.username!));
                 },
               );
             }),
@@ -283,5 +313,76 @@ class _AthletesScreenState extends State<AthletesScreen> {
         ),
       ),
     );
+  }
+
+  Widget _athleteSelectorWidget(List<UserDto> athletes) {
+    return Container(
+      padding: const EdgeInsets.only(left: 16, right: 16),
+      decoration: BoxDecoration(
+        color: Colors.grey[850],
+        border: Border.all(color: AppColors.mainYellow),
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: DropdownButton(
+        underline: const SizedBox(),
+        icon: const Icon(Icons.arrow_drop_down),
+        iconSize: 32.0,
+        isExpanded: true,
+        hint: const Text(
+          'Select an athlete to view their feedback.',
+          style: TextStyle(fontSize: 16.0),
+        ),
+        onChanged: (newValue) {
+          setState(() {
+            athleteSessions.clear();
+            selectedAthleteUsername = newValue;
+          });
+          _sessionBloc.add(GetSessionCardDataEvent(selectedAthleteUsername!));
+        },
+        items: athletes.map((athlete) {
+          return DropdownMenuItem(
+            value: athlete.username,
+            child: Text(
+              athlete.name!,
+              style: const TextStyle(fontSize: 16.0), // Adjust item text style
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _inviteAthleteButton() {
+    return Row(children: [
+      ElevatedButton.icon(
+        icon: const Icon(Icons.outgoing_mail, color: Colors.black),
+        label: const Text(
+          'Invite new athlete',
+          style: TextStyle(fontSize: 12, color: Colors.black),
+        ),
+        onPressed: () {},
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.mainYellow,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      )
+    ]);
+  }
+
+  Widget _athleteSessionCardsWidget(List<SessionCardDto> athleteSessions) {
+    if (athleteSessions.isEmpty) {
+      return Center(
+        child: Container(color: Colors.red),
+      );
+    } else {
+      return ListView.builder(
+        itemCount: athleteSessions.length,
+        itemBuilder: (context, index) {
+          return Center(child: Text(athleteSessions[index].title!));
+        },
+      );
+    }
   }
 }
