@@ -2,9 +2,8 @@ package com.salesianos.triana.BeElite.service;
 
 import com.salesianos.triana.BeElite.dto.User.AddUser;
 import com.salesianos.triana.BeElite.exception.NotFoundException;
-import com.salesianos.triana.BeElite.model.Athlete;
-import com.salesianos.triana.BeElite.model.Coach;
-import com.salesianos.triana.BeElite.model.Program;
+import com.salesianos.triana.BeElite.model.*;
+import com.salesianos.triana.BeElite.model.Composite_Ids.AthleteBlockId;
 import com.salesianos.triana.BeElite.repository.AthleteRepository;
 import com.salesianos.triana.BeElite.repository.CoachRepository;
 import com.salesianos.triana.BeElite.repository.ProgramRepository;
@@ -49,6 +48,15 @@ public class AthleteService {
 
         return athleteRepository.findAthletesByProgram(p.getId());
 
+    }
+
+    public static AthleteBlock toAthleteBlock(Block block, AthleteSession athleteSession){
+        return AthleteBlock.builder()
+                .id(AthleteBlockId.of(block.getBlock_id().getBlock_number(), athleteSession.getId()))
+                .block(block)
+                .athleteSession(athleteSession)
+                .isCompleted(false)
+                .build();
     }
 
 }

@@ -4,6 +4,7 @@ import com.salesianos.triana.BeElite.model.Composite_Ids.AthleteSessionId;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity

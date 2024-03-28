@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,6 +28,7 @@ public class SessionService {
     private final SessionRepository sessionRepository;
     private final AthleteSessionRepository athleteSessionRepository;
     private final AthleteBlockRepository athleteBlockRepository;
+    private final BlockRepository blockRepository;
 
     public Page<AthleteSession> findSessionCardPageByIdAndAthleteUsername(Pageable page, String athleteUsername){
         Page<AthleteSession> pagedResult =  athleteSessionRepository.findByAthleteUsernameUpUntilTodayOrderedByDate(page, athleteUsername);
@@ -38,7 +40,7 @@ public class SessionService {
     }
 
     public Session findPostDtoById(String coachUsername, String programName,
-                                          String weekName, Long weekNumber, Long sessionNumber){
+                                   String weekName, Long weekNumber, Long sessionNumber){
         Coach c = coachRepository.findByUsername(coachUsername).orElseThrow(() -> new NotFoundException("coach"));
         Program p = programRepository.findByCoachAndProgramName(c.getId(), programName).orElseThrow(() -> new NotFoundException("program"));
 
@@ -46,43 +48,40 @@ public class SessionService {
         return sessionRepository.findByIdOrderedByBlockNumberAsc(sessionId).orElseThrow(() -> new NotFoundException("session"));
     }
 
-    @Transactional
     public Session save(String coachUsername, String programName, String weekName, Long weekNumber, PostSessionDto postSession) {
         Coach c = coachRepository.findByUsername(coachUsername).orElseThrow(() -> new NotFoundException("coach"));
         Program p = programRepository.findByCoachAndProgramName(c.getId(), programName).orElseThrow(() -> new NotFoundException("program"));
-        Session s = sessionRepository.save(PostSessionDto.toEntity(postSession, WeekId.of(weekNumber, weekName, p.getId())));
+        Session s = sessionRepository.save(this.toEntity(postSession, WeekId.of(weekNumber, weekName, p.getId())));
+
+        List<Block> blockEntities = postSession.blocks().stream().map(block -> BlockService.toEntity(block, s.getId(),s)).toList();
 
         for (Athlete athlete : p.getAthletes()) {
+            // Initialize an empty list of blocks to add to each athlete's session
+            List<AthleteBlock> athleteBlocks = new ArrayList<>();
+
             AthleteSession newAthleteSession = AthleteSession.builder()
-                    .id(AthleteSessionId.of(athleteSessionRepository.countNumberOfSessionsPerAthlete(athlete.getId()) + 1,
-                            athlete.getId()))
+                    .id(AthleteSessionId.of((long) athlete.getAthleteSessions().size() + 1, athlete.getId()))
                     .athlete(athlete)
                     .session(s)
                     .isCompleted(false)
                     .build();
 
-            List<AthleteBlock> athleteBlocks = postSession.blocks().stream()
-                    .map(block -> AthleteBlock.builder()
-                            .id(AthleteBlockId.of(athleteBlockRepository.countNumberOfBlocksPerAthleteSession(
-                                            athlete.getId(), newAthleteSession.getId().getAthlete_session_number()) + 1,
-                                    newAthleteSession.getId()))
-                            .block(PostBlockDto.toEntity(block, s.getId()))
-                            .isCompleted(false)
-                            .athleteSession(newAthleteSession)
-                            .build())
-                    .toList();
+            for(int i = 1; i < blockEntities.size(); i++){
+                athleteBlocks.add(AthleteBlock.builder()
+                        .id(AthleteBlockId.of((long) i, newAthleteSession.getId()))
+                        .block(blockEntities.get(i-1))
+                        .isCompleted(false)
+                        .athleteSession(newAthleteSession)
+                        .build());
+            }
 
             newAthleteSession.setAthleteBlocks(athleteBlocks);
             athlete.getAthleteSessions().add(newAthleteSession);
             athleteRepository.save(athlete); // This should cascade changes to AthleteSessions
-
-            athleteBlocks.forEach(athleteBlockRepository::save); // Save all AthleteBlocks
-            athleteSessionRepository.save(newAthleteSession);
         }
 
         return s;
     }
-
 
     public Session edit(PostSessionDto editedSession, String coachUsername, String programName, String weekName, Long weekNumber) {
         Coach c = coachRepository.findByUsername(coachUsername).orElseThrow(() -> new NotFoundException("coach"));
@@ -91,11 +90,6 @@ public class SessionService {
 
         Session originalSession = sessionRepository.findById(SessionId.of(editedSession.session_number(), weekId))
                 .orElseThrow(() -> new NotFoundException("session"));
-
-        //Remove the old session from the athlete's session list
-        for(Athlete athlete : p.getAthletes()){
-            athlete.getAthleteSessions().removeIf(athleteSession -> athleteSession.getSession().getId().equals(originalSession.getId()));
-        }
 
         //Update the session with the new data
         originalSession.getBlocks().clear();
@@ -125,36 +119,26 @@ public class SessionService {
         originalSession.setTitle(editedSession.title());
         originalSession.setSubtitle(editedSession.subtitle());
         originalSession.setSame_day_session_number(editedSession.same_day_session_number());
+        sessionRepository.save(originalSession);
 
-        //Add back the updated session to the athlete's session list
-        for(Athlete athlete : p.getAthletes()){
-            AthleteSession updatedAthleteSession = AthleteSession.builder()
-                    .id(AthleteSessionId.of(athleteSessionRepository.countNumberOfSessionsPerAthlete(athlete.getId()) + 1,athlete.getId()))
-                    .athlete(athlete)
-                    .session(originalSession)
-                    .isCompleted(false)
-                    .build();
+        //Update session to the athlete's session list
+        for (Athlete athlete : p.getAthletes()) {
+            for (AthleteSession athleteSession : athlete.getAthleteSessions()) {
+                if (athleteSession.getSession().equals(originalSession)) {
+                    // Clear the existing athleteBlocks collection
+                    athleteSession.getAthleteBlocks().clear();
 
-            //Add the blocks to the new session being added to the athletes
-            for(Block block : originalSession.getBlocks()){
-                AthleteBlock athleteBlock = AthleteBlock.builder()
-                        .id(AthleteBlockId.of(athleteBlockRepository.countNumberOfBlocksPerAthleteSession(
-                                athlete.getId(), updatedAthleteSession.getId().getAthlete_session_number()) + 1,
-                                updatedAthleteSession.getId()))
-                        .block(block)
-                        .isCompleted(false)
-                        .athleteSession(updatedAthleteSession)
-                        .build();
-
-                athleteBlockRepository.save(athleteBlock);
-                updatedAthleteSession.getAthleteBlocks().add(athleteBlock);
+                    for (Block block : originalSession.getBlocks()) {
+                        AthleteBlock athleteBlock = AthleteService.toAthleteBlock(block, athleteSession);
+                        athleteSession.getAthleteBlocks().add(athleteBlock);
+                    }
+                }
             }
-            athleteSessionRepository.save(updatedAthleteSession);
-            athlete.getAthleteSessions().add(updatedAthleteSession);
-            athleteRepository.save(athlete);
+            athleteRepository.save(athlete); // Save changes to cascade updates and deletions
         }
 
-        return sessionRepository.save(originalSession);
+
+        return originalSession;
     }
 
 
@@ -173,4 +157,33 @@ public class SessionService {
 
         sessionRepository.delete(s);
     }
+
+    public Session toEntity(PostSessionDto postSession, WeekId weekId){
+        SessionId sessionId = SessionId.of(postSession.session_number(), weekId);
+
+        Session newSession = Session.builder()
+                .id(sessionId)
+                .date(postSession.date())
+                .title(postSession.title())
+                .subtitle(postSession.subtitle())
+                .same_day_session_number(postSession.same_day_session_number())
+                .week(Week.builder().id(weekId).build())
+                .blocks(List.of())
+                .build();
+        List<Block> newSessionBlocks = postSession.blocks().stream().map(
+                block -> BlockService.toEntity(block, sessionId, newSession)).toList();
+
+        newSession.setBlocks(newSessionBlocks);
+        return newSession;
+    }
+
+    private Block findCorrespondingBlock(Session editedSession, AthleteBlockId athleteBlockId) {
+        for (Block editedBlock : editedSession.getBlocks()) {
+            if (editedBlock.getBlock_id().equals(athleteBlockId)) {
+                return editedBlock;
+            }
+        }
+        return null;
+    }
+
 }
