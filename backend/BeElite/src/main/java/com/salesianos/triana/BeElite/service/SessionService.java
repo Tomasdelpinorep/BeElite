@@ -125,7 +125,6 @@ public class SessionService {
         for (Athlete athlete : p.getAthletes()) {
             for (AthleteSession athleteSession : athlete.getAthleteSessions()) {
                 if (athleteSession.getSession().equals(originalSession)) {
-                    // Clear the existing athleteBlocks collection
                     athleteSession.getAthleteBlocks().clear();
 
                     for (Block block : originalSession.getBlocks()) {
@@ -134,7 +133,7 @@ public class SessionService {
                     }
                 }
             }
-            athleteRepository.save(athlete); // Save changes to cascade updates and deletions
+            athleteRepository.save(athlete);
         }
 
 
