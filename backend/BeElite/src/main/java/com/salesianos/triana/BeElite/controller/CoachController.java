@@ -41,6 +41,54 @@ public class CoachController {
 
     @GetMapping("/{coachUsername}")
     @PreAuthorize("hasRole('COACH') and #coach.id == principal.id or hasRole('ADMIN')")
+    @Operation(summary = "Get coach details")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved coach details",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CoachDetailsDto.class),
+                            examples = {@ExampleObject(
+                                    value = """
+                                            {
+                                                "id": "123e4567-e89b-12d3-a456-426614174001",
+                                                "username": "coach_john",
+                                                "name": "John Smith",
+                                                "email": "john.smith@example.com",
+                                                "profilePicUrl": "https://example.com/profile.jpg",
+                                                "createdAt": "2024-03-31T08:00:00",
+                                                "athletes": [
+                                                    {
+                                                        "username": "john_doe",
+                                                        "name": "John Doe",
+                                                        "profilePicUrl": "https://example.com/john.jpg",
+                                                        "email": "john.doe@example.com"
+                                                    },
+                                                    {
+                                                        "username": "jane_smith",
+                                                        "name": "Jane Smith",
+                                                        "profilePicUrl": "https://example.com/jane.jpg",
+                                                        "email": "jane.smith@example.com"
+                                                    }
+                                                ],
+                                                "programs": [
+                                                    {
+                                                        "program_name": "Weightlifting Program",
+                                                        "image": "https://example.com/weightlifting.jpg"
+                                                    },
+                                                    {
+                                                        "program_name": "Running Program",
+                                                        "image": "https://example.com/running.jpg"
+                                                    }
+                                                ]
+                                            }
+                                            """
+                            )}
+                    )}
+            ),
+            @ApiResponse(responseCode = "404", description = "Coach not found",
+                    content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content)
+    })
     public ResponseEntity<CoachDetailsDto> getCoachDetails(@AuthenticationPrincipal Coach coach , @PathVariable String coachUsername){
         return ResponseEntity.ok(CoachDetailsDto.of(coachService.findByUsername(coachUsername)));
     }

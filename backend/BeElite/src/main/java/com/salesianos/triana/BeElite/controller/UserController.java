@@ -119,6 +119,11 @@ public class UserController {
     }
 
     @PostMapping("/auth/validateToken")
+    @Operation(summary = "Validate JWT token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "Token is valid"),
+            @ApiResponse(responseCode = "403", description = "Token is invalid")
+    })
     public ResponseEntity<Boolean> validateToken(@RequestBody String token){
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(jwtProvider.validateToken(token));
     }
