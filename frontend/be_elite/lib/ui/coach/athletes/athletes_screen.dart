@@ -7,6 +7,7 @@ import 'package:be_elite/models/Coach/coach_details.dart';
 import 'package:be_elite/models/Coach/program_dto.dart';
 import 'package:be_elite/models/Coach/user_dto.dart';
 import 'package:be_elite/models/Program/invite_dto.dart';
+import 'package:be_elite/models/Program/post_invite_dto.dart';
 import 'package:be_elite/models/Session/post_session_dto/session_card_dto/session_card_dto.dart';
 import 'package:be_elite/repositories/athlete/athlete_repository.dart';
 import 'package:be_elite/repositories/athlete/athlete_repository_impl.dart';
@@ -15,6 +16,7 @@ import 'package:be_elite/repositories/program/program_repository_impl.dart';
 import 'package:be_elite/repositories/session/session_repository.dart';
 import 'package:be_elite/repositories/session/session_repository_impl.dart';
 import 'package:be_elite/styles/app_colors.dart';
+import 'package:be_elite/ui/coach/coach_main_screen.dart';
 import 'package:be_elite/ui/coach/programs/add_program_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -40,6 +42,7 @@ class _AthletesScreenState extends State<AthletesScreen> {
   late SessionRepository sessionRepository;
   late ProgramRepository programRepository;
   late ProgramBloc _programBloc;
+  List<InviteDto> invitesSent = [];
 
   @override
   void initState() {
@@ -63,6 +66,8 @@ class _AthletesScreenState extends State<AthletesScreen> {
 
     _athleteBLoc.add(GetAthletesByProgramEvent(
         selectedProgramName, widget.coachDetails.username!));
+    _programBloc.add(GetInvitesSentEvent(
+        widget.coachDetails.username!, selectedProgramName));
   }
 
   Future<void> _saveDropDownValue(String value) async {
@@ -108,6 +113,7 @@ class _AthletesScreenState extends State<AthletesScreen> {
                   'Error fetching athletes for program with name: $selectedProgramName.');
             } else if (state is GetAthletesByProgramEmptyState) {
               athletes = [];
+              _programBloc.add(GetInvitesSentEvent(widget.coachDetails.username!, selectedProgramName));
               return _buildEmptyHome();
             } else if (state is GetAthletesByProgramSuccessState) {
               athletes = state.athletes;
@@ -140,7 +146,56 @@ class _AthletesScreenState extends State<AthletesScreen> {
         BlocListener<ProgramBloc, ProgramState>(
           listener: (context, state) {
             if (state is SendInviteSuccessState) {
-            } else if (state is ProgramErrorState) {}
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    // Show dialog
+                    return AlertDialog(
+                      title: const Text('Success!',
+                          style: TextStyle(color: Colors.white)),
+                      content: const Text('Invite has been sent.',
+                          style: TextStyle(color: Colors.white)),
+                      backgroundColor: AppColors.successGreen,
+                    );
+                  },
+                );
+                Future.delayed(const Duration(seconds: 1), () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const CoachMainScreen()),
+                  );
+                });
+              });
+            } else if (state is ProgramErrorState) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    // Show dialog
+                    return AlertDialog(
+                      title: const Text('Error',
+                          style: TextStyle(color: Colors.white)),
+                      content: Text(state.errorMessage,
+                          style: const TextStyle(color: Colors.white)),
+                      backgroundColor: AppColors.errorRed,
+                    );
+                  },
+                );
+                Future.delayed(const Duration(seconds: 1), () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const CoachMainScreen()),
+                  );
+                });
+              });
+            } else if (state is GetInvitesSentSuccessState) {
+              setState(() {
+                invitesSent = state.invites;
+              });
+            }
           },
           child: const SizedBox(),
         )
@@ -191,10 +246,12 @@ class _AthletesScreenState extends State<AthletesScreen> {
               children: [
                 Text('$selectedProgramName has no athletes yet.'),
                 const SizedBox(height: 30),
-                _bigInviteAthleteButton()
+                _bigInviteAthleteButton(),
               ],
             ),
-          )
+          ),
+          const Text('Invitations', style: TextStyle(fontSize: 20)),
+          SizedBox(height: 150, child: SingleChildScrollView(child: _invitationStatusWidget()))
         ],
       ),
     );
@@ -323,6 +380,7 @@ class _AthletesScreenState extends State<AthletesScreen> {
               setState(() {
                 selectedProgramName = newValue!;
                 _saveDropDownValue(selectedProgramName);
+                invitesSent = [];
               });
             }
           },
@@ -442,48 +500,91 @@ class _AthletesScreenState extends State<AthletesScreen> {
 
   void openInviteDialog() {
     final athleteUsernameTextController = TextEditingController();
+    final GlobalKey<FormState> inviteFormKey = GlobalKey<FormState>();
 
     showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-              title: const Text('Invite Athlete'),
-              content: TextFormField(
-                controller: athleteUsernameTextController,
-                decoration: const InputDecoration(
-                  hintText: 'Athlete username',
-                  hintStyle: TextStyle(color: Colors.white54),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide:
-                        BorderSide(color: Colors.white54), // Underline color
-                  ),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors.white), // Focused underline color
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Athlete username cannot be empty';
-                  }
-                  return null;
-                },
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Invite Athlete'),
+        content: Form(
+          key: inviteFormKey,
+          child: TextFormField(
+            controller: athleteUsernameTextController,
+            decoration: const InputDecoration(
+              hintText: 'Athlete username',
+              hintStyle: TextStyle(color: Colors.white54),
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.white54),
               ),
-              actions: [
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.outgoing_mail, color: Colors.black),
-                  label: const Text(
-                    'Send invite',
-                    style: TextStyle(fontSize: 14, color: Colors.black),
-                  ),
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.mainYellow,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                )
-              ],
-            ));
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.white),
+              ),
+            ),
+            keyboardType: TextInputType.text,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Athlete username cannot be empty';
+              }
+              return null;
+            },
+          ),
+        ),
+        actions: [
+          Center(
+            child: ElevatedButton.icon(
+              icon: const Icon(Icons.outgoing_mail, color: Colors.black),
+              label: const Text(
+                'Send invite',
+                style: TextStyle(fontSize: 14, color: Colors.black),
+              ),
+              onPressed: () {
+                if (inviteFormKey.currentState!.validate()) {
+                  _programBloc.add(SendInviteEvent(PostInviteDto(
+                      athleteUsername: athleteUsernameTextController.text,
+                      programName: selectedProgramName,
+                      coachId: widget.coachDetails.id)));
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.mainYellow,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _invitationStatusWidget() {
+    if (invitesSent.isEmpty) {
+      return DataTable(
+        columns: const [
+          DataColumn(label: Text('Athlete Username')),
+          DataColumn(label: Text('Invitation Status'))
+        ],
+        rows: const [
+          DataRow(cells: [
+            DataCell(Text('This program has sent no invitations yet.')),
+            DataCell(Text(""))
+          ])
+        ],
+      );
+    } else {
+      return DataTable(
+        columns: const [
+          DataColumn(label: Text('Athlete Username')),
+          DataColumn(label: Text('Invitation Status'))
+        ],
+        rows: invitesSent.map((invite) {
+          return DataRow(cells: [
+            DataCell(Text(invite.athleteUsername!)),
+            DataCell(Text(invite.status!))
+          ]);
+        }).toList(),
+      );
+    }
   }
 }

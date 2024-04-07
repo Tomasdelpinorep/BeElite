@@ -15,7 +15,8 @@ public record ProgramDetailsDto(String programName,
                                 String image,
                                 UserDto coach,
                                 List<UserDto> athletes,
-                                LocalDate createdAt
+                                LocalDate createdAt,
+                                List<InviteDto> invitesSent
                                 ) {
     public static ProgramDetailsDto of(Program p){
         return ProgramDetailsDto.builder()
@@ -30,6 +31,9 @@ public record ProgramDetailsDto(String programName,
                         p.getAthletes().stream().map(UserDto::of).toList() :
                         List.of())
                 .createdAt(p.getCreatedAt())
+                .invitesSent(p.getInvitesSent() != null ?
+                        p.getInvitesSent().stream().map(InviteDto::of).toList() :
+                        List.of())
                 .build();
     }
 }

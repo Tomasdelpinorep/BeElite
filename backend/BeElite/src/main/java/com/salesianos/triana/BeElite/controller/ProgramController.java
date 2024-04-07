@@ -1,6 +1,7 @@
 package com.salesianos.triana.BeElite.controller;
 
 import com.salesianos.triana.BeElite.dto.Program.InviteDto;
+import com.salesianos.triana.BeElite.dto.Program.PostInviteDto;
 import com.salesianos.triana.BeElite.dto.Program.PostProgramDto;
 import com.salesianos.triana.BeElite.dto.Program.ProgramDetailsDto;
 import com.salesianos.triana.BeElite.dto.Program.ProgramDto;
@@ -215,6 +216,14 @@ public class ProgramController {
         return ProgramDto.of(programService.findByCoachAndProgramName(coachUsername,programName));
     }
 
+    @GetMapping("/coach/{coachUsername}/{programName}/invites")
+    public List<InviteDto> getProgramInvites(@PathVariable String coachUsername,@PathVariable String programName){
+        List<Invite> invites = programService.findInvites(coachUsername, programName);
+
+        return invites.stream().map(InviteDto::of).toList();
+    }
+
+
 //    @GetMapping("/coach/{coachUsername}/{programName}/id")
 //    public UUID getProgamId(@PathVariable String coachUsername ,@PathVariable String programName) {
 //        return programService.findByCoachAndProgramName(coachUsername, programName).getId();
@@ -256,23 +265,11 @@ public class ProgramController {
         return ResponseEntity.created(createdURI).body(ProgramDto.of(p));
     }
 
-    @PostMapping("/coach/invite")
-    public ResponseEntity<InviteDto> sendInvite(@RequestBody InviteDto invite){
-        Invite i = programService.saveInvite(invite);
-
-        URI createdUri = ServletUriComponentsBuilder.fromCurrentRequest()
-                .buildAndExpand(i.getId()).toUri();
-
-        return ResponseEntity.created(createdUri).body(InviteDto.of(i));
-    }
-
-    @PutMapping("coach/program/{programName}")
     @Operation(summary = "Send an invite to an athlete")
-    @PreAuthorize("hasRole('COACH') and #coach.id == principal.id or hasRole('ADMIN')")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Invite successfully sent",
                     content = { @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = InviteDto.class),
+                            schema = @Schema(implementation = PostInviteDto.class),
                             examples = {@ExampleObject(
                                     value = """
                                         {
@@ -292,6 +289,17 @@ public class ProgramController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content)
     })
+    @PostMapping("/coach/invite")
+    public ResponseEntity<PostInviteDto> sendInvite(@RequestBody PostInviteDto invite){
+        Invite i = programService.saveInvite(invite);
+
+        URI createdUri = ServletUriComponentsBuilder.fromCurrentRequest()
+                .buildAndExpand(i.getId()).toUri();
+
+        return ResponseEntity.created(createdUri).body(PostInviteDto.of(i));
+    }
+
+    @PutMapping("coach/program/{programName}")
     public ProgramDto editProgram(@RequestParam String programName,@Valid @RequestBody PostProgramDto editedProgram){
         return ProgramDto.of(programService.edit(programName, editedProgram));
     }

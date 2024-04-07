@@ -32,7 +32,7 @@ public record AthleteDetailsDto(@NotEmpty(message = "Athlete must have username.
                 .program(a.getProgram() != null ? ProgramDto.of(a.getProgram()) : ProgramDto.empty())
                 .coach(a.getProgram() != null ? UserDto.of(a.getProgram().getCoach()) : UserDto.empty())
                 .completed_sessions(a.getCompleted_sessions())
-                .invites(a.getInvites() != null ? a.getInvites().stream().map(InviteDto::of).toList() : InviteDto.emptyList())
+                .invites(a.getInvites() != null ? a.getInvites().stream().map(InviteDto::of).toList() : List.of())
                 .build();
     }
 }

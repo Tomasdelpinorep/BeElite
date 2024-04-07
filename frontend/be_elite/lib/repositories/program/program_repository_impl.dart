@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:be_elite/models/Coach/program_dto.dart';
 import 'package:be_elite/models/Program/invite_dto.dart';
+import 'package:be_elite/models/Program/post_invite_dto.dart';
 import 'package:be_elite/models/Program/post_program_dto.dart';
 import 'package:be_elite/repositories/program/program_repository.dart';
 import 'package:be_elite/variables.dart';
@@ -51,11 +52,11 @@ class ProgramRepositoryImpl implements ProgramRepository{
   }
 
   @override
-  Future<void> sendInvite(InviteDto invite) async{
+  Future<void> sendInvite(PostInviteDto invite) async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     final response = await _client.post(
-      Uri.parse('$urlChrome/coach/program'),
+      Uri.parse('$urlChrome/coach/invite'),
       headers: <String, String>{
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ${prefs.getString('authToken')}'
@@ -63,10 +64,37 @@ class ProgramRepositoryImpl implements ProgramRepository{
       body: jsonEncode(invite.toJson())
     );
 
-    if(response.statusCode != 201){
-      throw Exception('Error sending invite.');
+    if(response.statusCode == 404){
+      throw Exception('No athlete found.');
     }
   }
+
+  @override
+  Future<List<InviteDto>> getSentInvites(String coachUsername, String programName) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  final response = await _client.get(
+    Uri.parse('$urlChrome/coach/$coachUsername/$programName/invites'),
+    headers: <String, String>{
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ${prefs.getString('authToken')}'
+    },
+  );
+
+  if (response.statusCode == 200) {
+    // Decode the JSON response into a List<dynamic>
+    List<dynamic> jsonResponse = json.decode(response.body);
+
+    // Map each dynamic item to InviteDto and convert to List<InviteDto>
+    List<InviteDto> invites = jsonResponse.map((item) => InviteDto.fromJson(item)).toList();
+
+    return invites;
+  }else if(response.statusCode == 404){
+    return [];
+  }else {
+    throw Exception('Error fetching invites: ${response.statusCode}');
+  }
+}
   
   // @override
   // Future<String> getProgramId(String programName, String coachUsername) async{

@@ -1,27 +1,27 @@
 package com.salesianos.triana.BeElite.dto.Program;
 
+import com.salesianos.triana.BeElite.model.InvitationStatus;
 import com.salesianos.triana.BeElite.model.Invite;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
-import java.util.List;
-import java.util.UUID;
+import java.time.LocalDateTime;
 
 @Builder
-public record InviteDto(
-        UUID programId,
-        UUID athleteId
-) {
+public record InviteDto(LocalDateTime createdAt,
+                        String programName,
+                        String athleteUsername,
+                        InvitationStatus status) {
 
     public static InviteDto of(Invite i){
         return InviteDto.builder()
-                .athleteId(i.getAthlete().getId())
-                .programId(i.getProgram().getId())
+                .createdAt(i.getCreatedAt())
+                .programName(i.getProgram().getProgramName())
+                .athleteUsername(i.getAthlete().getUsername())
+                .status(i.getStatus())
                 .build();
-    }
-
-    public static List<InviteDto> emptyList(){
-        return List.of(InviteDto.builder().build());
     }
 }
