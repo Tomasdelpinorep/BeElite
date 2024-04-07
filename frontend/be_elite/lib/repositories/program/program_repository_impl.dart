@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:be_elite/models/Coach/program_dto.dart';
+import 'package:be_elite/models/Program/invite_dto.dart';
 import 'package:be_elite/models/Program/post_program_dto.dart';
 import 'package:be_elite/repositories/program/program_repository.dart';
 import 'package:be_elite/variables.dart';
@@ -46,6 +47,24 @@ class ProgramRepositoryImpl implements ProgramRepository{
       return PostProgramDto.fromJson(json.decode(response.body));
     }else{
       throw Exception('Error creating new program.');
+    }
+  }
+
+  @override
+  Future<void> sendInvite(InviteDto invite) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    final response = await _client.post(
+      Uri.parse('$urlChrome/coach/program'),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${prefs.getString('authToken')}'
+      },
+      body: jsonEncode(invite.toJson())
+    );
+
+    if(response.statusCode != 201){
+      throw Exception('Error sending invite.');
     }
   }
   

@@ -18,3 +18,8 @@ class GetProgramIdEvent extends ProgramEvent{
   final String coachUsername;
   GetProgramIdEvent(this.programName, this.coachUsername);
 }
+
+class SendInviteEvent extends ProgramEvent{
+  final InviteDto invite;
+  SendInviteEvent(this.invite);
+}

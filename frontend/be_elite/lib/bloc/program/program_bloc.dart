@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:be_elite/models/Coach/program_dto.dart';
+import 'package:be_elite/models/Program/invite_dto.dart';
 import 'package:be_elite/models/Program/post_program_dto.dart';
 import 'package:be_elite/repositories/program/program_repository.dart';
 import 'package:bloc/bloc.dart';
@@ -15,6 +16,7 @@ class ProgramBloc extends Bloc<ProgramEvent, ProgramState> {
   ProgramBloc(this.programRepository) : super(ProgramInitial()) {
     on<GetProgramDtoEvent>(_getProgramDto);
     on<CreateNewProgramEvent>(_createNewProgram);
+    on<SendInviteEvent>(_sendInvite);
   }
 
   FutureOr<void> _getProgramDto(GetProgramDtoEvent event, Emitter<ProgramState> emit) async{
@@ -48,4 +50,16 @@ class ProgramBloc extends Bloc<ProgramEvent, ProgramState> {
   //     emit(ProgramErrorState(e.toString()));
   //   }
   // }
+
+  FutureOr<void> _sendInvite(SendInviteEvent event, Emitter<ProgramState> emit) async{
+    emit(ProgramLoadingState());
+
+    try{
+      await programRepository.sendInvite(event.invite);
+
+      emit(SendInviteSuccessState());
+    }on Exception catch(e){
+      emit(ProgramErrorState(e.toString()));
+    }
+  }
 }

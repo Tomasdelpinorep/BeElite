@@ -1,13 +1,17 @@
 import 'package:be_elite/bloc/athlete/athlete_bloc.dart';
+import 'package:be_elite/bloc/program/program_bloc.dart';
 import 'package:be_elite/bloc/session/session_bloc.dart';
 import 'package:be_elite/misc/Widgets/beElite_logo.dart';
 import 'package:be_elite/misc/Widgets/circular_avatar.dart';
 import 'package:be_elite/models/Coach/coach_details.dart';
 import 'package:be_elite/models/Coach/program_dto.dart';
 import 'package:be_elite/models/Coach/user_dto.dart';
-import 'package:be_elite/models/Session/session_card_dto/session_card_dto.dart';
+import 'package:be_elite/models/Program/invite_dto.dart';
+import 'package:be_elite/models/Session/post_session_dto/session_card_dto/session_card_dto.dart';
 import 'package:be_elite/repositories/athlete/athlete_repository.dart';
 import 'package:be_elite/repositories/athlete/athlete_repository_impl.dart';
+import 'package:be_elite/repositories/program/program_repository.dart';
+import 'package:be_elite/repositories/program/program_repository_impl.dart';
 import 'package:be_elite/repositories/session/session_repository.dart';
 import 'package:be_elite/repositories/session/session_repository_impl.dart';
 import 'package:be_elite/styles/app_colors.dart';
@@ -34,6 +38,8 @@ class _AthletesScreenState extends State<AthletesScreen> {
   late List<UserDto> athletes;
   late SessionBloc _sessionBloc;
   late SessionRepository sessionRepository;
+  late ProgramRepository programRepository;
+  late ProgramBloc _programBloc;
 
   @override
   void initState() {
@@ -41,6 +47,8 @@ class _AthletesScreenState extends State<AthletesScreen> {
     _athleteBLoc = AthleteBloc(athleteRepository);
     sessionRepository = SessionRepositoryImpl();
     _sessionBloc = SessionBloc(sessionRepository);
+    programRepository = ProgramRepositoryImpl();
+    _programBloc = ProgramBloc(programRepository);
     _loadDropDownValue();
     super.initState();
   }
@@ -76,6 +84,7 @@ class _AthletesScreenState extends State<AthletesScreen> {
         child: MultiBlocProvider(providers: [
           BlocProvider.value(value: _athleteBLoc),
           BlocProvider.value(value: _sessionBloc),
+          BlocProvider.value(value: _programBloc)
         ], child: _blocManager()),
       ),
     );
@@ -109,27 +118,32 @@ class _AthletesScreenState extends State<AthletesScreen> {
           },
           listener: (context, state) {},
         ),
-        Expanded(
-          child: BlocConsumer<SessionBloc, SessionState>(
-            buildWhen: (context, state) {
-              return state is SessionLoadingState ||
-                  state is SessionErrorState ||
-                  state is GetSessionCardDataSuccessState;
-            },
-            builder: (context, state) {
-              if (state is SessionLoadingState) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (state is SessionErrorState) {
-                return Text(state.errorMessage);
-              } else if (state is GetSessionCardDataSuccessState) {
-                athleteSessions = state.sessionPage.sessionCardDto!;
-                return _athleteSessionCardsWidget(athleteSessions);
-              }
-              return const SizedBox(height: 0);
-            },
-            listener: (context, state) {},
-          ),
+        BlocConsumer<SessionBloc, SessionState>(
+          buildWhen: (context, state) {
+            return state is SessionLoadingState ||
+                state is SessionErrorState ||
+                state is GetSessionCardDataSuccessState;
+          },
+          builder: (context, state) {
+            if (state is SessionLoadingState) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is SessionErrorState) {
+              return Text(state.errorMessage);
+            } else if (state is GetSessionCardDataSuccessState) {
+              athleteSessions = state.sessionPage.sessionCardDto!;
+              return _athleteSessionCardsWidget(athleteSessions);
+            }
+            return const SizedBox(height: 0);
+          },
+          listener: (context, state) {},
         ),
+        BlocListener<ProgramBloc, ProgramState>(
+          listener: (context, state) {
+            if (state is SendInviteSuccessState) {
+            } else if (state is ProgramErrorState) {}
+          },
+          child: const SizedBox(),
+        )
       ],
     );
   }
@@ -165,20 +179,22 @@ class _AthletesScreenState extends State<AthletesScreen> {
 
   Widget _buildEmptyHome() {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.8,
+      height: 800,
       padding: const EdgeInsets.all(8.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           _topBarWidget(widget.coachDetails),
           Expanded(
-            child: Stack(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Center(
-                    child: Text('$selectedProgramName has no athletes yet.')),
+                Text('$selectedProgramName has no athletes yet.'),
+                const SizedBox(height: 30),
+                _bigInviteAthleteButton()
               ],
             ),
-          ),
+          )
         ],
       ),
     );
@@ -371,6 +387,44 @@ class _AthletesScreenState extends State<AthletesScreen> {
     ]);
   }
 
+  Widget _bigInviteAthleteButton() {
+    return SizedBox(
+      height: 100,
+      width: 150,
+      child: ElevatedButton(
+        onPressed: () {
+          openInviteDialog();
+        },
+        style: ElevatedButton.styleFrom(
+          elevation: 5,
+          backgroundColor: AppColors.mainYellow,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        child: const Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.outgoing_mail,
+              size: 32,
+              color: Colors.black,
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Invite an athlete',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _athleteSessionCardsWidget(List<SessionCardDto> athleteSessions) {
     if (athleteSessions.isEmpty) {
       return Center(
@@ -384,5 +438,52 @@ class _AthletesScreenState extends State<AthletesScreen> {
         },
       );
     }
+  }
+
+  void openInviteDialog() {
+    final athleteUsernameTextController = TextEditingController();
+
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: const Text('Invite Athlete'),
+              content: TextFormField(
+                controller: athleteUsernameTextController,
+                decoration: const InputDecoration(
+                  hintText: 'Athlete username',
+                  hintStyle: TextStyle(color: Colors.white54),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide:
+                        BorderSide(color: Colors.white54), // Underline color
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                        color: Colors.white), // Focused underline color
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Athlete username cannot be empty';
+                  }
+                  return null;
+                },
+              ),
+              actions: [
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.outgoing_mail, color: Colors.black),
+                  label: const Text(
+                    'Send invite',
+                    style: TextStyle(fontSize: 14, color: Colors.black),
+                  ),
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.mainYellow,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                )
+              ],
+            ));
   }
 }

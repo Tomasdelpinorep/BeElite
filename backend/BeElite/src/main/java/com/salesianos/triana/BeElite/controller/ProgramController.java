@@ -257,7 +257,6 @@ public class ProgramController {
     }
 
     @PostMapping("/coach/invite")
-    @PreAuthorize("hasRole('COACH') and #coach.id == principal.id or hasRole('ADMIN')")
     public ResponseEntity<InviteDto> sendInvite(@RequestBody InviteDto invite){
         Invite i = programService.saveInvite(invite);
 

@@ -22,3 +22,7 @@ final class CreateProgramSuccessState extends ProgramState{
   CreateProgramSuccessState(this.program);
 }
 
+final class SendInviteSuccessState extends ProgramState{
+  
+}
+
