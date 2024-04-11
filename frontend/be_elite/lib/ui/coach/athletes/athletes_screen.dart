@@ -42,7 +42,9 @@ class _AthletesScreenState extends State<AthletesScreen> {
   late SessionRepository sessionRepository;
   late ProgramRepository programRepository;
   late ProgramBloc _programBloc;
+
   List<InviteDto> invitesSent = [];
+  bool showInvitationStatusWidget = false;
 
   @override
   void initState() {
@@ -219,9 +221,10 @@ class _AthletesScreenState extends State<AthletesScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [_inviteAthleteButton()]),
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [_inviteAthleteButton(), _viewInvitationStatusButton(), _kickAthleteButton()]),
                   _athleteSelectorWidget(athletes),
+                  showInvitationStatusWidget ? _invitationStatusWidget() : const SizedBox(),
                 ],
               ),
             ),
@@ -427,20 +430,36 @@ class _AthletesScreenState extends State<AthletesScreen> {
   }
 
   Widget _inviteAthleteButton() {
-    return Row(children: [
-      ElevatedButton.icon(
-        icon: const Icon(Icons.outgoing_mail, color: Colors.black),
-        label: const Text(
-          'Invite new athlete',
-          style: TextStyle(fontSize: 12, color: Colors.black),
-        ),
-        onPressed: () {},
+    return Column(children: [
+      ElevatedButton(
+        onPressed: () {
+          openInviteDialog();
+        },
         style: ElevatedButton.styleFrom(
+          elevation: 5,
           backgroundColor: AppColors.mainYellow,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
         ),
+        child: const Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(
+          Icons.outgoing_mail,
+          size: 24, 
+          color: Colors.black,
+        ),
+        Text(
+          'Invite',
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.black,
+            fontWeight: FontWeight.bold
+          ),
+        ),
+      ],
+    ),
       )
     ]);
   }
@@ -586,5 +605,81 @@ class _AthletesScreenState extends State<AthletesScreen> {
         }).toList(),
       );
     }
+  }
+
+  Widget _viewInvitationStatusButton() {
+    return Column(children: [
+      OutlinedButton(
+        onPressed: () {
+          setState(() {
+            if(showInvitationStatusWidget){
+              showInvitationStatusWidget = false;
+            }else{
+              showInvitationStatusWidget = true;
+            }
+          });
+        },
+        style: ElevatedButton.styleFrom(
+          elevation: 5,
+          backgroundColor: Colors.white10,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        child: const Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(
+          Icons.mark_email_unread,
+          size: 24, 
+          color: Colors.black,
+        ),
+        Text(
+          'Status',
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.black,
+            fontWeight: FontWeight.bold
+          ),
+        ),
+      ],
+    ),
+      )
+    ]);
+  }
+
+  Widget _kickAthleteButton(){
+    return Column(children: [
+      ElevatedButton(
+        onPressed: () {
+          // openKickDialog();
+        },
+        style: ElevatedButton.styleFrom(
+          elevation: 5,
+          backgroundColor: AppColors.errorRed,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        child: const Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(
+          Icons.person_remove_alt_1_rounded,
+          size: 24, 
+          color: Colors.black,
+        ),
+        Text(
+          'Kick',
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.black,
+            fontWeight: FontWeight.bold
+          ),
+        ),
+      ],
+    ),
+      )
+    ]);
   }
 }
