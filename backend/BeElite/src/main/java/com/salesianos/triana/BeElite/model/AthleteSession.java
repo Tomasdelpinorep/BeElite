@@ -32,7 +32,7 @@ public class AthleteSession {
     })
     private Session session;
 
-    @OneToMany(mappedBy = "athleteSession", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "athleteSession", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<AthleteBlock> athleteBlocks;
 
     private boolean isCompleted;

@@ -115,7 +115,8 @@ class _AthletesScreenState extends State<AthletesScreen> {
                   'Error fetching athletes for program with name: $selectedProgramName.');
             } else if (state is GetAthletesByProgramEmptyState) {
               athletes = [];
-              _programBloc.add(GetInvitesSentEvent(widget.coachDetails.username!, selectedProgramName));
+              _programBloc.add(GetInvitesSentEvent(
+                  widget.coachDetails.username!, selectedProgramName));
               return _buildEmptyHome();
             } else if (state is GetAthletesByProgramSuccessState) {
               athletes = state.athletes;
@@ -223,14 +224,23 @@ class _AthletesScreenState extends State<AthletesScreen> {
                   children: [
                     Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [_inviteAthleteButton(), _viewInvitationStatusButton(), _kickAthleteButton()]),
+                        children: [
+                          _inviteAthleteButton(),
+                          _viewInvitationStatusButton(),
+                          _kickAthleteButton()
+                        ]),
                     _athleteSelectorWidget(athletes),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: 20),
-            showInvitationStatusWidget ? _invitationStatusWidget() : const SizedBox(),
+            showInvitationStatusWidget
+                ? _invitationStatusWidget()
+                : const SizedBox(),
+            selectedAthleteUsername != null
+                ? _athleteSessionCard()
+                : _emptySessionCard(),
           ],
         ),
       ),
@@ -256,7 +266,9 @@ class _AthletesScreenState extends State<AthletesScreen> {
             ),
           ),
           const Text('Invitations', style: TextStyle(fontSize: 20)),
-          SizedBox(height: 150, child: SingleChildScrollView(child: _invitationStatusWidget()))
+          SizedBox(
+              height: 150,
+              child: SingleChildScrollView(child: _invitationStatusWidget()))
         ],
       ),
     );
@@ -446,23 +458,22 @@ class _AthletesScreenState extends State<AthletesScreen> {
           ),
         ),
         child: const Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          Icons.outgoing_mail,
-          size: 24, 
-          color: Colors.black,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.outgoing_mail,
+              size: 24,
+              color: Colors.black,
+            ),
+            Text(
+              'Invite',
+              style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
-        Text(
-          'Invite',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.black,
-            fontWeight: FontWeight.bold
-          ),
-        ),
-      ],
-          ),
       ),
     );
   }
@@ -616,9 +627,9 @@ class _AthletesScreenState extends State<AthletesScreen> {
       child: OutlinedButton(
         onPressed: () {
           setState(() {
-            if(showInvitationStatusWidget){
+            if (showInvitationStatusWidget) {
               showInvitationStatusWidget = false;
-            }else{
+            } else {
               showInvitationStatusWidget = true;
             }
           });
@@ -631,28 +642,27 @@ class _AthletesScreenState extends State<AthletesScreen> {
           ),
         ),
         child: const Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          Icons.mark_email_unread,
-          size: 24, 
-          color: Colors.black,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.mark_email_unread,
+              size: 24,
+              color: Colors.black,
+            ),
+            Text(
+              'Status',
+              style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
-        Text(
-          'Status',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.black,
-            fontWeight: FontWeight.bold
-          ),
-        ),
-      ],
-          ),
       ),
     );
   }
 
-  Widget _kickAthleteButton(){
+  Widget _kickAthleteButton() {
     return SizedBox(
       width: 100,
       child: ElevatedButton(
@@ -667,23 +677,90 @@ class _AthletesScreenState extends State<AthletesScreen> {
           ),
         ),
         child: const Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          Icons.person_remove_alt_1_rounded,
-          size: 24, 
-          color: Colors.black,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.person_remove_alt_1_rounded,
+              size: 24,
+              color: Colors.black,
+            ),
+            Text(
+              'Kick',
+              style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
-        Text(
-          'Kick',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.black,
-            fontWeight: FontWeight.bold
+      ),
+    );
+  }
+
+  Widget _athleteSessionCard() {
+    return Placeholder();
+  }
+
+  Widget _emptySessionCard() {
+    return Card(
+      elevation: 5,
+      child: Column(
+        children: [
+          Container(
+            width: 300,
+            decoration: BoxDecoration(
+              color: AppColors.mainYellow,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(4).copyWith(left: 8),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                      'Athlete sessions will appear here',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16)),
+                          const SizedBox(height: 10),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: LinearProgressIndicator(
+                              color: Colors.yellow[900],
+                              backgroundColor: Colors.black,
+                              value: 4/5,
+                            ),
+                          ),
+                           const Padding(
+                             padding: EdgeInsets.only(left: 20),
+                             child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                               children: [
+                                 Text('4/5 workouts completed',
+                                 style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 12,
+                                 )),
+                               ],
+                             ),
+                           )
+                ],
+              ),
+            ),
           ),
-        ),
-      ],
-          ),
+          const Padding(
+              padding: EdgeInsets.only(bottom: 12.0),
+              child: Wrap(
+                alignment: WrapAlignment.spaceAround,
+                children: [
+    
+                ],
+              ))
+        ],
       ),
     );
   }
