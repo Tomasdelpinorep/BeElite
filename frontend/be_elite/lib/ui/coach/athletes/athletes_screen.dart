@@ -206,31 +206,33 @@ class _AthletesScreenState extends State<AthletesScreen> {
   }
 
   Widget _buildHome() {
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          _topBarWidget(widget.coachDetails),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: MediaQuery.of(context).size.width * 0.8,
-            child: SizedBox(
-              height: 100,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [_inviteAthleteButton(), _viewInvitationStatusButton(), _kickAthleteButton()]),
-                  _athleteSelectorWidget(athletes),
-                  showInvitationStatusWidget ? _invitationStatusWidget() : const SizedBox(),
-                ],
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            _topBarWidget(widget.coachDetails),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.8,
+              child: SizedBox(
+                height: 100,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [_inviteAthleteButton(), _viewInvitationStatusButton(), _kickAthleteButton()]),
+                    _athleteSelectorWidget(athletes),
+                  ],
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 20),
-        ],
+            const SizedBox(height: 20),
+            showInvitationStatusWidget ? _invitationStatusWidget() : const SizedBox(),
+          ],
+        ),
       ),
     );
   }
@@ -430,8 +432,9 @@ class _AthletesScreenState extends State<AthletesScreen> {
   }
 
   Widget _inviteAthleteButton() {
-    return Column(children: [
-      ElevatedButton(
+    return SizedBox(
+      width: 100,
+      child: ElevatedButton(
         onPressed: () {
           openInviteDialog();
         },
@@ -459,9 +462,9 @@ class _AthletesScreenState extends State<AthletesScreen> {
           ),
         ),
       ],
-    ),
-      )
-    ]);
+          ),
+      ),
+    );
   }
 
   Widget _bigInviteAthleteButton() {
@@ -608,8 +611,9 @@ class _AthletesScreenState extends State<AthletesScreen> {
   }
 
   Widget _viewInvitationStatusButton() {
-    return Column(children: [
-      OutlinedButton(
+    return SizedBox(
+      width: 100,
+      child: OutlinedButton(
         onPressed: () {
           setState(() {
             if(showInvitationStatusWidget){
@@ -621,7 +625,7 @@ class _AthletesScreenState extends State<AthletesScreen> {
         },
         style: ElevatedButton.styleFrom(
           elevation: 5,
-          backgroundColor: Colors.white10,
+          backgroundColor: Colors.white38,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
@@ -643,14 +647,15 @@ class _AthletesScreenState extends State<AthletesScreen> {
           ),
         ),
       ],
-    ),
-      )
-    ]);
+          ),
+      ),
+    );
   }
 
   Widget _kickAthleteButton(){
-    return Column(children: [
-      ElevatedButton(
+    return SizedBox(
+      width: 100,
+      child: ElevatedButton(
         onPressed: () {
           // openKickDialog();
         },
@@ -678,8 +683,8 @@ class _AthletesScreenState extends State<AthletesScreen> {
           ),
         ),
       ],
-    ),
-      )
-    ]);
+          ),
+      ),
+    );
   }
 }
