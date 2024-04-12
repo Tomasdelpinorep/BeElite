@@ -7,6 +7,7 @@ import 'package:be_elite/ui/coach/profile/coach_profile_screen.dart';
 import 'package:be_elite/ui/coach/programs/programs_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CoachMainScreen extends StatefulWidget {
   const CoachMainScreen({super.key});
@@ -23,10 +24,23 @@ class _CoachMainScreenState extends State<CoachMainScreen> {
 
   @override
   void initState() {
+    loadIndex();
     userRepository = UserRepositoryImpl();
     _coachDetailsBloc = CoachDetailsBloc(userRepository)
       ..add(GetCoachDetailsEvent());
     super.initState();
+  }
+
+  Future<void> loadIndex() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      myIndex = prefs.getInt('index') ?? 0;
+    });
+  }
+
+  Future<void> _saveDropDownValue(int index) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('index', index);
   }
 
   @override
@@ -66,6 +80,7 @@ class _CoachMainScreenState extends State<CoachMainScreen> {
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: AppColors.mainYellow.withOpacity(0.25),
         onTap: (index) {
+          _saveDropDownValue(index);
           setState(() {
             myIndex = index;
           });

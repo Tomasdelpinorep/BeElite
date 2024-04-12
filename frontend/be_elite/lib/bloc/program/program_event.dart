@@ -20,6 +20,12 @@ class GetProgramIdEvent extends ProgramEvent{
 }
 
 class SendInviteEvent extends ProgramEvent{
-  final InviteDto invite;
+  final PostInviteDto invite;
   SendInviteEvent(this.invite);
+}
+
+class GetInvitesSentEvent extends ProgramEvent{
+  final String coachUsername;
+  final String programName;
+  GetInvitesSentEvent(this.coachUsername, this.programName);
 }

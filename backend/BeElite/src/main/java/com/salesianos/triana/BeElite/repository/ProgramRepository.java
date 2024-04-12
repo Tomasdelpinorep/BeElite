@@ -1,5 +1,7 @@
 package com.salesianos.triana.BeElite.repository;
 
+import com.salesianos.triana.BeElite.dto.Program.InviteDto;
+import com.salesianos.triana.BeElite.model.Invite;
 import com.salesianos.triana.BeElite.model.Program;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,4 +27,5 @@ public interface ProgramRepository extends JpaRepository<Program, UUID> {
             SELECT p FROM Program p
             """)
     Page<Program> findPage(Pageable page);
+
 }

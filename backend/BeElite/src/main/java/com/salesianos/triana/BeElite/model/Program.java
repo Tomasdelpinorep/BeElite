@@ -45,6 +45,10 @@ public class Program {
     @CreatedDate
     private LocalDate createdAt;
 
+    @OneToMany
+    private List<Invite> invitesSent;
+
+
     public void removeAthletes(){
         if(!athletes.isEmpty()){
             for(Athlete athlete : athletes){

@@ -1,9 +1,9 @@
 package com.salesianos.triana.BeElite.service;
 
 import com.salesianos.triana.BeElite.dto.Program.InviteDto;
+import com.salesianos.triana.BeElite.dto.Program.PostInviteDto;
 import com.salesianos.triana.BeElite.dto.Program.PostProgramDto;
 import com.salesianos.triana.BeElite.dto.Program.ProgramDto;
-import com.salesianos.triana.BeElite.exception.InviteErrorException;
 import com.salesianos.triana.BeElite.exception.NotFoundException;
 import com.salesianos.triana.BeElite.exception.ProgramNameAlreadyInUseException;
 import com.salesianos.triana.BeElite.model.*;
@@ -12,14 +12,10 @@ import com.salesianos.triana.BeElite.repository.CoachRepository;
 import com.salesianos.triana.BeElite.repository.InviteRepository;
 import com.salesianos.triana.BeElite.repository.ProgramRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Not;
-import org.hibernate.annotations.NotFound;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -44,13 +40,17 @@ public class ProgramService {
         return programRepository.save(PostProgramDto.toEntity(newProgram,c));
     }
 
-    public Invite saveInvite(InviteDto i){
+    public Invite saveInvite(PostInviteDto i){
+        Program p = programRepository.findByCoachAndProgramName(i.coachId(), i.programName()).orElseThrow(() -> new NotFoundException("Program"));
+
         Invite invite = Invite.builder()
-                .athlete(athleteRepository.findById(i.athleteId()).orElseThrow(() -> new InviteErrorException("Could not send invite.")))
-                .program(programRepository.findById(i.programId()).orElseThrow(() -> new InviteErrorException("Could not send invite.")))
+                .athlete(athleteRepository.findByUsername(i.athleteUsername()).orElseThrow(() -> new NotFoundException("Athlete")))
+                .program(p)
                 .status(InvitationStatus.PENDING)
                 .createdAt(LocalDateTime.now())
                 .build();
+
+        p.getInvitesSent().add(invite);
 
         return inviteRepository.save(invite);
     }
@@ -123,5 +123,12 @@ public class ProgramService {
                 program.removeAthletes();
                 programRepository.delete(program);
         });
+    }
+
+    public List<Invite> findInvites(String coachUsername, String programName){
+        Coach c = coachRepository.findByUsername(coachUsername).orElseThrow(() -> new NotFoundException("coach"));
+        Program p = programRepository.findByCoachAndProgramName(c.getId(), programName).orElseThrow(() -> new NotFoundException("program"));
+
+        return inviteRepository.findInvitesByProgram(p.getId());
     }
 }
