@@ -6,11 +6,11 @@ class Block {
 
 	factory Block.fromJson(Map<String, dynamic> json) => Block(
 				movement: json['movement'] as String?,
-				isCompleted: json['is_completed'] as bool?,
+				isCompleted: json['isCompleted'] as bool?,
 			);
 
 	Map<String, dynamic> toJson() => {
 				'movement': movement,
-				'is_completed': isCompleted,
+				'isCompleted': isCompleted,
 			};
 }
