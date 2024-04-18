@@ -6,10 +6,7 @@ import com.salesianos.triana.BeElite.exception.NotFoundException;
 import com.salesianos.triana.BeElite.model.*;
 import com.salesianos.triana.BeElite.model.Composite_Ids.SessionId;
 import com.salesianos.triana.BeElite.model.Composite_Ids.WeekId;
-import com.salesianos.triana.BeElite.repository.CoachRepository;
-import com.salesianos.triana.BeElite.repository.ProgramRepository;
-import com.salesianos.triana.BeElite.repository.SessionRepository;
-import com.salesianos.triana.BeElite.repository.WeekRepository;
+import com.salesianos.triana.BeElite.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +25,8 @@ public class WeekService {
     private final WeekRepository weekRepository;
     private final ProgramRepository programRepository;
     private final CoachRepository coachRepository;
+    private final AthleteSessionRepository athleteSessionRepository;
+    private final AthleteBlockRepository athleteBlockRepository;
 
     public Page<Week> findPageByProgram(Pageable page, String programName, String coachUsername){
         Sort sort = Sort.by(Sort.Direction.DESC, "created_at");
@@ -104,6 +103,13 @@ public class WeekService {
         Program p = programRepository.findByCoachAndProgramName(c.getId(),  programName).orElseThrow(() -> new NotFoundException("program"));
 
         Week w = weekRepository.findById(WeekId.of(weekNumber, weekName, p.getId())).orElseThrow(() -> new NotFoundException("week"));
+
+        //Delete associated athlete session's and blocks
+        for(Session session : w.getSessions()){
+            athleteBlockRepository.deleteBySessionId(session.getId());
+            athleteSessionRepository.deleteBySessionId(session.getId());
+        }
+
         weekRepository.delete(w);
     }
 }

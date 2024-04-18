@@ -32,6 +32,11 @@ final class GetPostSessionDtoSuccessState extends SessionState{
   GetPostSessionDtoSuccessState(this.session);
 }
 
+final class GetSessionCardDataIsEmptyState extends SessionState{
+  final SessionCardDtoPage sessionPage;
+  GetSessionCardDataIsEmptyState(this.sessionPage);
+}
+
 final class LoadNewSessionSuccessState extends SessionState{}
 
 final class DeleteSessionSuccessState extends SessionState{}

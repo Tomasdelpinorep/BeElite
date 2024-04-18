@@ -65,7 +65,7 @@ class ProgramRepositoryImpl implements ProgramRepository{
     );
 
     if(response.statusCode == 404){
-      throw Exception('No athlete found.');
+      throw Exception('No athlete matching that username was found.');
     }
   }
 

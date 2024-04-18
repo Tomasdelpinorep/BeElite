@@ -1,5 +1,5 @@
 import 'package:be_elite/models/Session/post_session_dto/post_session_dto.dart';
-import 'package:be_elite/models/Session/post_session_dto/session_card_dto/session_card_dto_page.dart';
+import 'package:be_elite/models/Session/session_card_dto/session_card_dto_page.dart';
 import 'package:be_elite/models/Session/session_dto.dart';
 
 abstract class SessionRepository{

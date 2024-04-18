@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:be_elite/models/Session/post_session_dto/post_session_dto.dart';
-import 'package:be_elite/models/Session/post_session_dto/session_card_dto/session_card_dto_page.dart';
+import 'package:be_elite/models/Session/session_card_dto/session_card_dto_page.dart';
 import 'package:be_elite/models/Session/session_dto.dart';
 import 'package:be_elite/repositories/session/session_repository.dart';
 import 'package:be_elite/variables.dart';
@@ -76,7 +76,7 @@ class SessionRepositoryImpl extends SessionRepository {
     if (response.statusCode == 200) {
       return SessionCardDtoPage.fromJson(json.decode(response.body));
     } else if (response.statusCode == 404) {
-      throw Exception("This athlete currently has no sessions assigned.");
+      return SessionCardDtoPage();
     } else {
       throw Exception("There was an error fetching session data.");
     }

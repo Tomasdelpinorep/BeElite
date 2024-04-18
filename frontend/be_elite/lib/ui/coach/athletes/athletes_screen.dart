@@ -1,6 +1,7 @@
 import 'package:be_elite/bloc/athlete/athlete_bloc.dart';
 import 'package:be_elite/bloc/program/program_bloc.dart';
 import 'package:be_elite/bloc/session/session_bloc.dart';
+import 'package:be_elite/misc/Method_Classes/athletes_screen_methods.dart';
 import 'package:be_elite/misc/Widgets/beElite_logo.dart';
 import 'package:be_elite/misc/Widgets/circular_avatar.dart';
 import 'package:be_elite/models/Coach/coach_details.dart';
@@ -8,7 +9,7 @@ import 'package:be_elite/models/Coach/program_dto.dart';
 import 'package:be_elite/models/Coach/user_dto.dart';
 import 'package:be_elite/models/Program/invite_dto.dart';
 import 'package:be_elite/models/Program/post_invite_dto.dart';
-import 'package:be_elite/models/Session/post_session_dto/session_card_dto/session_card_dto.dart';
+import 'package:be_elite/models/Session/session_card_dto/session_card_dto.dart';
 import 'package:be_elite/repositories/athlete/athlete_repository.dart';
 import 'package:be_elite/repositories/athlete/athlete_repository_impl.dart';
 import 'package:be_elite/repositories/program/program_repository.dart';
@@ -45,6 +46,8 @@ class _AthletesScreenState extends State<AthletesScreen> {
 
   List<InviteDto> invitesSent = [];
   bool showInvitationStatusWidget = false;
+  bool showEmptySessionCard = true;
+  AthleteScreenMethods methods = AthleteScreenMethods();
 
   @override
   void initState() {
@@ -115,7 +118,8 @@ class _AthletesScreenState extends State<AthletesScreen> {
                   'Error fetching athletes for program with name: $selectedProgramName.');
             } else if (state is GetAthletesByProgramEmptyState) {
               athletes = [];
-              _programBloc.add(GetInvitesSentEvent(widget.coachDetails.username!, selectedProgramName));
+              _programBloc.add(GetInvitesSentEvent(
+                  widget.coachDetails.username!, selectedProgramName));
               return _buildEmptyHome();
             } else if (state is GetAthletesByProgramSuccessState) {
               athletes = state.athletes;
@@ -127,23 +131,26 @@ class _AthletesScreenState extends State<AthletesScreen> {
           listener: (context, state) {},
         ),
         BlocConsumer<SessionBloc, SessionState>(
-          buildWhen: (context, state) {
-            return state is SessionLoadingState ||
-                state is SessionErrorState ||
-                state is GetSessionCardDataSuccessState;
-          },
           builder: (context, state) {
             if (state is SessionLoadingState) {
               return const Center(child: CircularProgressIndicator());
             } else if (state is SessionErrorState) {
               return Text(state.errorMessage);
-            } else if (state is GetSessionCardDataSuccessState) {
-              athleteSessions = state.sessionPage.sessionCardDto!;
-              return _athleteSessionCardsWidget(athleteSessions);
             }
             return const SizedBox(height: 0);
           },
-          listener: (context, state) {},
+          listener: (context, state) {
+            if (state is GetSessionCardDataIsEmptyState) {
+              setState(() {
+                showEmptySessionCard = false;
+              });
+            } else if (state is GetSessionCardDataSuccessState) {
+              setState(() {
+                athleteSessions = state.sessionPage.sessionCardDtos!;
+                showEmptySessionCard = false;
+              });
+            }
+          },
         ),
         BlocListener<ProgramBloc, ProgramState>(
           listener: (context, state) {
@@ -223,14 +230,30 @@ class _AthletesScreenState extends State<AthletesScreen> {
                   children: [
                     Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [_inviteAthleteButton(), _viewInvitationStatusButton(), _kickAthleteButton()]),
+                        children: [
+                          _inviteAthleteButton(),
+                          _viewInvitationStatusButton(),
+                          _kickAthleteButton()
+                        ]),
                     _athleteSelectorWidget(athletes),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: 20),
-            showInvitationStatusWidget ? _invitationStatusWidget() : const SizedBox(),
+            showInvitationStatusWidget
+                ? _invitationStatusWidget()
+                : const SizedBox(),
+            selectedAthleteUsername != null && athleteSessions.isNotEmpty
+                ? Expanded(child: _athleteSessionCardsWidget())
+                : Column(
+                    children: [
+                      const SizedBox(height: 150),
+                      Align(
+                          alignment: Alignment.topCenter,
+                          child: Container(child: _emptySessionCard())),
+                    ],
+                  ),
           ],
         ),
       ),
@@ -256,7 +279,9 @@ class _AthletesScreenState extends State<AthletesScreen> {
             ),
           ),
           const Text('Invitations', style: TextStyle(fontSize: 20)),
-          SizedBox(height: 150, child: SingleChildScrollView(child: _invitationStatusWidget()))
+          SizedBox(
+              height: 150,
+              child: SingleChildScrollView(child: _invitationStatusWidget()))
         ],
       ),
     );
@@ -407,6 +432,7 @@ class _AthletesScreenState extends State<AthletesScreen> {
         icon: const Icon(Icons.arrow_drop_down),
         iconSize: 32.0,
         isExpanded: true,
+        value: selectedAthleteUsername,
         hint: const Text(
           'Select an athlete to view their feedback.',
           style: TextStyle(fontSize: 16.0),
@@ -446,23 +472,22 @@ class _AthletesScreenState extends State<AthletesScreen> {
           ),
         ),
         child: const Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          Icons.outgoing_mail,
-          size: 24, 
-          color: Colors.black,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.outgoing_mail,
+              size: 24,
+              color: Colors.black,
+            ),
+            Text(
+              'Invite',
+              style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
-        Text(
-          'Invite',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.black,
-            fontWeight: FontWeight.bold
-          ),
-        ),
-      ],
-          ),
       ),
     );
   }
@@ -503,21 +528,6 @@ class _AthletesScreenState extends State<AthletesScreen> {
         ),
       ),
     );
-  }
-
-  Widget _athleteSessionCardsWidget(List<SessionCardDto> athleteSessions) {
-    if (athleteSessions.isEmpty) {
-      return Center(
-        child: Container(color: Colors.red),
-      );
-    } else {
-      return ListView.builder(
-        itemCount: athleteSessions.length,
-        itemBuilder: (context, index) {
-          return Center(child: Text(athleteSessions[index].title!));
-        },
-      );
-    }
   }
 
   void openInviteDialog() {
@@ -616,9 +626,9 @@ class _AthletesScreenState extends State<AthletesScreen> {
       child: OutlinedButton(
         onPressed: () {
           setState(() {
-            if(showInvitationStatusWidget){
+            if (showInvitationStatusWidget) {
               showInvitationStatusWidget = false;
-            }else{
+            } else {
               showInvitationStatusWidget = true;
             }
           });
@@ -631,28 +641,27 @@ class _AthletesScreenState extends State<AthletesScreen> {
           ),
         ),
         child: const Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          Icons.mark_email_unread,
-          size: 24, 
-          color: Colors.black,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.mark_email_unread,
+              size: 24,
+              color: Colors.black,
+            ),
+            Text(
+              'Status',
+              style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
-        Text(
-          'Status',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.black,
-            fontWeight: FontWeight.bold
-          ),
-        ),
-      ],
-          ),
       ),
     );
   }
 
-  Widget _kickAthleteButton(){
+  Widget _kickAthleteButton() {
     return SizedBox(
       width: 100,
       child: ElevatedButton(
@@ -667,24 +676,433 @@ class _AthletesScreenState extends State<AthletesScreen> {
           ),
         ),
         child: const Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          Icons.person_remove_alt_1_rounded,
-          size: 24, 
-          color: Colors.black,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.person_remove_alt_1_rounded,
+              size: 24,
+              color: Colors.black,
+            ),
+            Text(
+              'Kick',
+              style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
-        Text(
-          'Kick',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.black,
-            fontWeight: FontWeight.bold
-          ),
-        ),
-      ],
-          ),
       ),
     );
+  }
+
+  Widget _athleteSessionCardsWidget() {
+    return SizedBox(
+      width: 330,
+      child: ListView.separated(
+        separatorBuilder: (context, index) => const SizedBox(height: 30),
+        itemCount: athleteSessions.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: Card(
+              elevation: 5,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.mainYellow,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(10),
+                        topRight: Radius.circular(10),
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            methods.getSessionCardTitle(
+                                athleteSessions[index].date!),
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          LinearProgressIndicator(
+                            value: athleteSessions[index].blocks!.isNotEmpty
+                                ? methods.getNumberOfWorkoutsCompleted(
+                                        athleteSessions[index].blocks!) /
+                                    athleteSessions[index].blocks!.length
+                                : 0,
+                            backgroundColor: Colors.black,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.yellow[900]!),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${methods.getNumberOfWorkoutsCompleted(athleteSessions[index].blocks!)}/${athleteSessions[index].blocks!.length} workouts completed',
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: ListView.separated(
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 8),
+                      shrinkWrap: true,
+                      itemCount: (athleteSessions.length / 2).ceil(),
+                      itemBuilder: (context, blockIndex) {
+                        final leftIndex = blockIndex * 2;
+                        final rightIndex = leftIndex + 1;
+
+                        if (athleteSessions[index].blocks!.isNotEmpty) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Wrap(
+                              runSpacing: 8.0,
+                              alignment: WrapAlignment.center,
+                              children: [
+                                leftIndex <
+                                        athleteSessions[index].blocks!.length
+                                    ? SizedBox(
+                                        width: 100,
+                                        child: Column(
+                                          children: [
+                                            athleteSessions[index]
+                                                    .blocks![leftIndex]
+                                                    .isCompleted!
+                                                ? Container(
+                                                    width: 20.0,
+                                                    height: 20.0,
+                                                    decoration: BoxDecoration(
+                                                      color: AppColors
+                                                          .successGreen,
+                                                      shape: BoxShape.circle,
+                                                      border: Border.all(
+                                                          color: Colors.white,
+                                                          width: 0.75),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.black
+                                                              .withOpacity(
+                                                                  0.5),
+                                                          spreadRadius: 2,
+                                                          blurRadius: 7,
+                                                          offset:
+                                                              const Offset(
+                                                                  0, 3),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  )
+                                                : Container(
+                                                    width: 20.0,
+                                                    height: 20.0,
+                                                    decoration: BoxDecoration(
+                                                      color:
+                                                          AppColors.errorRed,
+                                                      shape: BoxShape.circle,
+                                                      border: Border.all(
+                                                          color: Colors.white,
+                                                          width: 0.75),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.black
+                                                              .withOpacity(
+                                                                  0.5),
+                                                          spreadRadius: 2,
+                                                          blurRadius: 7,
+                                                          offset:
+                                                              const Offset(
+                                                                  0, 3),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                            Text(
+                                              athleteSessions[index]
+                                                  .blocks![leftIndex]
+                                                  .movement!,
+                                              style: const TextStyle(
+                                                  fontSize: 16),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    : const SizedBox(),
+                            
+                                // If there's another block on the right, put the divider there
+                                // I think +1 should work but it doesn't, +2 works fine though :/
+                                athleteSessions[index].blocks!.length >
+                                        blockIndex + 2
+                                    ? const Padding(
+                                      padding: EdgeInsets.fromLTRB(8,0,8,8),
+                                      child: SizedBox(
+                                        height: 40,
+                                        child: VerticalDivider(
+                                            color: Colors.grey,
+                                            thickness: 2.0,
+                                            width: 10.0,
+                                          ),
+                                      ),
+                                    )
+                                    : const SizedBox(),
+                                rightIndex <
+                                        athleteSessions[index].blocks!.length
+                                    ? SizedBox(
+                                        width: 100,
+                                        child: Column(
+                                          children: [
+                                            athleteSessions[index]
+                                                    .blocks![leftIndex]
+                                                    .isCompleted!
+                                                ? Container(
+                                                    width: 20.0,
+                                                    height: 20.0,
+                                                    decoration: BoxDecoration(
+                                                      color: AppColors
+                                                          .successGreen,
+                                                      shape: BoxShape.circle,
+                                                      border: Border.all(
+                                                          color: Colors.white,
+                                                          width: 0.75),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.black
+                                                              .withOpacity(
+                                                                  0.5),
+                                                          spreadRadius: 2,
+                                                          blurRadius: 7,
+                                                          offset:
+                                                              const Offset(
+                                                                  0, 3),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  )
+                                                : Container(
+                                                    width: 20.0,
+                                                    height: 20.0,
+                                                    decoration: BoxDecoration(
+                                                      color:
+                                                          AppColors.errorRed,
+                                                      shape: BoxShape.circle,
+                                                      border: Border.all(
+                                                          color: Colors.white,
+                                                          width: 0.75),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.black
+                                                              .withOpacity(
+                                                                  0.5),
+                                                          spreadRadius: 2,
+                                                          blurRadius: 7,
+                                                          offset:
+                                                              const Offset(
+                                                                  0, 3),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                            Text(
+                                              athleteSessions[index]
+                                                  .blocks![rightIndex]
+                                                  .movement!,
+                                              style: const TextStyle(
+                                                  fontSize: 16),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    : const SizedBox(),
+                              ],
+                            ),
+                          );
+                        } else {
+                          return const SizedBox(height: 10);
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _emptySessionCard() {
+    final List<String> data = [
+      "Exercise 1",
+      "Exercise 2",
+      "Exercise 3",
+      "Exercise 4"
+    ];
+
+    if (showEmptySessionCard) {
+      return SizedBox(
+        width: 300,
+        child: Card(
+          elevation: 5,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.mainYellow,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Athlete sessions will appear here',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      LinearProgressIndicator(
+                        value: 0.5,
+                        backgroundColor: Colors.black,
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(Colors.yellow[900]!),
+                      ),
+                      const SizedBox(height: 8),
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            '2/4 workouts completed',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: ListView.separated(
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 8),
+                  shrinkWrap: true,
+                  itemCount: (data.length / 2).ceil(),
+                  itemBuilder: (context, index) {
+                    final leftIndex = index * 2;
+                    final rightIndex = leftIndex + 1;
+
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: IntrinsicHeight(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Column(
+                              children: [
+                                Container(
+                                  width: 20.0,
+                                  height: 20.0,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.successGreen,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                        color: Colors.white, width: 0.75),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.5),
+                                        spreadRadius: 2,
+                                        blurRadius: 7,
+                                        offset: const Offset(0, 3),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                Text(
+                                  data[leftIndex],
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                              ],
+                            ),
+                            const VerticalDivider(
+                              color: Colors.grey,
+                              thickness: 2.0,
+                              width: 10.0,
+                            ),
+                            rightIndex < 4
+                                ? Column(
+                                    children: [
+                                      Container(
+                                        width: 20.0,
+                                        height: 20.0,
+                                        decoration: BoxDecoration(
+                                          color: AppColors.errorRed,
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                              color: Colors.white, width: 0.75),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color:
+                                                  Colors.black.withOpacity(0.5),
+                                              spreadRadius: 2,
+                                              blurRadius: 7,
+                                              offset: const Offset(0, 3),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                      Text(
+                                        data[rightIndex],
+                                        style: const TextStyle(fontSize: 16),
+                                      ),
+                                    ],
+                                  )
+                                : const SizedBox(),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    } else if (!showEmptySessionCard && athleteSessions.isEmpty) {
+      return const Text("This athlete doesn't have any sessions yet.",
+          style: TextStyle(fontSize: 18));
+    } else {
+      return const SizedBox();
+    }
   }
 }

@@ -1,9 +1,9 @@
-import 'package:be_elite/models/Session/post_session_dto/session_card_dto/session_card_dto.dart';
+import 'package:be_elite/models/Session/session_card_dto/session_card_dto.dart';
 import 'pageable.dart';
 import 'sort.dart';
 
 class SessionCardDtoPage {
-	List<SessionCardDto>? sessionCardDto;
+	List<SessionCardDto>? sessionCardDtos;
 	Pageable? pageable;
 	bool? last;
 	int? totalPages;
@@ -16,7 +16,7 @@ class SessionCardDtoPage {
 	bool? empty;
 
 	SessionCardDtoPage({
-		this.sessionCardDto, 
+		this.sessionCardDtos, 
 		this.pageable, 
 		this.last, 
 		this.totalPages, 
@@ -31,7 +31,7 @@ class SessionCardDtoPage {
 
 	factory SessionCardDtoPage.fromJson(Map<String, dynamic> json) {
 		return SessionCardDtoPage(
-			sessionCardDto: (json['content'] as List<dynamic>?)
+			sessionCardDtos: (json['content'] as List<dynamic>?)
 						?.map((e) => SessionCardDto.fromJson(e as Map<String, dynamic>))
 						.toList(),
 			pageable: json['pageable'] == null
@@ -54,7 +54,7 @@ class SessionCardDtoPage {
 
 
 	Map<String, dynamic> toJson() => {
-				'content': sessionCardDto?.map((e) => e.toJson()).toList(),
+				'content': sessionCardDtos?.map((e) => e.toJson()).toList(),
 				'pageable': pageable?.toJson(),
 				'last': last,
 				'totalPages': totalPages,

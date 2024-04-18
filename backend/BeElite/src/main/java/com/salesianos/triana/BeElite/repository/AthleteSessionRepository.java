@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface AthleteSessionRepository extends JpaRepository<AthleteSession, AthleteSessionId> {
@@ -39,6 +40,13 @@ public interface AthleteSessionRepository extends JpaRepository<AthleteSession, 
             "AND a.week_name = :#{#sessionId.week_id.week_name} " +
             "AND a.program_id = :#{#sessionId.week_id.program_id}", nativeQuery = true)
     void deleteBySessionId(SessionId sessionId);
+
+    @Query(value = "SELECT FROM athlete_session a WHERE " +
+            "a.session_number = :#{#sessionId.session_number} " +
+            "AND a.week_number = :#{#sessionId.week_id.week_number} " +
+            "AND a.week_name = :#{#sessionId.week_id.week_name} " +
+            "AND a.program_id = :#{#sessionId.week_id.program_id}", nativeQuery = true)
+    List<AthleteSession> findBySessionId(SessionId sessionId);
 
 
 }
