@@ -2,6 +2,7 @@ package com.salesianos.triana.BeElite.controller;
 
 import com.salesianos.triana.BeElite.dto.User.AthleteDetailsDto;
 import com.salesianos.triana.BeElite.dto.User.UserDto;
+import com.salesianos.triana.BeElite.model.Athlete;
 import com.salesianos.triana.BeElite.service.AthleteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,7 +32,7 @@ public class AthleteController {
     @Operation(summary = "Get athlete details by username")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved athlete details",
-                    content = { @Content(mediaType = "application/json",
+                    content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = AthleteDetailsDto.class),
                             examples = {@ExampleObject(
                                     value = """
@@ -66,7 +68,7 @@ public class AthleteController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content)
     })
-    public AthleteDetailsDto getAthleteDetails(@PathVariable String athleteUsername){
+    public AthleteDetailsDto getAthleteDetails(@PathVariable String athleteUsername) {
         return AthleteDetailsDto.of(athleteService.findByName(athleteUsername));
     }
 
@@ -74,7 +76,7 @@ public class AthleteController {
     @Operation(summary = "Get athletes for a specific program")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved athletes",
-                    content = { @Content(mediaType = "application/json",
+                    content = {@Content(mediaType = "application/json",
                             array = @ArraySchema(schema = @Schema(implementation = UserDto.class)),
                             examples = {@ExampleObject(
                                     value = """
@@ -101,7 +103,7 @@ public class AthleteController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content)
     })
-    public ResponseEntity<List<UserDto>> getAthletesByProgram(@PathVariable String coachUsername, @PathVariable String programName){
+    public ResponseEntity<List<UserDto>> getAthletesByProgram(@PathVariable String coachUsername, @PathVariable String programName) {
         List<UserDto> athletes = athleteService.findAthletesByProgram(coachUsername, programName).stream().map(UserDto::of).toList();
 
         if (athletes.isEmpty()) {
@@ -112,5 +114,9 @@ public class AthleteController {
 
     }
 
-
+    @GetMapping("/{coachUsername}/oldestAthlete")
+    public UserDto getOldestAthleteInAllPrograms(@PathVariable String coachUsername) {
+        Athlete a = athleteService.findOldestAthleteInProgram(coachUsername);
+        return UserDto.of(a, a.getJoinedProgramDate());
+    }
 }

@@ -92,4 +92,9 @@ public class CoachController {
     public ResponseEntity<CoachDetailsDto> getCoachDetails(@AuthenticationPrincipal Coach coach , @PathVariable String coachUsername){
         return ResponseEntity.ok(CoachDetailsDto.of(coachService.findByUsername(coachUsername)));
     }
+
+    @GetMapping("/{coachUsername}/totalSessionsCompleted")
+    public int getTotalSessionsCompleted(@PathVariable String coachUsername){
+        return coachService.getTotalSessionsCompleted(coachUsername);
+    }
 }

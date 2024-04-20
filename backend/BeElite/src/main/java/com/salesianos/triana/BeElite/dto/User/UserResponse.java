@@ -34,7 +34,7 @@ public class UserResponse {
                 .email(usuario.getEmail())
                 .name(usuario.getName())
                 .profilePicUrl(usuario.getProfilePicUrl())
-                .createdAt(usuario.getCreatedAt())
+                .createdAt(usuario.getJoinDate())
                 .role(getRole(usuario.getAuthorities()))
                 .build();
     }

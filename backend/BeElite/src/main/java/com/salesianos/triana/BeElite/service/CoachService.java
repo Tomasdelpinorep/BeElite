@@ -32,4 +32,9 @@ public class CoachService {
     public Coach findById(UUID id){
         return coachRepository.findById(id).orElseThrow(() -> new NotFoundException("coach"));
     }
+
+    public int getTotalSessionsCompleted(String coachUsername){
+        Coach c = coachRepository.findByUsername(coachUsername).orElseThrow(() -> new NotFoundException("coach"));
+        return coachRepository.getTotalSessionsCompleted(c.getId());
+    }
 }

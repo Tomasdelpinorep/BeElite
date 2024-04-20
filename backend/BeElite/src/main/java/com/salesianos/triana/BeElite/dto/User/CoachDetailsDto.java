@@ -28,7 +28,7 @@ public record CoachDetailsDto(
                 .name(c.getName())
                 .email(c.getEmail())
                 .profilePicUrl(c.getProfilePicUrl())
-                .createdAt(c.getCreatedAt())
+                .createdAt(c.getJoinDate())
                 .athletes(c.getPrograms().stream().flatMap(program -> program.getAthletes().stream()).map(UserDto::of).toList())
                 .programs(c.getPrograms().stream().map(ProgramDto::of).toList())
                 .build();

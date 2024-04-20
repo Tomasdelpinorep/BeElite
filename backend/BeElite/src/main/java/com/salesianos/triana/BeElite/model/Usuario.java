@@ -52,7 +52,7 @@ public abstract class Usuario implements UserDetails {
     private boolean enabled = true;
 
     @CreatedDate
-    private LocalDateTime createdAt;
+    private LocalDateTime joinDate;
 
     private LocalDateTime lastPasswordChangeAt = LocalDateTime.now();
 

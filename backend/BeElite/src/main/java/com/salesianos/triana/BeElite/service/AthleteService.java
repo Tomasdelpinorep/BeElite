@@ -50,6 +50,12 @@ public class AthleteService {
 
     }
 
+    public Athlete findOldestAthleteInProgram(String coachUsername){
+        Coach c = coachRepository.findByUsername(coachUsername).orElseThrow(() -> new NotFoundException("coach"));
+
+        return athleteRepository.findOldestAthlete(c.getId());
+    }
+
     public static AthleteBlock toAthleteBlock(Block block, AthleteSession athleteSession){
         return AthleteBlock.builder()
                 .id(AthleteBlockId.of(block.getBlock_id().getBlock_number(), athleteSession.getId()))
