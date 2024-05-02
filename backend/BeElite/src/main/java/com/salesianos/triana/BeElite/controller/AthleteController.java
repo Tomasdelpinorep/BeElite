@@ -3,6 +3,7 @@ package com.salesianos.triana.BeElite.controller;
 import com.salesianos.triana.BeElite.dto.User.AthleteDetailsDto;
 import com.salesianos.triana.BeElite.dto.User.UserDto;
 import com.salesianos.triana.BeElite.model.Athlete;
+import com.salesianos.triana.BeElite.model.Coach;
 import com.salesianos.triana.BeElite.service.AthleteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -13,6 +14,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -118,5 +122,11 @@ public class AthleteController {
     public UserDto getOldestAthleteInAllPrograms(@PathVariable String coachUsername) {
         Athlete a = athleteService.findOldestAthleteInProgram(coachUsername);
         return UserDto.of(a, a.getJoinedProgramDate());
+    }
+
+    @GetMapping("/all")
+    public Page<UserDto> getAllAthletes(@PageableDefault(page = 0, size = 20) Pageable page){
+        Page<Athlete> athletes = athleteService.getAllAthletes(page);
+        return athletes.map(UserDto::of);
     }
 }

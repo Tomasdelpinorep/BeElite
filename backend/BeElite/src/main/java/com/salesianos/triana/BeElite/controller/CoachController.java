@@ -3,6 +3,7 @@ package com.salesianos.triana.BeElite.controller;
 import com.salesianos.triana.BeElite.dto.Program.InviteDto;
 import com.salesianos.triana.BeElite.dto.User.AddUser;
 import com.salesianos.triana.BeElite.dto.User.CoachDetailsDto;
+import com.salesianos.triana.BeElite.dto.User.UserDto;
 import com.salesianos.triana.BeElite.model.Athlete;
 import com.salesianos.triana.BeElite.model.Coach;
 import com.salesianos.triana.BeElite.model.Program;
@@ -21,6 +22,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,6 +34,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -96,5 +102,11 @@ public class CoachController {
     @GetMapping("/{coachUsername}/totalSessionsCompleted")
     public int getTotalSessionsCompleted(@PathVariable String coachUsername){
         return coachService.getTotalSessionsCompleted(coachUsername);
+    }
+
+    @GetMapping("/all")
+    public Page<UserDto> getAllCoaches(@PageableDefault(page = 0, size = 20) Pageable page){
+        Page<Coach> coaches = coachService.getAllCoaches(page);
+        return coaches.map(UserDto::of);
     }
 }

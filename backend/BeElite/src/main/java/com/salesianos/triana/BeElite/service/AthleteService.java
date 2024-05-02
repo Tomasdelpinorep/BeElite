@@ -8,6 +8,8 @@ import com.salesianos.triana.BeElite.repository.AthleteRepository;
 import com.salesianos.triana.BeElite.repository.CoachRepository;
 import com.salesianos.triana.BeElite.repository.ProgramRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -54,6 +56,10 @@ public class AthleteService {
         Coach c = coachRepository.findByUsername(coachUsername).orElseThrow(() -> new NotFoundException("coach"));
 
         return athleteRepository.findOldestAthlete(c.getId());
+    }
+
+    public Page<Athlete> getAllAthletes(Pageable page){
+        return athleteRepository.findAll(page);
     }
 
     public static AthleteBlock toAthleteBlock(Block block, AthleteSession athleteSession){
