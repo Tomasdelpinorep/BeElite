@@ -3,7 +3,7 @@ import { ViewComponent } from './post/view/view.component';
 import { CreateCoachComponent } from './post/create/coaches/create.component';
 import { EditComponent } from './post/edit/edit.component';
 import { AdminCoachesComponent } from './post/coaches/coaches.component';
-import { AuthGuard } from './auth.guards';
+import { AuthGuard } from './misc/auth.guards';
 import { LoginComponent } from './login/login.component';
 
 export const routes: Routes = [

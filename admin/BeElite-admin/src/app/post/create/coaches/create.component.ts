@@ -2,8 +2,9 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PostService } from '../../service/post/post.service';
 import { Router } from '@angular/router';
-import { ReactiveFormsModule, FormGroup, FormControl, Validators, AbstractControl } from '@angular/forms';
-import { UserDto } from '../../../models/user-dto.intercace';
+import { ReactiveFormsModule, FormGroup, FormControl, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { usernameValidator } from '../../../misc/username.validator';
+import { Observable, map, of, switchMap, timer } from 'rxjs';
 
 @Component({
   selector: 'app-create-coach',
@@ -18,50 +19,63 @@ export class CreateCoachComponent {
   profilePic!: File;
   submitted = false;
 
-  /*------------------------------------------
-  --------------------------------------------
-  Created constructor
-  --------------------------------------------
-  --------------------------------------------*/
-  constructor(public postService: PostService,private router: Router) { }
+  constructor(public postService: PostService, private router: Router) { }
 
-  customeEmailValidator(control:AbstractControl) {
+  customEmailValidator(control: AbstractControl) {
     const pattern = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,20}$/;
     const value = control.value;
-    if(!pattern.test(value)) 
+    if (!pattern.test(value))
       return {
-        invalidAddress:true
+        invalidAddress: true
       }
     else return null;
+  }
+
+  usernameValidator({ value }: AbstractControl): Observable<ValidationErrors> {
+    return timer(200).pipe(
+      switchMap(() => {
+        if (!value) {
+          return of(null);
+        }
+        return this.postService.checkUsername(value).pipe(
+          map(isValid => {
+            if (!isValid) {
+              return {
+                isNotValid: true
+              };
+            }
+            return null;
+          })
+        );
+      })
+    );
+  };
+  }
+
+ngOnInit(): void {
+  this.form = new FormGroup({
+    name: new FormControl('', [Validators.required]),
+    username: new FormControl('', [Validators.required, this.usernameValidator]),
+    email: new FormControl('', [Validators.required, this.customEmailValidator.bind(this)]),
+    password: new FormControl('', Validators.required),
+    verifyPassword: new FormControl('', Validators.required),
+  });
 }
 
-  ngOnInit(): void {
-    this.form = new FormGroup({
-      name: new FormControl('', [Validators.required]),
-      username: new FormControl('', Validators.required),
-      email: new FormControl('', [Validators.required, this.customeEmailValidator]),
-      password: new FormControl('', Validators.required),
-      verifyPassword: new FormControl('', Validators.required),
-    });
-  }
-
   get f() {
-    return this.form.controls;
-  }
+  return this.form.controls;
+}
 
-  submit() {
-    this.submitted = true;
+submit() {
+  this.submitted = true;
+  if(this.form.valid){
     this.postService.createCoach(this.form.value).subscribe({
       next: resp => {
-
+  
       }, error: err => {
-
       }
     })
   }
-
-  onFileSelected(event:any){
-    this.profilePic=event.target.files[0];
-  }
+}
 
 }

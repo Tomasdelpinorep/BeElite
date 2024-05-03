@@ -26,6 +26,7 @@
                 class="form-control">
             <div *ngIf="submitted && f['username'].invalid" class="alert alert-danger">
                 <div *ngIf="f['username'].errors && f['username'].errors['required']">Username is required.</div>
+                <div *ngIf="f['username'].errors && f['username'].errors['alreadyExists']">Username is already taken.</div>
             </div>
         </div>
 

@@ -30,14 +30,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.SignatureException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -49,6 +47,11 @@ public class UserController {
     private final CoachService coachService;
     private final AthleteService athleteService;
     private final AdminService adminService;
+
+    @GetMapping("/checkAvailability/{username}")
+    public boolean isUsernameAvailable(@PathVariable String username){
+        return adminService.isUsernameAvailable(username);
+    }
 
     @Operation(summary = "Login for athletes and coaches")
     @ApiResponses(value = {
