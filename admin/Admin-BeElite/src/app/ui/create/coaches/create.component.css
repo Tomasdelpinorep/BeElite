@@ -11,3 +11,8 @@ input ~ div{
 input{
     margin-bottom: 10px;
 }
+
+.d-flex > a{
+    height: 50%;
+    margin: auto 0;
+}

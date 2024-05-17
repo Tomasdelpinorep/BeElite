@@ -1,6 +1,8 @@
 package com.salesianos.triana.BeElite.controller;
 
 import com.salesianos.triana.BeElite.dto.User.AddUser;
+import com.salesianos.triana.BeElite.dto.User.EditUserDto;
+import com.salesianos.triana.BeElite.dto.User.UserDto;
 import com.salesianos.triana.BeElite.model.Usuario;
 import com.salesianos.triana.BeElite.dto.User.LoginUser;
 import com.salesianos.triana.BeElite.repository.AdminRepository;
@@ -134,4 +136,8 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(jwtProvider.validateToken(token));
     }
 
+    @PutMapping("/admin/user/edit/{originalUsername}")
+    public UserDto editUser(@RequestBody EditUserDto editUserDto, @PathVariable String originalUsername){
+         return UserDto.of(adminService.editUser(editUserDto, originalUsername));
+    }
 }

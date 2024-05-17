@@ -25,3 +25,10 @@ h1{
     --bs-table-bg: rgba(255,255,255,0.2);
     border-color: gray;
 }
+
+.confirmationDialog{
+    color: white;
+    button{
+        padding: 0.5rem 2rem;
+    }
+}

@@ -1,7 +1,8 @@
 <div class="container mt-5">
-    <h1>Create New Coach</h1>
-
-    <a href="#" routerLink="/post/index" class="btn btn-primary">Back</a>
+    <div class="d-flex justify-content-between align-content-center">
+        <h1>Create Coach</h1>
+        <a href="#" routerLink="/admin/coaches" class="btn btn-primary">Back</a>
+    </div>
 
     <form [formGroup]="form" (ngSubmit)="submit()">
 
@@ -28,7 +29,7 @@
             <input formControlName="email" id="email" type="text" class="form-control">
             <div *ngIf="submitted && f['email'].invalid" class="alert alert-danger">
                 <div *ngIf="f['email'].errors && f['email'].errors['required']">Email is required.</div>
-                <div *ngIf="f['email'].errors && f['email'].dirty && f['email'].errors['invalidAddress']">Must enter a
+                <div *ngIf="f['email'].errors && f['email'].value != '' && f['email'].errors['invalidAddress']">Must enter a
                     valid email address.</div>
             </div>
         </div>

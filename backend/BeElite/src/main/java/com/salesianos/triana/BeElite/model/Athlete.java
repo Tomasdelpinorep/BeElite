@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @RequiredArgsConstructor
+@SuperBuilder
 public class Athlete extends Usuario {
 
     private int completed_sessions;

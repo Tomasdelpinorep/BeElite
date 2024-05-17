@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormControl, Validators, AbstractControl } from '@angular/forms';
-import { matchpassword, usernameValidator } from '../../../misc/validators';
+import { customEmailValidator, matchpassword, usernameValidator } from '../../../misc/validators';
 import { PostService } from '../../../service/post/post.service';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
@@ -19,21 +19,11 @@ export class CreateCoachComponent {
 
   constructor(public postService: PostService, private toastr: ToastrService, private router: Router) { }
 
-  customEmailValidator(control: AbstractControl) {
-    const pattern = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,20}$/;
-    const value = control.value;
-    if (!pattern.test(value))
-      return {
-        invalidAddress: true
-      }
-    else return null;
-  };
-
   ngOnInit(): void {
     this.form = new FormGroup({
       name: new FormControl('', [Validators.required]),
       username: new FormControl('', [Validators.required], [usernameValidator(this.postService)]),
-      email: new FormControl('', [Validators.required, this.customEmailValidator.bind(this)]),
+      email: new FormControl('', [Validators.required, customEmailValidator.bind(this)]),
       password: new FormControl('', [Validators.required, Validators.minLength(6)]),
       verifyPassword: new FormControl('', Validators.required),
     }, { validators: matchpassword });

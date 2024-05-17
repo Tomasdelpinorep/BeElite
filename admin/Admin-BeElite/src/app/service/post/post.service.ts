@@ -37,8 +37,9 @@ export class PostService {
   }
 
 
-  editCoach(coachUsername: String, coachData: any) {
-    return this.http.put<any>(`${environment.apiBaseUrl}admin/edit/coach/${coachUsername}`, coachData,
+  editCoach(coachData: any, originalCoachUsername: String) {
+    return this.http.put<any>(`${environment.apiBaseUrl}admin/user/edit/${originalCoachUsername}`,
+    { name: coachData.name, email: coachData.email},
     { headers: this.headers }
     );
   }

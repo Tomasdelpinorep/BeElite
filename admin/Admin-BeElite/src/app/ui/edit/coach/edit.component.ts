@@ -3,6 +3,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { CoachDetails } from '../../../models/coach-details-dto.interface';
 import { PostService } from '../../../service/post/post.service';
+import { ToastrService } from 'ngx-toastr';
+import { environment } from '../../../environment/environtments';
+import { customEmailValidator } from '../../../misc/validators';
   
 @Component({
   selector: 'app-edit',
@@ -14,17 +17,19 @@ export class EditComponent {
   
   coachUsername!: String;
   coachDetails!: CoachDetails;
+  defaultProgramPicUrl: String = environment.defaultProfilePicUrl;
       
   constructor(
     public postService: PostService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private toastr: ToastrService
   ) { }
       
   form : FormGroup = new FormGroup({
     name: new FormControl('', [Validators.required]),
     username: new FormControl('', Validators.required),
-    email: new FormControl('', Validators.required)
+    email: new FormControl('', [Validators.required, customEmailValidator])
   });
 
   ngOnInit(): void {
@@ -44,12 +49,19 @@ export class EditComponent {
     return this.form.controls;
   }
       
-  submit(){
-    console.log(this.form.value);
-    this.postService.editCoach(this.coachUsername, this.form.value).subscribe((res:any) => {
-         console.log('Coach updated successfully!');
-         this.router.navigateByUrl('post/index');
-    })
+  submit() {
+    if (this.form.valid) {
+      this.postService.editCoach(this.form.value, this.coachUsername).subscribe({
+        next: resp => {
+          if(resp){
+            this.toastr.success("Coach has been updated successfully.", "Success!")
+            this.router.navigate(["/admin/coaches"]);
+          }
+        }, error: err => {
+          this.toastr.error("There has been an error updating the coach.")
+        }
+      })
+    }
   }
   
 }

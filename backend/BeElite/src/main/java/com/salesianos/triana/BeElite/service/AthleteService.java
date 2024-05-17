@@ -1,6 +1,7 @@
 package com.salesianos.triana.BeElite.service;
 
 import com.salesianos.triana.BeElite.dto.User.AddUser;
+import com.salesianos.triana.BeElite.dto.User.EditUserDto;
 import com.salesianos.triana.BeElite.exception.NotFoundException;
 import com.salesianos.triana.BeElite.model.*;
 import com.salesianos.triana.BeElite.model.Composite_Ids.AthleteBlockId;

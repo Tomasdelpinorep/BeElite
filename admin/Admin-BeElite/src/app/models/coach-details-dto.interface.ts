@@ -11,8 +11,10 @@ export interface CoachDetails {
     programs:      ProgramDto[];
 }
 
-export interface ProgramDto {
+export interface ProgramDto{
     program_name:        string;
     program_description: string;
     image:               string;
+    numberOfSessions:    number;
+    numberOfAthletes:    number;
 }

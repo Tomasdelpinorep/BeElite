@@ -6,13 +6,20 @@ import lombok.Builder;
 public record ProgramDto(
         String program_name,
         String program_description,
-        String image
-                         )
+        String image,
+        int numberOfSessions,
+        int numberOfAthletes)
 {
 
 
     public static ProgramDto of(Program p){
-        return new ProgramDto(p.getProgramName(), p.getDescription(), p.getImage());
+        return ProgramDto.builder()
+                .program_name(p.getProgramName())
+                .program_description(p.getDescription())
+                .image(p.getImage())
+                .numberOfSessions(p.getWeeks().stream().flatMap(week -> week.getSessions().stream()).mapToInt(session -> 1).sum())
+                .numberOfAthletes(p.getAthletes().size())
+                .build();
     }
 
     public static ProgramDto empty(){
