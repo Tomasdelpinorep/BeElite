@@ -1,0 +1,23 @@
+<div class="container">
+    <h1>Edit Coach</h1>
+   
+    <a href="#" routerLink="/admin/coaches" class="btn btn-primary">Back</a>
+          
+    <form [formGroup]="form" (ngSubmit)="submit()">
+    
+        <div class="form-group">
+            <label for="title">Name:</label>
+            <input 
+                formControlName="name"
+                id="name" 
+                type="text" 
+                [(ngModel)]="coachDetails.username"
+                class="form-control">
+            <div *ngIf="f['title'].touched && f['title'].invalid" class="alert alert-danger">
+                <div *ngIf="f['title'].errors && f['title'].errors['required']">Title is required.</div>
+            </div>
+        </div>
+         
+        <button class="btn btn-primary" type="submit" [disabled]="!form.valid">Update</button>
+    </form>
+</div>
