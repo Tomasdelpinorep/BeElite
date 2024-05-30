@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostBinding } from '@angular/core';
 import { FormGroup, FormControl, Validators, AbstractControl } from '@angular/forms';
 import { customEmailValidator, matchpassword, usernameValidator } from '../../../misc/validators';
 import { PostService } from '../../../service/post/post.service';
@@ -12,8 +12,8 @@ import { Router } from '@angular/router';
   styleUrl: './create.component.css'
 })
 export class CreateCoachComponent {
-
-  form!: FormGroup;
+  @HostBinding('class.w-100') applyClass = true;
+  form!: FormGroup; 
   profilePic!: File;
   submitted = false;
 
@@ -36,7 +36,7 @@ export class CreateCoachComponent {
   submit() {
     this.submitted = true;
     if (this.form.valid) {
-      this.postService.createCoach(this.form.value).subscribe({
+      this.postService.createUser(this.form.value, "coach").subscribe({
         next: resp => {
           if(resp){
             this.toastr.success("New coach has been created successfully.", "Success!")

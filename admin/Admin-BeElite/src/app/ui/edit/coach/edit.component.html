@@ -18,7 +18,7 @@
                     <div class="form-group">
                         <label for="title">Full Name:</label>
                         <input formControlName="name" id="name" type="text" class="form-control">
-                        <div *ngIf="f['name'].invalid" class="alert alert-danger">
+                        <div *ngIf="f['name'].dirty && f['name'].invalid" class="alert alert-danger">
                             <div *ngIf="f['name'].errors && f['name'].errors['required']">Full name is required.</div>
                         </div>
                     </div>
@@ -26,12 +26,17 @@
                     <div class="form-group">
                         <label for="title">Email:</label>
                         <input formControlName="email" id="email" type="text" class="form-control">
-                        <div *ngIf="f['email'].invalid" class="alert alert-danger">
+                        <div *ngIf="f['email'].dirty && f['email'].invalid" class="alert alert-danger">
                             <div *ngIf="f['email'].errors && f['email'].errors['required']">Email is required.</div>
                             <div
                                 *ngIf="f['email'].errors && f['email'].value != '' && f['email'].errors['invalidAddress']">
                                 Must enter a valid email address.</div>
                         </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="profilePic">Profile Picture:</label>
+                        <input formControlName="profilePic" id="profilePic" type="file" class="form-control" (change)="onFileSelected($event)">
                     </div>
                 </div>
             </div>
@@ -51,26 +56,21 @@
                     <tbody>
                         <tr *ngFor="let program of coachDetails.programs">
                             <td>
-                                <ng-container *ngIf="program.image; else noProfilePic">
-                                    <img src="{{program.image}}" alt="Coach profile picture">
-                                </ng-container>
-                                <ng-template #noProfilePic>
-                                    <img src="{{defaultProgramPicUrl}}" alt="Default profile picture">
-                                </ng-template>
+                                <img [src]="program.programPicUrl" alt="Program picture">
                             </td>
-                            <td>{{program.program_name}}</td>
+                            <td>{{program.programName}}</td>
                             <td>{{program.numberOfSessions}}</td>
                             <td>{{program.numberOfAthletes}}</td>
                             <td>
-                                <a [routerLink]="['/admin/programs/edit/', program.program_name]"
-                                    class="btn btn-primary mr-5">Edit</a>
+                                <a [routerLink]="['/admin/programs/edit/', coachUsername, program.programName]"
+                                    class="btn btn-primary mr-5 "><span class="material-symbols-outlined">edit</span>Edit</a>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
-
-        <button class="btn btn-primary" type="submit" [disabled]="!form.valid">Update</button>
+        
+        <button class="btn btn-primary" type="submit" [disabled]="!form.valid"><span class="material-symbols-outlined">update</span>Update</button>
     </form>
 </div>

@@ -3,6 +3,8 @@ package com.salesianos.triana.BeElite.controller;
 import com.salesianos.triana.BeElite.dto.User.AddUser;
 import com.salesianos.triana.BeElite.dto.User.EditUserDto;
 import com.salesianos.triana.BeElite.dto.User.UserDto;
+import com.salesianos.triana.BeElite.exception.NotFoundException;
+import com.salesianos.triana.BeElite.model.ProfilePicture;
 import com.salesianos.triana.BeElite.model.Usuario;
 import com.salesianos.triana.BeElite.dto.User.LoginUser;
 import com.salesianos.triana.BeElite.repository.AdminRepository;
@@ -22,11 +24,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.activation.MimetypesFileTypeMap;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,6 +43,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URLConnection;
 import java.security.SignatureException;
 import java.util.List;
 
@@ -51,8 +59,34 @@ public class UserController {
     private final AdminService adminService;
 
     @GetMapping("/checkAvailability/{username}")
-    public boolean isUsernameAvailable(@PathVariable String username){
+    public boolean isUsernameAvailable(@PathVariable String username) {
         return adminService.isUsernameAvailable(username);
+    }
+
+    @GetMapping("open/profile-picture/{username}")
+    public ResponseEntity<ByteArrayResource> getProfilePicture(@PathVariable String username) {
+        ProfilePicture profilePic;
+
+        try { //In case username search doesn't return any user
+            profilePic = adminService.getUserProfilePic(username);
+        } catch (RuntimeException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        if (profilePic == null || profilePic.getFile() == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        String mimeType = URLConnection.guessContentTypeFromName(profilePic.getFileName());
+        if (mimeType == null) {
+            mimeType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+        }
+
+        ByteArrayResource resource = new ByteArrayResource(profilePic.getFile());
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(mimeType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + profilePic.getFileName() + "\"")
+                .body(resource);
     }
 
     @Operation(summary = "Login for athletes and coaches")
@@ -110,12 +144,12 @@ public class UserController {
         if (addUser.userType().equalsIgnoreCase("coach")) {
             user = coachService.createCoach(addUser);
 
-        } else if(addUser.userType().equalsIgnoreCase("athlete")){
+        } else if (addUser.userType().equalsIgnoreCase("athlete")) {
             user = athleteService.createAthlete(addUser);
 
-        }else if((addUser.userType().equalsIgnoreCase("admin"))){
+        } else if ((addUser.userType().equalsIgnoreCase("admin"))) {
             user = adminService.createAdmin(addUser);
-        }else{
+        } else {
             user = null;
         }
 
@@ -132,12 +166,28 @@ public class UserController {
             @ApiResponse(responseCode = "202", description = "Token is valid"),
             @ApiResponse(responseCode = "403", description = "Token is invalid")
     })
-    public ResponseEntity<Boolean> validateToken(@RequestBody String token){
+    public ResponseEntity<Boolean> validateToken(@RequestBody String token) {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(jwtProvider.validateToken(token));
     }
 
-    @PutMapping("/admin/user/edit/{originalUsername}")
-    public UserDto editUser(@RequestBody EditUserDto editUserDto, @PathVariable String originalUsername){
-         return UserDto.of(adminService.editUser(editUserDto, originalUsername));
+    @PutMapping("/admin/user/edit")
+    @Transactional
+    public ResponseEntity<UserDto> editUser(
+            @Valid @RequestPart("username") String username,
+            @Valid @RequestPart("name") String name,
+            @Valid @RequestPart("email") String email,
+            @RequestPart(value = "profilePic", required = false) MultipartFile profilePic) throws IOException {
+
+        EditUserDto editUserDto = new EditUserDto(username, name, email, profilePic);
+
+        UserDto editedUser = UserDto.of(adminService.editUser(editUserDto));
+
+        return ResponseEntity.ok(editedUser);
+    }
+
+    @DeleteMapping("admin/user/delete/{username}")
+    public ResponseEntity<?> deleteUser(@PathVariable String username) {
+        adminService.deleteUser(username);
+        return ResponseEntity.noContent().build();
     }
 }

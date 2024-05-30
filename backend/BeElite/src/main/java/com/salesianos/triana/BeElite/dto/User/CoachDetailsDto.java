@@ -2,6 +2,8 @@ package com.salesianos.triana.BeElite.dto.User;
 
 import com.salesianos.triana.BeElite.dto.Program.ProgramDto;
 import com.salesianos.triana.BeElite.model.Coach;
+import com.salesianos.triana.BeElite.model.Program;
+import jakarta.transaction.Transactional;
 import lombok.Builder;
 import org.apache.catalina.User;
 
@@ -21,6 +23,7 @@ public record CoachDetailsDto(
         List<ProgramDto> programs
 ) {
 
+    @Transactional
     public static CoachDetailsDto of(Coach c){
         return CoachDetailsDto.builder()
                 .id(c.getId())
@@ -30,7 +33,7 @@ public record CoachDetailsDto(
                 .profilePicUrl(c.getProfilePicUrl())
                 .createdAt(c.getJoinDate())
                 .athletes(c.getPrograms().stream().flatMap(program -> program.getAthletes().stream()).map(UserDto::of).toList())
-                .programs(c.getPrograms().stream().map(ProgramDto::of).toList())
+                .programs(c.getPrograms().stream().filter(Program::isVisible).map(ProgramDto::of).toList())
                 .build();
     }
 }

@@ -1,0 +1,39 @@
+img{
+    height: 50px;
+    width: 50px;
+    border-radius: 5px;
+}
+
+.mr-5{
+    margin-right: 20px;
+}
+
+td{
+    vertical-align: middle;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+th{
+    color: white;
+}
+
+h1{
+    color: white;
+}
+
+.table{
+    --bs-table-bg: rgba(255,255,255,0.2);
+    border-color: gray;
+}
+
+.confirmationDialog{
+    color: white;
+    button{
+        padding: 0.5rem 2rem;
+    }
+}
+
+.btn-close{
+    padding: 1rem !important;
+    align-self: flex-start;
+}

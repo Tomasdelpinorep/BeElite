@@ -1,24 +1,35 @@
 package com.salesianos.triana.BeElite.dto.Program;
 import com.salesianos.triana.BeElite.model.Program;
+import jakarta.transaction.Transactional;
 import lombok.Builder;
+
+import java.time.LocalDate;
 
 @Builder
 public record ProgramDto(
-        String program_name,
-        String program_description,
-        String image,
+        String coachName,
+        String coachUsername,
+        String programName,
+        String programDescription,
+        String programPicUrl,
+        LocalDate createdAt,
         int numberOfSessions,
-        int numberOfAthletes)
+        int numberOfAthletes,
+        boolean isVisible)
 {
 
-
+    @Transactional
     public static ProgramDto of(Program p){
         return ProgramDto.builder()
-                .program_name(p.getProgramName())
-                .program_description(p.getDescription())
-                .image(p.getImage())
+                .coachName(p.getCoach().getName())
+                .coachUsername(p.getCoach().getUsername())
+                .programName(p.getProgramName())
+                .programDescription(p.getDescription())
+                .programPicUrl(p.getImage())
+                .createdAt(p.getCreatedAt())
                 .numberOfSessions(p.getWeeks().stream().flatMap(week -> week.getSessions().stream()).mapToInt(session -> 1).sum())
                 .numberOfAthletes(p.getAthletes().size())
+                .isVisible(p.isVisible())
                 .build();
     }
 
@@ -26,9 +37,4 @@ public record ProgramDto(
         return ProgramDto.builder().build();
     }
 
-    public Program toEntity(ProgramDto pDto){
-        return Program.builder()
-
-                .build();
-    }
 }

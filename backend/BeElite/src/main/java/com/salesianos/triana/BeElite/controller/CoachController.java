@@ -36,6 +36,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -77,11 +79,11 @@ public class CoachController {
                                                 ],
                                                 "programs": [
                                                     {
-                                                        "program_name": "Weightlifting Program",
+                                                        "programName": "Weightlifting Program",
                                                         "image": "https://example.com/weightlifting.jpg"
                                                     },
                                                     {
-                                                        "program_name": "Running Program",
+                                                        "programName": "Running Program",
                                                         "image": "https://example.com/running.jpg"
                                                     }
                                                 ]
@@ -105,8 +107,15 @@ public class CoachController {
     }
 
     @GetMapping("/all")
-    public Page<UserDto> getAllCoaches(@PageableDefault(page = 0, size = 20) Pageable page){
+    public Page<UserDto> getAllCoaches(@PageableDefault(page = 0, size = 10) Pageable page){
         Page<Coach> coaches = coachService.getAllCoaches(page);
         return coaches.map(UserDto::of);
+    }
+
+    @GetMapping("/allNamesAndIds")
+    public ResponseEntity<Map<String, UUID>> getAllNamesAndIds(){
+        Map<String, UUID> map = coachService.getAllNamesAndIdsMap();
+        return map.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(map);
+
     }
 }

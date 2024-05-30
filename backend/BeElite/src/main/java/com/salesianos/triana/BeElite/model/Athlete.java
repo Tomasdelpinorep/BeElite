@@ -34,9 +34,9 @@ public class Athlete extends Usuario {
     LocalDate joinedProgramDate;
 
     public Athlete(UUID id, String username, String password, String email, String name, String profilePicUrl,
-                   byte[] profilePic, boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled,
+                   byte[] profilePic, String profilePicFileName, boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled,
                    LocalDateTime createdAt, LocalDateTime lastPasswordChangeAt, int completed_sessions, Program program) {
-        super(id, username, password, email, name, profilePicUrl, profilePic, accountNonExpired, accountNonLocked, credentialsNonExpired,
+        super(id, username, password, email, name, profilePicUrl, profilePic, profilePicFileName, accountNonExpired, accountNonLocked, credentialsNonExpired,
                 enabled, createdAt, lastPasswordChangeAt);
         this.completed_sessions = completed_sessions;
         this.program = program;

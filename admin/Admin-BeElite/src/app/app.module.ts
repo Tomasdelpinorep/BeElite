@@ -26,6 +26,12 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { HeaderComponent } from './components/header/header.component';
 import { NotFoundPageComponent } from './ui/not-found-page-component/not-found-page-component';
 import { ToastrModule } from 'ngx-toastr';
+import { AthletesComponent } from './ui/athletes/athletes.component';
+import { EditAthleteComponent } from './ui/edit/athlete/edit-athlete.component';
+import { CreateAthleteComponent } from './ui/create/athlete/create-athlete.component';
+import { ProgramsComponent } from './ui/programs/programs.component';
+import { EditProgramComponent } from './ui/edit/programs/edit-program.component';
+import { CreateProgramComponent } from './ui/create/programs/create-program.component';
 
 @NgModule({
   declarations: [
@@ -37,6 +43,12 @@ import { ToastrModule } from 'ngx-toastr';
     EditComponent,
     HeaderComponent,
     NotFoundPageComponent,
+    AthletesComponent,
+    EditAthleteComponent,
+    CreateAthleteComponent,
+    ProgramsComponent,
+    CreateProgramComponent,
+    EditProgramComponent
   ],
   imports: [
     AppRoutingModule,

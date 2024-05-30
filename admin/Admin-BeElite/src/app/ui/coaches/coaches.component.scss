@@ -24,6 +24,7 @@ h1{
 .table{
     --bs-table-bg: rgba(255,255,255,0.2);
     border-color: gray;
+    max-height: 40px;
 }
 
 .confirmationDialog{
@@ -31,4 +32,9 @@ h1{
     button{
         padding: 0.5rem 2rem;
     }
+}
+
+.btn-close{
+    padding: 1rem !important;
+    align-self: flex-start;
 }

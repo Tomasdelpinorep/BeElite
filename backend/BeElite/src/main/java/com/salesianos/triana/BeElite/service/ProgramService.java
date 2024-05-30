@@ -1,5 +1,6 @@
 package com.salesianos.triana.BeElite.service;
 
+import com.salesianos.triana.BeElite.constants.Constants;
 import com.salesianos.triana.BeElite.dto.Program.InviteDto;
 import com.salesianos.triana.BeElite.dto.Program.PostInviteDto;
 import com.salesianos.triana.BeElite.dto.Program.PostProgramDto;
@@ -11,11 +12,18 @@ import com.salesianos.triana.BeElite.repository.AthleteRepository;
 import com.salesianos.triana.BeElite.repository.CoachRepository;
 import com.salesianos.triana.BeElite.repository.InviteRepository;
 import com.salesianos.triana.BeElite.repository.ProgramRepository;
+import com.salesianos.triana.BeElite.utils.ImageUtility;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -30,17 +38,17 @@ public class ProgramService {
     private final InviteRepository inviteRepository;
     private final AthleteRepository athleteRepository;
 
-    public boolean programExists(String program_name) {
-        return programRepository.existsByProgramNameIgnoreCase(program_name);
+    public boolean programExists(String programName) {
+        return programRepository.existsByProgramNameIgnoreCase(programName);
     }
 
-    public Program save(PostProgramDto newProgram) {
+    public Program save(PostProgramDto newProgram) throws IOException {
         Coach c = coachRepository.findById(newProgram.coach_id()).orElseThrow(() -> new NotFoundException("Coach"));
 
-        return programRepository.save(PostProgramDto.toEntity(newProgram,c));
+        return programRepository.save(PostProgramDto.toEntity(newProgram, c));
     }
 
-    public Invite saveInvite(PostInviteDto i){
+    public Invite saveInvite(PostInviteDto i) {
         Program p = programRepository.findByCoachAndProgramName(i.coachId(), i.programName()).orElseThrow(() -> new NotFoundException("Program"));
 
         Invite invite = Invite.builder()
@@ -55,34 +63,45 @@ public class ProgramService {
         return inviteRepository.save(invite);
     }
 
-    public Program edit(String programName, PostProgramDto editedProgram){
-       Optional<Program> programWithMatchingName = programRepository.findByCoachAndProgramName(editedProgram.coach_id(), editedProgram.programName());
+    public Program edit(String originalProgramName, PostProgramDto editedProgram) throws IOException {
+          UUID coachId;
+//
+        if (editedProgram.coach_id() == null) { //Must do this since I am reusing the method for the admin dashboard
+            coachId = coachRepository.findByUsername(editedProgram.coachUsername())
+                    .orElseThrow(() -> new NotFoundException("coach"))
+                    .getId();
+        } else {
+            coachId = editedProgram.coach_id();
+        }
 
-       //If new name matches with current program list (possible if name isn't changed) and it isn't equal to original name,
-        // only other option is that it's using a name of another program, therefore an exception is thrown.
-       if(programWithMatchingName.isPresent() && !programWithMatchingName.get().getProgramName().equalsIgnoreCase(programName))
-           throw new ProgramNameAlreadyInUseException("Program name is already in use.");
 
-       //Original, non-edited program
-       Optional<Program> existingProgramOpt = programRepository.findByCoachAndProgramName(editedProgram.coach_id(),programName);
-       if(existingProgramOpt.isPresent()){
-           Program existingProgram = existingProgramOpt.get();
+        Optional<Program> existingProgramOpt = programRepository.findByCoachAndProgramName(coachId, originalProgramName);
+        if (existingProgramOpt.isPresent()) {
+            Program existingProgram = existingProgramOpt.get();
 
-           existingProgram.setProgramName(editedProgram.programName());
-           existingProgram.setImage(editedProgram.image());
-           existingProgram.setDescription(editedProgram.description());
+            existingProgram.setProgramName(editedProgram.programName());
+            existingProgram.setImage(editedProgram.image());
+            existingProgram.setDescription(editedProgram.description());
 
-           return programRepository.save(existingProgram);
-       }
-       throw new EntityNotFoundException("Unable to edit the program because it was not found.");
+            MultipartFile programPic = editedProgram.programPic();
+            if (programPic != null && !programPic.isEmpty()) {
+                byte[] compressedImage = ImageUtility.compressImage(programPic.getBytes());
+                existingProgram.setProgramPic(compressedImage);
+                existingProgram.setProgramPicFileName(programPic.getOriginalFilename());
+            }
+
+            return programRepository.save(existingProgram);
+        }
+        throw new EntityNotFoundException("Unable to edit the program because it was not found.");
 
     }
 
-    public List<Program> findByCoach(UUID coach_id) {
-        List<Program> p = programRepository.findByCoach(coach_id);
+    public List<Program> findByCoach(String coachUsername) {
+        Coach c = coachRepository.findByUsername(coachUsername).orElseThrow(() -> new NotFoundException("coach"));
+        List<Program> p = programRepository.findByCoach(c.getId());
 
         if (!p.isEmpty()) {
-            return programRepository.findByCoach(coach_id);
+            return programRepository.findByCoach(c.getId());
         }
 
         throw new NotFoundException("programs linked to this coach id.");
@@ -97,38 +116,68 @@ public class ProgramService {
                 .toList();
     }
 
-    public Program findByCoachAndProgramName(String coachUsername, String programName){
+    @Transactional
+    public Program findByCoachAndProgramName(String coachUsername, String programName) {
         Coach c = coachRepository.findByUsername(coachUsername).orElseThrow(() -> new NotFoundException("coach"));
-        Optional<Program> p = programRepository.findByCoachAndProgramName(c.getId(),programName);
+        Optional<Program> p = programRepository.findByCoachAndProgramName(c.getId(), programName);
 
-        if(p.isPresent())
+        if (p.isPresent())
             return p.get();
 
         throw new EntityNotFoundException("Unable to find any programs with said name and coach Id.");
     }
 
-    public Page<Program> findPage(Pageable page){
+    @Transactional
+    public Page<Program> findPage(Pageable page) {
         Page<Program> pagedResult = programRepository.findPage(page);
 
-        if(pagedResult.isEmpty())
+        if (pagedResult.isEmpty())
             throw new EntityNotFoundException("No programs found in this page.");
 
         return pagedResult;
     }
 
-    public void deleteByCoachAndProgramName(UUID coachId, String programName) {
-        Optional<Program> programOptional = programRepository.findByCoachAndProgramName(coachId, programName);
+    public void deleteByCoachUsernameAndProgramName(String coachUsername, String programName) {
+        Coach c = coachRepository.findByUsername(coachUsername).orElseThrow(() -> new NotFoundException("coach"));
+        Optional<Program> programOptional = programRepository.findByCoachAndProgramName(c.getId(), programName);
 
         programOptional.ifPresent(program -> {
-                program.removeAthletes();
-                programRepository.delete(program);
+            program.setVisible(false);
+            program.getAthletes().forEach(athlete -> athlete.setProgram(null));
+            programRepository.save(program);
         });
     }
 
-    public List<Invite> findInvites(String coachUsername, String programName){
+    public List<Invite> findInvites(String coachUsername, String programName) {
         Coach c = coachRepository.findByUsername(coachUsername).orElseThrow(() -> new NotFoundException("coach"));
         Program p = programRepository.findByCoachAndProgramName(c.getId(), programName).orElseThrow(() -> new NotFoundException("program"));
 
         return inviteRepository.findInvitesByProgram(p.getId());
+    }
+
+    @Transactional
+    public ProfilePicture findProgramPic(String programName) {
+        Program program = programRepository.findFirstByProgramName(programName).orElseThrow(() -> new NotFoundException("program"));
+
+        if (program.getProgramPic() == null) {
+            File defaultProfilePictureFile = new File("src/main/resources/images/defaultProgramPic.jpg");
+
+            byte[] defaultProfilePictureData;
+            try {
+                defaultProfilePictureData = Files.readAllBytes(defaultProfilePictureFile.toPath());
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to read default profile picture", e);
+            }
+
+            return ProfilePicture.builder()
+                    .fileName(Constants.DEFAULT_PROFILE_PICTURE_FILENAME)
+                    .file(defaultProfilePictureData)
+                    .build();
+        }
+
+        return ProfilePicture.builder()
+                .fileName(program.getProgramPicFileName())
+                .file(ImageUtility.decompressImage(program.getProgramPic()))
+                .build();
     }
 }

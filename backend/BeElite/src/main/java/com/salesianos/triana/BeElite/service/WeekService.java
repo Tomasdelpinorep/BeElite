@@ -51,7 +51,7 @@ public class WeekService {
 
     public Week save(PostWeekDto newWeek, String coachUsername){
         Coach c = coachRepository.findByUsername(coachUsername).orElseThrow(() -> new NotFoundException("coach"));
-        Program p = programRepository.findByCoachAndProgramName(c.getId(), newWeek.program().program_name())
+        Program p = programRepository.findByCoachAndProgramName(c.getId(), newWeek.program().programName())
                 .orElseThrow(() -> new NotFoundException("program"));
         Long weekId = generateWeekNumber(newWeek.week_name(), p.getId());
 
@@ -61,7 +61,7 @@ public class WeekService {
     public Week edit(EditWeekDto editedWeek, String coachUsername) {
         Coach c = coachRepository.findByUsername(coachUsername)
                 .orElseThrow(() -> new NotFoundException("coach"));
-        Program p = programRepository.findByCoachAndProgramName(c.getId(), editedWeek.getProgram().program_name())
+        Program p = programRepository.findByCoachAndProgramName(c.getId(), editedWeek.getProgram().programName())
                 .orElseThrow(() -> new NotFoundException("program"));
 
         Week originalWeekEntity = weekRepository.findById(WeekId.of(editedWeek.getWeek_number(), editedWeek.getOriginal_name(), p.getId()))

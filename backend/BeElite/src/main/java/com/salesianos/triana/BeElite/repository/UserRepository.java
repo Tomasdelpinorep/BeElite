@@ -18,4 +18,6 @@ public interface UserRepository extends JpaRepository<Usuario, UUID> {
 
     @Query(value = "SELECT username FROM Usuario", nativeQuery = true)
     List<String> getAllUsernames();
+
+    Optional<Usuario> findByUsername(String username);
 }

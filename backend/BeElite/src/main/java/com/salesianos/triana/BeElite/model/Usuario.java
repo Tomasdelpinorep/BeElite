@@ -50,6 +50,7 @@ public abstract class Usuario implements UserDetails {
     @Column(length = 1000000)
     private byte[] profilePic;
 
+    private String profilePicFileName;
 
     private boolean accountNonExpired = true;
     private boolean accountNonLocked = true;

@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,6 +34,7 @@ public class AthleteService {
         user.setPassword(passwordEncoder.encode(addAthlete.password()));
         user.setEmail(addAthlete.email());
         user.setName(addAthlete.name());
+        user.setJoinDate(LocalDateTime.now());
 
         return athleteRepository.save(user);
     }

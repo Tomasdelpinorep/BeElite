@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +34,7 @@ public class AthleteController {
     private final AthleteService athleteService;
 
     @GetMapping("/athlete/{athleteUsername}")
+    @Transactional
     @Operation(summary = "Get athlete details by username")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved athlete details",
@@ -46,7 +48,7 @@ public class AthleteController {
                                                 "profilePicUrl": "https://example.com/profile.jpg",
                                                 "email": "john.doe@example.com",
                                                 "program": {
-                                                    "program_name": "Training Program",
+                                                    "programName": "Training Program",
                                                     "image": "https://example.com/program.jpg"
                                                 },
                                                 "coach": {
@@ -124,8 +126,8 @@ public class AthleteController {
         return UserDto.of(a, a.getJoinedProgramDate());
     }
 
-    @GetMapping("/all")
-    public Page<UserDto> getAllAthletes(@PageableDefault(page = 0, size = 20) Pageable page){
+    @GetMapping("athlete/all")
+    public Page<UserDto> getAllAthletes(@PageableDefault(page = 0, size = 10) Pageable page){
         Page<Athlete> athletes = athleteService.getAllAthletes(page);
         return athletes.map(UserDto::of);
     }

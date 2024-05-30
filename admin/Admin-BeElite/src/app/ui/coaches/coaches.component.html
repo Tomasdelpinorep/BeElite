@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container w-100">
   <h1>Coaches</h1>
 
   <a href="/admin/coaches/create" class="btn btn-success mb-2">Create New Coach</a>
@@ -16,20 +16,16 @@
     <tbody>
       <tr *ngFor="let coach of coachList">
         <td>
-          <ng-container *ngIf="coach.profilePicUrl; else noProfilePic">
-            <img src="{{coach.profilePicUrl}}" alt="Coach profile picture">
-          </ng-container>
-          <ng-template #noProfilePic>
-            <img src="{{defaultProfilePicUrl}}" alt="Default profile picture">
-          </ng-template>
+          <img [src]="coach.profilePicUrl" alt="Coach profile picture">
         </td>
         <td>{{ coach.username }}</td>
         <td>{{ coach.name }}</td>
         <td>{{ coach.email }}</td>
         <td>
-          <a [routerLink]="['/admin/coaches/edit/', coach.username]" class="btn btn-primary mr-5">Edit</a>
+          <a [routerLink]="['/admin/coaches/edit/', coach.username]" class="btn btn-primary mr-5 action"><span
+              class="material-symbols-outlined">edit</span>Edit</a>
           <button type="button" (click)="openConfirmationDialog(confirmationDialog, coach.username)"
-            class="btn btn-danger">Delete</button>
+            class="btn btn-danger action"><span class="material-symbols-outlined">delete</span>Delete</button>
         </td>
       </tr>
     </tbody>
@@ -54,3 +50,9 @@
     </div>
   </div>
 </ng-template>
+
+<div *ngIf="listSize > 10" class="pagination-container d-flex justify-content-center ">
+  <ngb-pagination class="custom-pagination" [boundaryLinks]="true" [collectionSize]="listSize" [(page)]="currentPage"
+    [pageSize]="10" (pageChange)="loadNewPage()" aria-label="Default pagination">
+  </ngb-pagination>
+</div>

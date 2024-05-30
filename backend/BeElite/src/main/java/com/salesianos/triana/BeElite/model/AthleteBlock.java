@@ -27,7 +27,7 @@ public class AthleteBlock {
     private AthleteSession athleteSession;
 
     // Mapping to the original block
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumns({
             @JoinColumn(name = "week_number", referencedColumnName = "week_number"),
             @JoinColumn(name = "week_name", referencedColumnName = "week_name"),

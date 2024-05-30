@@ -1,0 +1,21 @@
+.with-sidebar {
+    padding-left: 200px;
+    transition: all 0.2s ease;
+  }
+
+.without-sidebar{
+    transform: translateX(0px);
+    transition: all 0.2s ease;
+}
+
+.wrapper{
+    display: flex;
+    margin: auto;
+    width: fit-content;
+}
+
+@media (min-width: 1025px){
+    .wrapper{
+        min-width: 75vw;
+    }
+}

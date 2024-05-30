@@ -1,0 +1,23 @@
+input, select{
+    min-width:33vw;
+}
+
+@media (min-width: 1025px){
+    .container{
+        max-width: 33vw;
+    }
+}
+
+
+input ~ div{
+    padding: 5px;
+}
+
+input{
+    margin-bottom: 10px;
+}
+
+.d-flex > a{
+    height: 50%;
+    margin: auto 0;
+}

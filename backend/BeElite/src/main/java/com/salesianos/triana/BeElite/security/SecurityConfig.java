@@ -111,6 +111,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 antMatcher("/h2-console/**"),
                                 antMatcher("/auth/**"),
+                                antMatcher("/open/**"),
                                 antMatcher("/swagger/**"),
                                 antMatcher("/swagger-ui/**"),
                                 antMatcher("/api-docs"),

@@ -1,8 +1,9 @@
-import { Component, TemplateRef } from '@angular/core';
+import { Component, HostBinding, TemplateRef } from '@angular/core';
 import { UserDto } from '../../models/user-dto.intercace';
 import { PostService } from '../../service/post/post.service';
 import { environment } from '../../environment/environtments';
 import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-coaches',
@@ -11,39 +12,41 @@ import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
   styleUrl: './coaches.component.scss',
 })
 export class AdminCoachesComponent {
-
+  @HostBinding('class.w-100') applyClass = true;
   closeResult = "";
   coachList: UserDto[] = [];
   currentPage = 1;
   listSize!: number;
   defaultProfilePicUrl: String = environment.defaultProfilePicUrl;
   selectedCoachUsername: String = "";
+  apiBaseUrl: String = environment.apiBaseUrl;
 
-  /*------------------------------------------
-  --------------------------------------------
-  Created constructor
-  --------------------------------------------
-  --------------------------------------------*/
-  constructor(public postService: PostService, private modalService: NgbModal) { }
 
-  /**
-   * Write code on Method
-   *
-   * @return response()
-   */
+  constructor(public postService: PostService, private modalService: NgbModal, private toastr: ToastrService) { }
+
   ngOnInit(): void {
     this.postService.getAllCoaches(this.currentPage - 1).subscribe(resp => {
-      this.coachList = resp.content;
       this.listSize = resp.totalElements;
-    })
+      this.coachList = resp.content;
+      this.coachList = this.coachList.map(coach => ({
+        ...coach,
+        profilePicUrl: `${this.apiBaseUrl}open/profile-picture/${coach.username}`
+      }))
+    });
   }
 
   deleteCoach() {
     this.postService.delete(this.selectedCoachUsername).subscribe(res => {
-      this.coachList = this.coachList.filter(item => item.username !== this.selectedCoachUsername);
-      console.log('Post deleted successfully!');
-    })
+      this.toastr.success("Coach successfully deleted", "Success!");
+
+      this.modalService.dismissAll();
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000)
+    });
   }
+
+
 
   openConfirmationDialog(content: TemplateRef<any>, coachUsername: String) {
     this.selectedCoachUsername = coachUsername;
@@ -67,6 +70,15 @@ export class AdminCoachesComponent {
       default:
         return `with: ${reason}`;
     }
+  }
+
+  loadNewPage() {
+    this.postService.getAllAthletes(this.currentPage - 1).subscribe(resp => {
+      this.coachList = resp.content;
+    })
+
+    if (this.coachList.length == 1)
+      window.location.reload();
   }
 
 }
