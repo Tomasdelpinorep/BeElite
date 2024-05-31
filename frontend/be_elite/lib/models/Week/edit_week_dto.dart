@@ -1,4 +1,4 @@
-import 'package:be_elite/models/Coach/program_dto.dart';
+import 'package:be_elite/models/Program/program_dto.dart';
 
 
 class EditWeekDto {

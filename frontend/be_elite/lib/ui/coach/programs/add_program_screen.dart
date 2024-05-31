@@ -1,7 +1,7 @@
 import 'package:be_elite/bloc/program/program_bloc.dart';
 import 'package:be_elite/models/Coach/coach_details.dart';
-import 'package:be_elite/models/Coach/program_dto.dart';
 import 'package:be_elite/models/Program/post_program_dto.dart';
+import 'package:be_elite/models/Program/program_dto.dart';
 import 'package:be_elite/repositories/program/program_repository.dart';
 import 'package:be_elite/repositories/program/program_repository_impl.dart';
 import 'package:be_elite/styles/app_colors.dart';
@@ -242,8 +242,8 @@ class _CoachAddProgramScreenState extends State<CoachAddProgramScreen> {
   }
 
   _loadProgramData(ProgramDto program) {
-    programNameTextController.text = program.program_name!;
-    programDescriptionTextController.text = program.program_description ?? "";
-    imageUrlDescriptionTextController.text = program.image ?? "";
+    programNameTextController.text = program.programName!;
+    programDescriptionTextController.text = program.programDescription ?? "";
+    imageUrlDescriptionTextController.text = program.programPicUrl ?? "";
   }
 }

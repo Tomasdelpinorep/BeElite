@@ -5,10 +5,10 @@ import 'package:be_elite/misc/Method_Classes/athletes_screen_methods.dart';
 import 'package:be_elite/misc/Widgets/beElite_logo.dart';
 import 'package:be_elite/misc/Widgets/circular_avatar.dart';
 import 'package:be_elite/models/Coach/coach_details.dart';
-import 'package:be_elite/models/Coach/program_dto.dart';
 import 'package:be_elite/models/Coach/user_dto.dart';
 import 'package:be_elite/models/Program/invite_dto.dart';
 import 'package:be_elite/models/Program/post_invite_dto.dart';
+import 'package:be_elite/models/Program/program_dto.dart';
 import 'package:be_elite/models/Session/session_card_dto/session_card_dto.dart';
 import 'package:be_elite/repositories/athlete/athlete_repository.dart';
 import 'package:be_elite/repositories/athlete/athlete_repository_impl.dart';
@@ -66,7 +66,7 @@ class _AthletesScreenState extends State<AthletesScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       selectedProgramName = (prefs.getString('selectedProgramName') ??
-          widget.coachDetails.programs?.first.program_name)!;
+          widget.coachDetails.programs?.first.programName)!;
     });
 
     _athleteBLoc.add(GetAthletesByProgramEvent(
@@ -338,14 +338,14 @@ class _AthletesScreenState extends State<AthletesScreen> {
             // Existing programs
             ...programs.map((ProgramDto program) {
               return DropdownMenuItem<String>(
-                value: program.program_name,
+                value: program.programName,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
                     children: [
-                      program.image!.isNotEmpty
+                      program.programPicUrl!.isNotEmpty
                           ? Image.network(
-                              program.image!,
+                              program.programPicUrl!,
                               width: 50,
                               height: 50,
                               fit: BoxFit.cover,
@@ -358,7 +358,7 @@ class _AthletesScreenState extends State<AthletesScreen> {
                             ),
                       const SizedBox(width: 25),
                       Text(
-                        program.program_name!,
+                        program.programName!,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 24,
@@ -370,7 +370,7 @@ class _AthletesScreenState extends State<AthletesScreen> {
                 ),
                 onTap: () {
                   _athleteBLoc.add(GetAthletesByProgramEvent(
-                      program.program_name!, coachDetails.username!));
+                      program.programName!, coachDetails.username!));
                 },
               );
             }),

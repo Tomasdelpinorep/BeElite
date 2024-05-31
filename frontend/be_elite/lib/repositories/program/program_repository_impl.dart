@@ -1,9 +1,8 @@
 import 'dart:convert';
-
-import 'package:be_elite/models/Coach/program_dto.dart';
 import 'package:be_elite/models/Program/invite_dto.dart';
 import 'package:be_elite/models/Program/post_invite_dto.dart';
 import 'package:be_elite/models/Program/post_program_dto.dart';
+import 'package:be_elite/models/Program/program_dto.dart';
 import 'package:be_elite/repositories/program/program_repository.dart';
 import 'package:be_elite/variables.dart';
 import 'package:http/http.dart';

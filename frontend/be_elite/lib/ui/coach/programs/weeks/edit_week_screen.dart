@@ -1,7 +1,7 @@
 import 'package:be_elite/bloc/Week/week_bloc.dart';
 import 'package:be_elite/bloc/program/program_bloc.dart';
 import 'package:be_elite/models/Coach/coach_details.dart';
-import 'package:be_elite/models/Coach/program_dto.dart';
+import 'package:be_elite/models/Program/program_dto.dart';
 import 'package:be_elite/models/Week/content.dart';
 import 'package:be_elite/models/Week/edit_week_dto.dart';
 import 'package:be_elite/models/Week/week_dto.dart';
