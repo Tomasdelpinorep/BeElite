@@ -1,6 +1,7 @@
 package com.salesianos.triana.BeElite.service;
 
 import com.salesianos.triana.BeElite.dto.User.AddUser;
+import com.salesianos.triana.BeElite.dto.User.EditUserDto;
 import com.salesianos.triana.BeElite.exception.NotFoundException;
 import com.salesianos.triana.BeElite.model.*;
 import com.salesianos.triana.BeElite.model.Composite_Ids.AthleteBlockId;
@@ -8,9 +9,12 @@ import com.salesianos.triana.BeElite.repository.AthleteRepository;
 import com.salesianos.triana.BeElite.repository.CoachRepository;
 import com.salesianos.triana.BeElite.repository.ProgramRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +34,7 @@ public class AthleteService {
         user.setPassword(passwordEncoder.encode(addAthlete.password()));
         user.setEmail(addAthlete.email());
         user.setName(addAthlete.name());
+        user.setJoinDate(LocalDateTime.now());
 
         return athleteRepository.save(user);
     }
@@ -48,6 +53,16 @@ public class AthleteService {
 
         return athleteRepository.findAthletesByProgram(p.getId());
 
+    }
+
+    public Athlete findOldestAthleteInProgram(String coachUsername){
+        Coach c = coachRepository.findByUsername(coachUsername).orElseThrow(() -> new NotFoundException("coach"));
+
+        return athleteRepository.findOldestAthlete(c.getId());
+    }
+
+    public Page<Athlete> getAllAthletes(Pageable page){
+        return athleteRepository.findAll(page);
     }
 
     public static AthleteBlock toAthleteBlock(Block block, AthleteSession athleteSession){

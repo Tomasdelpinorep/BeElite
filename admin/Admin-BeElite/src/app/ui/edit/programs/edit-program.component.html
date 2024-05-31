@@ -1,0 +1,86 @@
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-content-center mb-5 title-wrapper">
+        <a href="#" routerLink="/admin/programs" class="btn btn-primary">Back</a>
+        <h1>Edit Program</h1>
+    </div>
+    <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="row">
+            <div class="form-group">
+                <fieldset>
+                    <label for="programName">Program Name:</label>
+                    <input formControlName="programName" id="programName" type="text" class="form-control">
+                </fieldset>
+                <div *ngIf="f['programName'].invalid && f['programName'].touched" class="alert alert-danger">
+                    <div *ngIf="f['programName'].errors && f['programName'].errors['required']">Program name is required.</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <fieldset>
+                    <label for="programDescription">Program Description:</label>
+                    <input formControlName="programDescription" id="programDescription" type="text" class="form-control" [placeholder]="f['programDescription'].value ? '' : 'Enter program description'">
+                </fieldset>
+            </div>
+
+            <div class="form-group">
+                <label for="programPic">Program Picture:</label>
+                <input formControlName="programPic" id="programPic" type="file" class="form-control"
+                    (change)="onFileSelected($event)">
+            </div>
+        </div>
+
+        <button class="btn btn-primary" type="submit" [disabled]="!form.valid"><span
+                class="material-symbols-outlined">update</span>Update</button>
+    </form>
+
+    <h5 class="mt-5">Program Weeks</h5>
+    <div class="scrollable-table">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Number</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr *ngFor="let week of programDetails.weeks">
+                    <td>{{week.weekNumber}}</td>
+                    <td>{{week.weekName}}</td>
+                    <td>{{week.description}}</td>
+                    <td>
+                        <!-- <a [routerLink]="['/admin/edit/', coachUsername, programName, week.weekName, week.weekNumber]"
+                            class="btn btn-primary mr-5 "><span class="material-symbols-outlined">edit</span>Edit</a> -->
+
+                        <button type="button"
+                            (click)="openConfirmationDialog(confirmationDialog, week.weekName, week.weekNumber)"
+                            class="btn btn-danger action"><span
+                                class="material-symbols-outlined">delete</span>Delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<ng-template #confirmationDialog let-modal>
+    <div class="confirmationDialog">
+        <div class="modal-header">
+            <h4 class="modal-title">Are you sure you want to delete this week?</h4>
+            <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+        </div>
+        <div class="modal-body">
+            <p>Deleting this week will also remove all sessions for the program and its athletes.</p>
+            <div class="d-flex justify-content-around">
+                <a class="mr-2" (click)="deleteWeek()">
+                    <button class="btn btn-danger">Yes</button>
+                </a>
+                <a (click)="modal.dismiss()">
+                    <button class="btn btn-secondary">No</button>
+                </a>
+            </div>
+        </div>
+    </div>
+</ng-template>

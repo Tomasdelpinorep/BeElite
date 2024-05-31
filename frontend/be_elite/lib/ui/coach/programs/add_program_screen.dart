@@ -1,5 +1,6 @@
 import 'package:be_elite/bloc/program/program_bloc.dart';
 import 'package:be_elite/models/Coach/coach_details.dart';
+import 'package:be_elite/models/Coach/program_dto.dart';
 import 'package:be_elite/models/Program/post_program_dto.dart';
 import 'package:be_elite/repositories/program/program_repository.dart';
 import 'package:be_elite/repositories/program/program_repository_impl.dart';
@@ -11,7 +12,9 @@ import 'package:intl/intl.dart';
 
 class CoachAddProgramScreen extends StatefulWidget {
   final CoachDetails coachDetails;
-  const CoachAddProgramScreen({super.key, required this.coachDetails});
+  final ProgramDto? program;
+  const CoachAddProgramScreen(
+      {super.key, required this.coachDetails, this.program});
 
   @override
   State<CoachAddProgramScreen> createState() => _CoachAddProgramScreenState();
@@ -30,6 +33,10 @@ class _CoachAddProgramScreenState extends State<CoachAddProgramScreen> {
   void initState() {
     programRepository = ProgramRepositoryImpl();
     _programBloc = ProgramBloc(programRepository);
+
+    if (widget.program != null) {
+      _loadProgramData(widget.program!);
+    }
     super.initState();
   }
 
@@ -56,7 +63,8 @@ class _CoachAddProgramScreenState extends State<CoachAddProgramScreen> {
                     },
                     builder: (context, state) {
                       if (state is ProgramErrorState) {
-                        return const Text('An error occured while trying to create a new program.');
+                        return const Text(
+                            'An error occured while trying to create a new program.');
                       } else if (state is ProgramLoadingState) {
                         return const CircularProgressIndicator();
                       } else if (state is CreateProgramSuccessState) {
@@ -125,10 +133,10 @@ class _CoachAddProgramScreenState extends State<CoachAddProgramScreen> {
                   BorderSide(color: Colors.white), // Focused underline color
             ),
           ),
-          validator: (value){
-            if(value == null || value.isEmpty){
+          validator: (value) {
+            if (value == null || value.isEmpty) {
               return 'Program name cannot be empty';
-            }else if (value.length > 20){
+            } else if (value.length > 20) {
               return 'Cannot be more than 20 characters long.';
             }
             return null;
@@ -156,10 +164,10 @@ class _CoachAddProgramScreenState extends State<CoachAddProgramScreen> {
                   BorderSide(color: Colors.white), // Focused underline color
             ),
           ),
-          validator: (value){
-            if(value == null || value.isEmpty){
+          validator: (value) {
+            if (value == null || value.isEmpty) {
               return 'Program description cannot be empty';
-            }else if (value.length > 200){
+            } else if (value.length > 200) {
               return 'Cannot be more than 200 characters long.';
             }
             return null;
@@ -199,14 +207,14 @@ class _CoachAddProgramScreenState extends State<CoachAddProgramScreen> {
         onPressed: () {
           if (formKey.currentState!.validate()) {
             DateTime now = DateTime.now();
-            String formattedDateTime = DateFormat('yyyy-MM-ddTHH:mm:ss').format(now);
+            String formattedDateTime =
+                DateFormat('yyyy-MM-ddTHH:mm:ss').format(now);
             _programBloc.add(CreateNewProgramEvent(PostProgramDto(
-              coachId: widget.coachDetails.id,
-              createdAt: formattedDateTime,
-              programName: programNameTextController.text,
-              description: programDescriptionTextController.text,
-              image: imageUrlDescriptionTextController.text
-              )));
+                coachId: widget.coachDetails.id,
+                createdAt: formattedDateTime,
+                programName: programNameTextController.text,
+                description: programDescriptionTextController.text,
+                image: imageUrlDescriptionTextController.text)));
           }
         },
         style: ElevatedButton.styleFrom(
@@ -214,12 +222,28 @@ class _CoachAddProgramScreenState extends State<CoachAddProgramScreen> {
             fixedSize: const Size(200, 50),
             shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.elliptical(5, 5)))),
-        child: const Text(
-          "Create Program",
-          style: TextStyle(
-              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
-        ),
+        child: widget.program == null
+            ? const Text(
+                "Create Program",
+                style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20),
+              )
+            : const Text(
+                "Save Changes",
+                style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20),
+              ),
       ),
     );
+  }
+
+  _loadProgramData(ProgramDto program) {
+    programNameTextController.text = program.program_name!;
+    programDescriptionTextController.text = program.program_description ?? "";
+    imageUrlDescriptionTextController.text = program.image ?? "";
   }
 }

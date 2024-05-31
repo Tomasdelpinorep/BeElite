@@ -1,0 +1,49 @@
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-content-center">
+        <a href="#" routerLink="/admin/programs" class="btn btn-primary">Back</a>
+        <div class="flex-grow-1 text-center">
+            <h1>Create Athlete</h1>
+        </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+
+        <div class="form-group">
+            <label for="title">Program Name:</label>
+            <input formControlName="programName" id="programName" type="text" class="form-control">
+            <div *ngIf="submitted && f['programName'].invalid" class="alert alert-danger">
+                <div *ngIf="f['programName'].errors && f['programName'].errors['required']">Program name is required.
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="programDescription">Program Description:</label>
+            <input formControlName="programDescription" id="programDescription" type="text" class="form-control"
+                placeholder="Enter program description">
+            <div *ngIf="submitted && f['programDescription'].invalid" class="alert alert-danger">
+                <div *ngIf="f['programDescription'].errors && f['programDescription'].errors['required']">Program descripition is required.
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="programCoach">Coach:</label>
+            <select formControlName="programCoach" id="programCoach" class="form-control">
+                <option selected value="" disabled>Select a coach</option>
+                <option *ngFor="let coach of coachNameList" [value]="coach">{{ coach }}</option>
+            </select>
+            <div *ngIf="submitted && f['programCoach'].invalid" class="alert alert-danger">
+                <div *ngIf="f['username'].errors && f['username'].errors['required']">Program must have a coach.</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="programPic">Program Picture:</label>
+            <input formControlName="programPic" id="programPic" type="file" class="form-control"
+                (change)="onFileSelected($event)">
+        </div>
+
+        <button class="btn btn-primary mt-3" type="submit">Create</button>
+    </form>
+</div>

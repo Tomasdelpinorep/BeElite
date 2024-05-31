@@ -3,6 +3,7 @@ package com.salesianos.triana.BeElite.controller;
 import com.salesianos.triana.BeElite.dto.Program.InviteDto;
 import com.salesianos.triana.BeElite.dto.User.AddUser;
 import com.salesianos.triana.BeElite.dto.User.CoachDetailsDto;
+import com.salesianos.triana.BeElite.dto.User.UserDto;
 import com.salesianos.triana.BeElite.model.Athlete;
 import com.salesianos.triana.BeElite.model.Coach;
 import com.salesianos.triana.BeElite.model.Program;
@@ -19,8 +20,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,6 +36,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/coach")
@@ -40,6 +49,7 @@ public class CoachController {
     private final CoachService coachService;
 
     @GetMapping("/{coachUsername}")
+    @Transactional
     @PreAuthorize("hasRole('COACH') and #coach.id == principal.id or hasRole('ADMIN')")
     @Operation(summary = "Get coach details")
     @ApiResponses(value = {
@@ -71,11 +81,11 @@ public class CoachController {
                                                 ],
                                                 "programs": [
                                                     {
-                                                        "program_name": "Weightlifting Program",
+                                                        "programName": "Weightlifting Program",
                                                         "image": "https://example.com/weightlifting.jpg"
                                                     },
                                                     {
-                                                        "program_name": "Running Program",
+                                                        "programName": "Running Program",
                                                         "image": "https://example.com/running.jpg"
                                                     }
                                                 ]
@@ -91,5 +101,23 @@ public class CoachController {
     })
     public ResponseEntity<CoachDetailsDto> getCoachDetails(@AuthenticationPrincipal Coach coach , @PathVariable String coachUsername){
         return ResponseEntity.ok(CoachDetailsDto.of(coachService.findByUsername(coachUsername)));
+    }
+
+    @GetMapping("/{coachUsername}/totalSessionsCompleted")
+    public int getTotalSessionsCompleted(@PathVariable String coachUsername){
+        return coachService.getTotalSessionsCompleted(coachUsername);
+    }
+
+    @GetMapping("/all")
+    public Page<UserDto> getAllCoaches(@PageableDefault(page = 0, size = 10) Pageable page){
+        Page<Coach> coaches = coachService.getAllCoaches(page);
+        return coaches.map(UserDto::of);
+    }
+
+    @GetMapping("/allNamesAndIds")
+    public ResponseEntity<Map<String, UUID>> getAllNamesAndIds(){
+        Map<String, UUID> map = coachService.getAllNamesAndIdsMap();
+        return map.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(map);
+
     }
 }

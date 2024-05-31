@@ -1,0 +1,10 @@
+<div *ngIf="isAuthorized" class="app-header">
+  <app-header></app-header>
+</div>
+<div *ngIf="isAuthorized" class="container w-100">
+  <app-sidenav></app-sidenav>
+</div>
+
+<div class="wrapper">
+  <router-outlet></router-outlet>
+</div>

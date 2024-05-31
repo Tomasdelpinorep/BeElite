@@ -46,13 +46,19 @@ public abstract class Usuario implements UserDetails {
 
     private String profilePicUrl;
 
+    @Lob
+    @Column(length = 1000000)
+    private byte[] profilePic;
+
+    private String profilePicFileName;
+
     private boolean accountNonExpired = true;
     private boolean accountNonLocked = true;
     private boolean credentialsNonExpired = true;
     private boolean enabled = true;
 
     @CreatedDate
-    private LocalDateTime createdAt;
+    private LocalDateTime joinDate;
 
     private LocalDateTime lastPasswordChangeAt = LocalDateTime.now();
 

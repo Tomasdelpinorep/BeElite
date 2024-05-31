@@ -38,6 +38,12 @@ public class Program {
 
     private String image;
 
+    @Lob
+    @Column(length = 1000000)
+    private byte[] programPic;
+
+    private String programPicFileName;
+
     @OneToMany(mappedBy = "program")
     @ToString.Exclude
     private List<Athlete> athletes;
@@ -46,8 +52,10 @@ public class Program {
     private LocalDate createdAt;
 
     @OneToMany
+    @ToString.Exclude
     private List<Invite> invitesSent;
 
+    private boolean isVisible = true;
 
     public void removeAthletes(){
         if(!athletes.isEmpty()){

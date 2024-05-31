@@ -17,15 +17,15 @@ public interface ProgramRepository extends JpaRepository<Program, UUID> {
 
     boolean existsByProgramNameIgnoreCase(String programName);
 
-    @Query(value = "SELECT * FROM program p WHERE p.coach_id = :coach_id AND p.program_name = :programName", nativeQuery = true)
+    Optional<Program> findFirstByProgramName(String programName);
+
+    @Query(value = "SELECT * FROM program p WHERE p.coach_id = :coach_id AND p.program_name = :programName AND p.is_visible = true", nativeQuery = true)
     Optional<Program> findByCoachAndProgramName(UUID coach_id, String programName);
 
-    @Query(value = "SELECT * FROM program p WHERE p.coach_id = :coachId", nativeQuery = true)
+    @Query(value = "SELECT * FROM program p WHERE p.coach_id = :coachId AND p.is_visible = true", nativeQuery = true)
     List<Program> findByCoach(@Param("coachId") UUID coachId);
 
-    @Query("""
-            SELECT p FROM Program p
-            """)
+    @Query(value = "SELECT * FROM program p WHERE p.is_visible = true", nativeQuery = true)
     Page<Program> findPage(Pageable page);
 
 }

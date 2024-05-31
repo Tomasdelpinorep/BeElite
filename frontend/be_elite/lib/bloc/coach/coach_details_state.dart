@@ -16,3 +16,14 @@ final class CoachDetailsSuccessState extends CoachDetailsState {
   final CoachDetails coachDetails;
   CoachDetailsSuccessState(this.coachDetails);
 }
+
+final class GetProfileStatsSuccessState extends CoachDetailsState{
+  final UserDto oldestAthlete;
+  final int totalSessionsCompleted;
+  GetProfileStatsSuccessState(this.oldestAthlete, this.totalSessionsCompleted);
+}
+
+final class GetProfileStatsErrorState extends CoachDetailsState{
+  final String errorMessage;
+  GetProfileStatsErrorState(this.errorMessage);
+}

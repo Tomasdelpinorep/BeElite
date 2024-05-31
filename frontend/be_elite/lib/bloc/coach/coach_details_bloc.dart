@@ -1,6 +1,6 @@
 import 'dart:async';
-
 import 'package:be_elite/models/Coach/coach_details.dart';
+import 'package:be_elite/models/Coach/user_dto.dart';
 import 'package:be_elite/repositories/user/user_repository.dart';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
@@ -14,6 +14,7 @@ class CoachDetailsBloc extends Bloc<CoachDetailsEvent, CoachDetailsState> {
 
   CoachDetailsBloc(this.userRepository) : super(CoachDetailsInitial()) {
     on<GetCoachDetailsEvent>(_getCoachDetails);
+    on<GetProfileScreenStatsEvent>(_getProfileScreenStats);
   }
 
   FutureOr<void> _getCoachDetails(
@@ -28,6 +29,19 @@ class CoachDetailsBloc extends Bloc<CoachDetailsEvent, CoachDetailsState> {
       emit(CoachDetailsSuccessState(response));
     } on Exception catch (e) {
       emit(CoachDetailsErrorState(e.toString()));
+    }
+  }
+
+  FutureOr<void> _getProfileScreenStats(GetProfileScreenStatsEvent event, Emitter<CoachDetailsState> emit) async{
+    emit(CoachDetailsLoadingState());
+
+    try{
+      final oldestAthlete = await userRepository.getOldestAthleteInProgram(event.coachUsername);
+      final totalSessionsCompleted = await userRepository.getTotalNumberOfSessionsCompleted(event.coachUsername);
+
+      emit(GetProfileStatsSuccessState(oldestAthlete, totalSessionsCompleted));
+    }on Exception catch(e){
+      emit(GetProfileStatsErrorState(e.toString()));
     }
   }
 }

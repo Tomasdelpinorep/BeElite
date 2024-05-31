@@ -5,7 +5,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -14,6 +16,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @RequiredArgsConstructor
+@SuperBuilder
 public class Athlete extends Usuario {
 
     private int completed_sessions;
@@ -28,10 +31,12 @@ public class Athlete extends Usuario {
     @OneToMany(mappedBy = "athlete", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AthleteSession> athleteSessions;
 
+    LocalDate joinedProgramDate;
+
     public Athlete(UUID id, String username, String password, String email, String name, String profilePicUrl,
-                   boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled,
+                   byte[] profilePic, String profilePicFileName, boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled,
                    LocalDateTime createdAt, LocalDateTime lastPasswordChangeAt, int completed_sessions, Program program) {
-        super(id, username, password, email, name, profilePicUrl, accountNonExpired, accountNonLocked, credentialsNonExpired,
+        super(id, username, password, email, name, profilePicUrl, profilePic, profilePicFileName, accountNonExpired, accountNonLocked, credentialsNonExpired,
                 enabled, createdAt, lastPasswordChangeAt);
         this.completed_sessions = completed_sessions;
         this.program = program;

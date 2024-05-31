@@ -297,7 +297,7 @@ class _AthletesScreenState extends State<AthletesScreen> {
             children: [
               CircularProfileAvatar(
                   imageUrl: coachDetails.profilePicUrl ??
-                      'https://i.imgur.com/jNNT4LE.png'),
+                      'https://i.imgur.com/jNNT4LE.png', radius: 40),
               Expanded(
                 child: Padding(
                     padding: const EdgeInsets.only(
