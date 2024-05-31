@@ -1,13 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Observable, map, throwError } from 'rxjs';
 import { environment } from '../../environment/environtments';
 import { AllUsersResponse } from '../../models/all-coaches-response.interface';
 import { CoachDetails } from '../../models/coach-details-dto.interface';
 import { AthleteDetails } from '../../models/athlete-details';
 import { AllProgramsResponse } from '../../models/all-programs-response';
 import { ProgramDetails } from '../../models/program-details';
-import { CoachBasicDto } from '../../models/coachBasicDto';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +18,7 @@ export class PostService {
   token = localStorage.getItem("auth-token");
 
   headers = new HttpHeaders({
-    'Authorization': `Bearer ${this.token}`
+    'Authorization': `Bearer ${this.token}`,
   });
 
   checkUsername(username: String): Observable<boolean> {
@@ -109,19 +108,21 @@ export class PostService {
       { name: coachData.name, username: coachData.username, email: coachData.email, password: coachData.password, verifyPassword: coachData.verifyPassword, userType: userType });
   }
 
-  createProgram(postProgramDto: any, programPic: File | null) {
+  createProgram(postProgramDto: any, programPic: File | null, coachId: string | undefined) {
+    if (coachId === null || coachId === undefined) {
+      return throwError(() => new Error('Coach ID is required'));
+    }
+
     const formData: FormData = new FormData();
     formData.append('programName', postProgramDto.programName);
     formData.append('programDescription', postProgramDto.programDescription);
+    formData.append('coachId', coachId);
 
-    if (programPic != null && programPic != undefined) {
-      formData.append('programPic', programPic, programPic.name)
+    if (programPic !== null && programPic !== undefined) {
+      formData.append('programPic', programPic, programPic.name);
     }
 
-    return this.http.post<any>(`${environment.apiBaseUrl}admin/create/program`,
-      formData,
-      { headers: this.headers }
-    );
+    return this.http.post<any>(`${environment.apiBaseUrl}admin/create/program`, formData, { headers: this.headers });
   }
 
   delete(coachUsername: String) {
@@ -153,8 +154,16 @@ export class PostService {
   }
 
   getAllCoachNamesAndId() {
-    return this.http.get<CoachBasicDto>(`${environment.apiBaseUrl}coach/allNamesAndIds`,
-      { headers: this.headers }
-    );
+    return this.http.get<{ [key: string]: string }>(`${environment.apiBaseUrl}coach/allNamesAndIds`, { headers: this.headers })
+      .pipe(
+        map(data => {
+          const coachMap = new Map<string, string>();
+          Object.keys(data).forEach(key => {
+            coachMap.set(key, data[key]);
+          });
+          return coachMap;
+        })
+      );
   }
+
 }

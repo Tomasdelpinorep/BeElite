@@ -42,6 +42,8 @@ public record PostProgramDto(
                                 .programPic(compressedImage)
                                 .programPicFileName(newProgram.programPic.getOriginalFilename())
                                 .image(newProgram.image())
+                                .createdAt(LocalDate.now())
+                                .isVisible(true)
                                 .build();
                 }else{
                         return Program.builder()

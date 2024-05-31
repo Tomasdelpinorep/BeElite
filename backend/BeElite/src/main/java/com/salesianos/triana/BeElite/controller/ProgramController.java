@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URLConnection;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -264,12 +265,6 @@ public class ProgramController {
         return invites.stream().map(InviteDto::of).toList();
     }
 
-
-//    @GetMapping("/coach/{coachUsername}/{programName}/id")
-//    public UUID getProgamId(@PathVariable String coachUsername ,@PathVariable String programName) {
-//        return programService.findByCoachAndProgramName(coachUsername, programName).getId();
-//    }
-
     @PostMapping("coach/program")
     @Operation(summary = "Create a new program")
     @PreAuthorize("hasRole('COACH') and #coach.id == principal.id or hasRole('ADMIN')")
@@ -333,11 +328,13 @@ public class ProgramController {
     })
     public ResponseEntity<ProgramDto> adminAddProgram(@Valid @RequestPart("programName") String programName,
                                                       @Valid @RequestPart("programDescription") String programDescription,
+                                                      @Valid @RequestPart("coachId") String coachId,
                                                       @RequestPart(value = "programPic", required = false) MultipartFile programPic) throws IOException {
         PostProgramDto newProgram = PostProgramDto.builder()
                 .programName(programName)
                 .description(programDescription)
                 .programPic(programPic)
+                .coach_id(UUID.fromString(coachId))
                 .build();
 
         Program p = programService.save(newProgram);

@@ -1,4 +1,5 @@
 package com.salesianos.triana.BeElite.dto.Program;
+
 import com.salesianos.triana.BeElite.model.Program;
 import jakarta.transaction.Transactional;
 import lombok.Builder;
@@ -15,11 +16,10 @@ public record ProgramDto(
         LocalDate createdAt,
         int numberOfSessions,
         int numberOfAthletes,
-        boolean isVisible)
-{
+        boolean isVisible) {
 
     @Transactional
-    public static ProgramDto of(Program p){
+    public static ProgramDto of(Program p) {
         return ProgramDto.builder()
                 .coachName(p.getCoach().getName())
                 .coachUsername(p.getCoach().getUsername())
@@ -27,13 +27,17 @@ public record ProgramDto(
                 .programDescription(p.getDescription())
                 .programPicUrl(p.getImage())
                 .createdAt(p.getCreatedAt())
-                .numberOfSessions(p.getWeeks().stream().flatMap(week -> week.getSessions().stream()).mapToInt(session -> 1).sum())
-                .numberOfAthletes(p.getAthletes().size())
+                .numberOfSessions(p.getWeeks() != null ?
+                        p.getWeeks().stream().flatMap(week -> week.getSessions().stream()).mapToInt(session -> 1).sum()
+                        : 0)
+                .numberOfAthletes(p.getAthletes() != null ?
+                        p.getAthletes().size()
+                        : 0)
                 .isVisible(p.isVisible())
                 .build();
     }
 
-    public static ProgramDto empty(){
+    public static ProgramDto empty() {
         return ProgramDto.builder().build();
     }
 

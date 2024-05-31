@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, HostBinding, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { TokenStorageService } from '../../service/auth/token.storage.service';
@@ -10,7 +10,7 @@ import { AuthService } from '../../service/auth/auth.service';
   styleUrl: './login.component.css',
 })
 export class LoginComponent implements OnInit{
-
+  @HostBinding('class.vw-100') applyClass = true;
   form!: FormGroup;
   isLoggedIn = false;
   isLoginFailed = false;
@@ -24,8 +24,7 @@ export class LoginComponent implements OnInit{
   ngOnInit(): void {
     this.form = new FormGroup({
       username: new FormControl('', [Validators.required]),
-      password: new FormControl('', Validators.required)
-    });
+      password: new FormControl('', Validators.required)    });
   }
 
   login(): void {

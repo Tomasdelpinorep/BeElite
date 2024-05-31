@@ -21,6 +21,10 @@
             <label for="programDescription">Program Description:</label>
             <input formControlName="programDescription" id="programDescription" type="text" class="form-control"
                 placeholder="Enter program description">
+            <div *ngIf="submitted && f['programDescription'].invalid" class="alert alert-danger">
+                <div *ngIf="f['programDescription'].errors && f['programDescription'].errors['required']">Program descripition is required.
+                </div>
+            </div>
         </div>
 
         <div class="form-group">

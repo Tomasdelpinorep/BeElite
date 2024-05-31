@@ -7,13 +7,13 @@
             <h1>Admin Dashboard</h1>
             <div class="input-box">
                 <input type="text" name="username" placeholder="Username" formControlName="username" required>
-                <div *ngIf="f['username'].touched && f['username'].invalid" class="alert alert-danger mt-1">
+                <div *ngIf="f['username'].dirty && f['username'].invalid" class="alert alert-danger mt-1">
                     <div *ngIf="f['username'].errors && f['username'].errors['required']">Username is required.</div>
                 </div>
             </div>
             <div class="input-box">
                 <input type="password" name="Password" placeholder="Password" formControlName="password" required>
-                <div *ngIf="f['password'].touched && f['password'].invalid" class="alert alert-danger mt-1">
+                <div *ngIf="f['password'].dirty && f['password'].invalid" class="alert alert-danger mt-1">
                     <div *ngIf="f['password'].errors && f['password'].errors['required']">Password is required.</div>
                 </div>
             </div>

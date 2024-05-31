@@ -16,7 +16,7 @@ export class CreateProgramComponent {
   form!: FormGroup;
   profilePic!: File;
   submitted = false;
-  coachMap!: { [key: string]: string };
+  coachMap = new Map<string, string>();
   coachNameList!: string[];
   selectedProgramPic!: any;
 
@@ -25,7 +25,7 @@ export class CreateProgramComponent {
     this.postService.getAllCoachNamesAndId().subscribe({
       next: resp => { 
         this.coachMap = resp;
-        this.coachNameList = Object.keys(resp);
+        this.coachNameList = Array.from(this.coachMap.keys());
       }, error: err => {
         this.toastr.error("There was an error getting the available coaches.")
       }
@@ -33,7 +33,7 @@ export class CreateProgramComponent {
 
     this.form = new FormGroup({
       programName: new FormControl('', [Validators.required]),
-      programDescription: new FormControl('', [Validators.required], [usernameValidator(this.postService)]),
+      programDescription: new FormControl('', [Validators.required]),
       programCoach: new FormControl('', [Validators.required]),
     });
   }
@@ -45,7 +45,7 @@ export class CreateProgramComponent {
   submit() {
     this.submitted = true;
     if (this.form.valid) {
-      this.postService.createProgram(this.form.value, this.selectedProgramPic).subscribe({
+      this.postService.createProgram(this.form.value, this.selectedProgramPic, this.coachMap.get(this.form.value.programCoach)).subscribe({
         next: resp => {
           if(resp){
             this.toastr.success("New program has been created successfully.", "Success!")
