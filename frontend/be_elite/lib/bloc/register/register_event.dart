@@ -9,7 +9,7 @@ class DoRegisterEvent extends RegisterEvent {
   final String email;
   final String password;
   final String verifyPassword;
-  final bool isCoach;
+  final String userType;
 
   DoRegisterEvent(
       {required this.name,
@@ -17,5 +17,5 @@ class DoRegisterEvent extends RegisterEvent {
       required this.email,
       required this.password,
       required this.verifyPassword,
-      required this.isCoach});
+      required this.userType});
 }

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:be_elite/models/Athlete/athlete_details_dto/athlete_details_dto.dart';
 import 'package:be_elite/models/Coach/user_dto.dart';
+import 'package:be_elite/models/Program/invite_dto.dart';
 import 'package:be_elite/models/Session/Athlete%20Sessions/athlete_session_dto.dart';
 import 'package:be_elite/models/Session/Athlete%20Sessions/athlete_session_id.dart';
 import 'package:be_elite/models/Session/Athlete%20Sessions/block.dart';
@@ -42,7 +43,7 @@ class AthleteRepositoryImpl extends AthleteRepository {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     final response = await _client.get(
-      Uri.parse("http://localhost:8080/athlete/${prefs.getString('username')}"),
+      Uri.parse("$urlChrome/athlete/${prefs.getString('username')}"),
       headers: <String, String>{
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ${prefs.getString('authToken')}'
@@ -183,6 +184,29 @@ class AthleteRepositoryImpl extends AthleteRepository {
       return AthleteSessionDto.fromJson(json.decode(response.body));
     } else if (response.statusCode == 404) {
       return null;
+    } else {
+      throw Exception("There was an error updating the session.");
+    }
+  }
+
+  @override
+  Future<InviteDto> manageInvitation(InviteDto invite) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    final response = await _client.put(
+      Uri.parse(
+          '$urlChrome/athlete/invite'),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${prefs.getString('authToken')}'
+      },
+      body: json.encode(invite)
+    );
+
+    if (response.statusCode == 200) {
+      return InviteDto.fromJson(json.decode(response.body));
+    } else if (response.statusCode == 404) {
+      return InviteDto();
     } else {
       throw Exception("There was an error updating the session.");
     }

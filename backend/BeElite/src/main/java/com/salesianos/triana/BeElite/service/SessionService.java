@@ -27,8 +27,6 @@ public class SessionService {
     private final AthleteRepository athleteRepository;
     private final SessionRepository sessionRepository;
     private final AthleteSessionRepository athleteSessionRepository;
-    private final AthleteBlockRepository athleteBlockRepository;
-    private final BlockRepository blockRepository;
 
     public Page<AthleteSession> findSessionCardPageByIdAndAthleteUsername(Pageable page, String athleteUsername){
         Page<AthleteSession> pagedResult =  athleteSessionRepository.findByAthleteUsernameUpUntilTodayOrderedByDate(page, athleteUsername);

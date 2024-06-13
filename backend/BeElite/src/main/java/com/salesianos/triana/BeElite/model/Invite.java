@@ -31,6 +31,5 @@ public class Invite {
     @ManyToOne
     private Athlete athlete;
 
-    @Enumerated(EnumType.STRING)
-    private InvitationStatus status;
+    private String status;
 }

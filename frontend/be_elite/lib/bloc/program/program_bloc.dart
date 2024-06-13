@@ -18,6 +18,7 @@ class ProgramBloc extends Bloc<ProgramEvent, ProgramState> {
     on<CreateNewProgramEvent>(_createNewProgram);
     on<SendInviteEvent>(_sendInvite);
     on<GetInvitesSentEvent>(_getInvitesSent);
+    on<KickAthleteEvent>(_kickAthlete);
   }
 
   FutureOr<void> _getProgramDto(
@@ -76,6 +77,17 @@ class ProgramBloc extends Bloc<ProgramEvent, ProgramState> {
           event.coachUsername, event.programName);
 
       emit(GetInvitesSentSuccessState(response));
+    } on Exception catch (e) {
+      emit(ProgramErrorState(e.toString()));
+    }
+  }
+
+  FutureOr<void> _kickAthlete(
+      KickAthleteEvent event, Emitter<ProgramState> emit) async {
+    try {
+      await programRepository.kickAthlete(event.coachUsername, event.programName, event.athleteUsername);
+
+      emit(KickAthleteSuccessState());
     } on Exception catch (e) {
       emit(ProgramErrorState(e.toString()));
     }

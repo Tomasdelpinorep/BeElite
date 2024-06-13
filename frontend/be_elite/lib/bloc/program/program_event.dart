@@ -29,3 +29,10 @@ class GetInvitesSentEvent extends ProgramEvent {
   final String programName;
   GetInvitesSentEvent(this.coachUsername, this.programName);
 }
+
+class KickAthleteEvent extends ProgramEvent{
+  final String coachUsername;
+  final String programName;
+  final String athleteUsername;
+  KickAthleteEvent(this.coachUsername, this.programName, this.athleteUsername);
+}

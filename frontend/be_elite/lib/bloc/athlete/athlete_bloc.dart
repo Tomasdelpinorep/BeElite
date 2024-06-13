@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:be_elite/models/Athlete/athlete_details_dto/athlete_details_dto.dart';
 import 'package:be_elite/models/Coach/user_dto.dart';
+import 'package:be_elite/models/Program/invite_dto.dart';
 import 'package:be_elite/models/Session/Athlete%20Sessions/athlete_session_dto.dart';
 import 'package:be_elite/models/Session/Athlete%20Sessions/athlete_session_id.dart';
 import 'package:be_elite/models/Session/Athlete%20Sessions/block.dart';
@@ -23,6 +24,7 @@ class AthleteBloc extends Bloc<AthleteEvent, AthleteState> {
     on<ChangeBlockDoneStatusEvent>(_changeBlockDoneStatus);
     on<UpdateAthleteSessionEvent>(_updateSession);
     on<CompleteSessionEvent>(_completeSession);
+    on<ManageInviteEvent>(_manageInvitation);
   }
 
   FutureOr<void> _getAthletesByProgram(
@@ -113,6 +115,15 @@ class AthleteBloc extends Bloc<AthleteEvent, AthleteState> {
     try {
       final response = await athleteRepository.completeSession(event.id);
       emit(UpdateAthleteSessionSuccessState(response));
+    } on Exception catch (e) {
+      emit(AthleteErrorState(e.toString()));
+    }
+  }
+
+  FutureOr<void> _manageInvitation(ManageInviteEvent event, Emitter<AthleteState> emit) async{
+    try {
+      final response = await athleteRepository.manageInvitation(event.invite);
+      emit(ManageInvitationSuccessState(response));
     } on Exception catch (e) {
       emit(AthleteErrorState(e.toString()));
     }

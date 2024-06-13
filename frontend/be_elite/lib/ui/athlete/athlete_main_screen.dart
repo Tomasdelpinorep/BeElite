@@ -18,12 +18,15 @@ class AthleteMainScreen extends StatefulWidget {
 class _AthleteMainScreenState extends State<AthleteMainScreen> {
   int myIndex = 0;
   late List<Widget> widgetList;
+  late AthleteBloc _athleteBloc;
   late AthleteRepository athleteRepository;
 
   @override
   void initState() {
     loadIndex();
     athleteRepository = AthleteRepositoryImpl();
+    _athleteBloc = AthleteBloc(athleteRepository)
+      ..add(GetAthleteDetailsEvent());
     super.initState();
   }
 
@@ -42,52 +45,53 @@ class _AthleteMainScreenState extends State<AthleteMainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Container(
-          alignment: Alignment.center,
-          child: BlocProvider(
-            create: (context) => AthleteBloc(athleteRepository)..add(GetAthleteDetailsEvent()),
-            child: BlocConsumer<AthleteBloc, AthleteState>(
-              buildWhen: (context, state) {
-                return state is AthleteLoadingState ||
-                    state is AthleteDetailsSuccessState ||
-                    state is AthleteErrorState;
-              },
-              builder: (context, state) {
-                if (state is AthleteLoadingState) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (state is AthleteErrorState) {
-                  return const Text('Error getting athlete information.');
-                } else if (state is AthleteDetailsSuccessState) {
-                  widgetList = [
-                    const AthleteUpcomingWorkoutsScreen(),
-                    AthleteProfileScreen(athleteDetails: state.athleteDetails),
-                  ];
+      body: Container(
+        alignment: Alignment.center,
+        child: BlocProvider.value(
+          value: _athleteBloc,
+          child: BlocConsumer<AthleteBloc, AthleteState>(
+            buildWhen: (context, state) {
+              return state is AthleteLoadingState ||
+                  state is AthleteDetailsSuccessState ||
+                  state is AthleteErrorState;
+            },
+            builder: (context, state) {
+              if (state is AthleteLoadingState) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state is AthleteErrorState) {
+                return const Text('Error getting athlete information.');
+              } else if (state is AthleteDetailsSuccessState) {
+                widgetList = [
+                  const AthleteUpcomingWorkoutsScreen(),
+                  AthleteProfileScreen(athleteDetails: state.athleteDetails),
+                ];
 
-                  return widgetList[myIndex];
-                } else {
-                  return const Placeholder();
-                }
-              },
-              listener: (context, state) {},
-            ),
+                return widgetList[myIndex];
+              } else {
+                return const Placeholder();
+              }
+            },
+            listener: (context, state) {},
           ),
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: AppColors.mainYellow.withOpacity(0.25),
-          onTap: (index) {
-            _saveDropDownValue(index);
-            setState(() {
-              myIndex = index;
-            });
-          },
-          currentIndex: myIndex,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.data_usage_rounded),
-              label: 'Workouts',
-            ),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile')
-          ],
-        ));
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: AppColors.mainYellow.withOpacity(0.25),
+        onTap: (index) {
+          _saveDropDownValue(index);
+          setState(() {
+            myIndex = index;
+          });
+        },
+        currentIndex: myIndex,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.data_usage_rounded),
+            label: 'Workouts',
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile')
+        ],
+      ),
+    );
   }
 }

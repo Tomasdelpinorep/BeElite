@@ -4,6 +4,7 @@ import 'package:be_elite/misc/Widgets/circular_avatar.dart';
 import 'package:be_elite/models/Athlete/athlete_details_dto/athlete_details_dto.dart';
 import 'package:be_elite/repositories/athlete/athlete_repository.dart';
 import 'package:be_elite/repositories/athlete/athlete_repository_impl.dart';
+import 'package:be_elite/ui/athlete/profile/athlete_invite_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -48,41 +49,14 @@ class _AthleteProfileScreenState extends State<AthleteProfileScreen> {
   }
 
   Widget _blocManager() {
-    return Placeholder();
-  }
-
-  Widget _buildProfilePageNoStats(String errorMessage) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 50),
-          child: CircularProfileAvatar(
-              imageUrl: widget.athleteDetails.profilePicUrl!, radius: 100),
-        ),
-        const SizedBox(height: 20),
-        Text(widget.athleteDetails.name!, style: const TextStyle(fontSize: 24)),
-        Text(widget.athleteDetails.email!,
-            style: const TextStyle(color: Colors.grey, fontSize: 14)),
-        const SizedBox(height: 50),
-        SizedBox(
-          width: double.infinity,
-          child: Wrap(
-            alignment: WrapAlignment.spaceAround,
-            children: [
-              _profilePageOption(Icons.data_usage_rounded, 'Manage Programs'),
-              _profilePageOption(Icons.person, 'Account'),
-              _profilePageOption(Icons.settings, 'Settings')
-            ],
-          ),
-        ),
-        const SizedBox(height: 100),
-        const Text(
-          'There has been an unexpected error while loading your statistics.',
-          style: TextStyle(fontSize: 16),
-        ),
-        Text(errorMessage)
-      ],
-    );
+    return Column(children: [
+      BlocConsumer<AthleteBloc, AthleteState>(
+        listener: (context, state) {},
+        builder: (context, state) {
+          return _buildProfilePage();
+        },
+      )
+    ]);
   }
 
   Widget _buildProfilePage() {
@@ -104,15 +78,15 @@ class _AthleteProfileScreenState extends State<AthleteProfileScreen> {
             alignment: WrapAlignment.spaceAround,
             children: [
               GestureDetector(
-                  child: _profilePageOption(
-                      Icons.data_usage_rounded, 'Manage Programs'),
-                  onTap: () {}),
-              GestureDetector(
-                  child: _profilePageOption(Icons.person, 'Account'),
-                  onTap: () {}),
-              GestureDetector(
-                  child: _profilePageOption(Icons.settings, 'Settings'),
-                  onTap: () {})
+                  child: _profilePageOption(Icons.mail, 'Invites'),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AthleteInvitesScreen(
+                                  athleteDetails: widget.athleteDetails,
+                                )));
+                  }),
             ],
           ),
         ),
@@ -121,16 +95,24 @@ class _AthleteProfileScreenState extends State<AthleteProfileScreen> {
           'Your Stats:',
           style: TextStyle(fontSize: 22),
         ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 10),
-            ListView(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              children: const [Text("Stats will appear here.")],
-            ),
-          ],
+        Padding(
+          padding: const EdgeInsets.only(left: 50),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 10),
+              ListView(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  _buildBulletPoint(
+                      '${widget.athleteDetails.completedSessions} completedSessions'),
+                  _buildLinkedBulletPoint(
+                      '${widget.athleteDetails.invites!.length} invites pending.')
+                ],
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -173,6 +155,24 @@ class _AthleteProfileScreenState extends State<AthleteProfileScreen> {
     return ListTile(
       leading: const Icon(Icons.circle, size: 10), // Bullet point icon
       title: Text(text),
+    );
+  }
+
+  Widget _buildLinkedBulletPoint(String text) {
+    return ListTile(
+      leading: const Icon(Icons.circle, size: 10), // Bullet point icon
+      title: GestureDetector(
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => AthleteInvitesScreen(
+                        athleteDetails: widget.athleteDetails)));
+          },
+          child: Text(text,
+              style: const TextStyle(
+                  fontStyle: FontStyle.italic,
+                  decoration: TextDecoration.underline))),
     );
   }
 }

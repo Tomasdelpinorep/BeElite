@@ -27,10 +27,10 @@ class ProgramsScreen extends StatefulWidget {
 }
 
 class ProgramsScreenState extends State<ProgramsScreen> {
-  late String dropDownValue;
+  String dropDownValue = '';
   late CoachRepository _coachRepository;
   late WeekBloc _weekBloc;
-  late String programName;
+  String programName = '';
   late WeekDto weekPage;
 
   @override
@@ -45,12 +45,14 @@ class ProgramsScreenState extends State<ProgramsScreen> {
   Future<void> _loadDropDownValue() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      dropDownValue = (prefs.getString('selectedProgramName') ??
-          widget.coachDetails.programs?.first.programName)!;
-      programName = dropDownValue;
-    });
+      if( widget.coachDetails.programs!.isNotEmpty){
+        dropDownValue = (prefs.getString('selectedProgramName') ??
+        widget.coachDetails.programs?.first.programName)!;
 
-    _weekBloc.add(GetWeeksEvent(programName));
+        programName = dropDownValue;
+      }
+      _weekBloc.add(GetWeeksEvent(programName));
+    });
   }
 
   // saves the selected value to shared preferences
@@ -285,7 +287,7 @@ class ProgramsScreenState extends State<ProgramsScreen> {
               ),
             ),
           ],
-          value: dropDownValue,
+          value: dropDownValue.isEmpty ? 'new' : dropDownValue,
           onChanged: (String? newValue) {
             if (newValue != dropDownValue) {
               switch (newValue) {

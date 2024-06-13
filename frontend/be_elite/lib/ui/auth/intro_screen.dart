@@ -38,7 +38,7 @@ class IntroScreen extends StatelessWidget {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) =>
-                                        const RegisterScreen(isCoach: false)));
+                                        const RegisterScreen(userType: "athlete")));
                           },
                           style: FilledButton.styleFrom(
                               backgroundColor: AppColors.mainYellow,
@@ -64,7 +64,7 @@ class IntroScreen extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                   builder: (context) =>
-                                      const RegisterScreen(isCoach: true)));
+                                      const RegisterScreen(userType: "coach")));
                         },
                         style: OutlinedButton.styleFrom(
                           fixedSize: const Size(275, 75),

@@ -40,3 +40,8 @@ class CompleteSessionEvent extends AthleteEvent{
   final AthleteSessionId id;
   CompleteSessionEvent(this.id);
 }
+
+class ManageInviteEvent extends AthleteEvent{
+  final InviteDto invite;
+  ManageInviteEvent(this.invite);
+}

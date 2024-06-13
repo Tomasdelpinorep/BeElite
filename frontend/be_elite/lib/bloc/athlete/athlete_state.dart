@@ -42,3 +42,8 @@ final class UpdateAthleteSessionSuccessState extends AthleteState {
   final AthleteSessionDto? session;
   UpdateAthleteSessionSuccessState(this.session);
 }
+
+final class ManageInvitationSuccessState extends AthleteState{
+  final InviteDto invite;
+  ManageInvitationSuccessState(this.invite);
+}

@@ -1,6 +1,7 @@
 package com.salesianos.triana.BeElite.controller;
 
 import com.salesianos.triana.BeElite.dto.Block.AthleteBlockDto;
+import com.salesianos.triana.BeElite.dto.Program.InviteDto;
 import com.salesianos.triana.BeElite.dto.Program.PostInviteDto;
 import com.salesianos.triana.BeElite.dto.Session.AthleteSessionDto;
 import com.salesianos.triana.BeElite.dto.User.AthleteDetailsDto;
@@ -176,5 +177,12 @@ public class AthleteController {
         AthleteSession a = athleteService.setSessionAsDone(id);
 
         return ResponseEntity.ok(AthleteSessionDto.of(a));
+    }
+
+    @PutMapping("athlete/invite")
+    public ResponseEntity<InviteDto> acceptOrRejectInvite(@RequestBody InviteDto invite) {
+        Invite i = athleteService.acceptOrRejectInvite(invite);
+
+        return ResponseEntity.ok(InviteDto.of(i));
     }
 }

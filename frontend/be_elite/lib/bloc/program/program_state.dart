@@ -28,3 +28,7 @@ final class GetInvitesSentSuccessState extends ProgramState {
   final List<InviteDto> invites;
   GetInvitesSentSuccessState(this.invites);
 }
+
+final class KickAthleteSuccessState extends ProgramState {
+  KickAthleteSuccessState();
+}

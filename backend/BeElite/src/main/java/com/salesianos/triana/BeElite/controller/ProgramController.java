@@ -427,4 +427,11 @@ public class ProgramController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("coach/{coachUsername}/{programName}/kick/{athleteUsername}")
+    public ResponseEntity<?> kickAthlete(@PathVariable String coachUsername, @PathVariable String programName, @PathVariable String athleteUsername) {
+        programService.kickAthleteByUsername(coachUsername, programName, athleteUsername);
+
+        return ResponseEntity.noContent().build();
+    }
 }

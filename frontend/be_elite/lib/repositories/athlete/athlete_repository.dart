@@ -1,5 +1,6 @@
 import 'package:be_elite/models/Athlete/athlete_details_dto/athlete_details_dto.dart';
 import 'package:be_elite/models/Coach/user_dto.dart';
+import 'package:be_elite/models/Program/invite_dto.dart';
 import 'package:be_elite/models/Session/Athlete%20Sessions/athlete_session_dto.dart';
 import 'package:be_elite/models/Session/Athlete%20Sessions/athlete_session_id.dart';
 import 'package:be_elite/models/Session/Athlete%20Sessions/block.dart';
@@ -14,4 +15,5 @@ abstract class AthleteRepository {
   Future<AthleteBlockDto> changeBlockDoneStatus(AthleteBlockDto block);
   Future<AthleteSessionDto?> updateSession(AthleteSessionId id);
   Future<AthleteSessionDto?> completeSession(AthleteSessionId id);
+  Future<InviteDto> manageInvitation(InviteDto invite);
 }

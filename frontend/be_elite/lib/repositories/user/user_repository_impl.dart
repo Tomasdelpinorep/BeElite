@@ -15,7 +15,7 @@ class UserRepositoryImpl extends UserRepository {
   Future<CoachDetails> getCoachDetails(
       String coachUsername, String authToken) async {
     final response = await _client.get(
-      Uri.parse("http://localhost:8080/coach/$coachUsername"),
+      Uri.parse("$urlChrome/coach/$coachUsername"),
       headers: <String, String>{
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $authToken'

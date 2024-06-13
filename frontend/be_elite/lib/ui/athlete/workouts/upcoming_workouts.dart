@@ -37,19 +37,21 @@ class _AthleteUpcomingWorkoutsScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        gradient: RadialGradient(
-          colors: [Colors.grey[800]!, Colors.grey[900]!],
-          radius: 0.5,
+    return Scaffold(
+      body: Container(
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          gradient: RadialGradient(
+            colors: [Colors.grey[800]!, Colors.grey[900]!],
+            radius: 0.5,
+          ),
         ),
-      ),
-      child: MultiBlocProvider(
-        providers: [
-          BlocProvider.value(value: _athleteBloc),
-        ],
-        child: _blocManager(),
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider.value(value: _athleteBloc),
+          ],
+          child: _blocManager(),
+        ),
       ),
     );
   }
@@ -133,7 +135,10 @@ class _AthleteUpcomingWorkoutsScreenState
     if (workouts.isEmpty) {
       return const Padding(
         padding: EdgeInsets.only(top: 30),
-        child: Align(alignment: Alignment.topCenter,child: Text('Workouts will appear here.', style: TextStyle(color: Colors.white70, fontSize: 28))),
+        child: Align(
+            alignment: Alignment.topCenter,
+            child: Text('Workouts will appear here.',
+                style: TextStyle(color: Colors.white70, fontSize: 28))),
       );
     } else {
       return Column(

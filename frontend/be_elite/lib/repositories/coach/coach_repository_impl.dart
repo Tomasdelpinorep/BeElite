@@ -12,8 +12,9 @@ class CoachRepositoryImpl extends CoachRepository {
   final Client _client = Client();
 
   @override
-  FutureOr<WeekDto?> getWeeks(
-      String authToken, String coachUsername, String programName) async {
+  FutureOr<WeekDto?> getWeeks(String authToken, String coachUsername, String programName) async {
+    if(programName.isEmpty) return null;
+
     final response = await _client.get(
       Uri.parse('$urlChrome/coach/$coachUsername/$programName/weeks'),
       headers: <String, String>{

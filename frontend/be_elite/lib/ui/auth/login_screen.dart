@@ -202,7 +202,7 @@ class _LoginScreenState extends State<LoginScreen> {
             shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.elliptical(5, 5)))),
         child: const Text(
-          "Login",
+          "Log in",
           style: TextStyle(
               color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
         ),

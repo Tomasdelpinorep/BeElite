@@ -35,7 +35,7 @@ class _AthletesScreenState extends State<AthletesScreen> {
   String? selectedAthleteUsername;
   List<SessionCardDto> athleteSessions = [];
 
-  late String selectedProgramName;
+  String selectedProgramName = '';
   late AthleteBloc _athleteBLoc;
   late AthleteRepository athleteRepository;
   late List<UserDto> athletes;
@@ -65,8 +65,11 @@ class _AthletesScreenState extends State<AthletesScreen> {
   Future<void> _loadDropDownValue() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      selectedProgramName = (prefs.getString('selectedProgramName') ??
+      if(widget.coachDetails.programs!.isNotEmpty){
+        selectedProgramName = (prefs.getString('selectedProgramName') ??
           widget.coachDetails.programs?.first.programName)!;
+      }
+  
     });
 
     _athleteBLoc.add(GetAthletesByProgramEvent(
@@ -125,7 +128,7 @@ class _AthletesScreenState extends State<AthletesScreen> {
               athletes = state.athletes;
               return _buildHome();
             } else {
-              return const Placeholder();
+              return _buildNoProgramHome();
             }
           },
           listener: (context, state) {},
@@ -175,6 +178,31 @@ class _AthletesScreenState extends State<AthletesScreen> {
                     MaterialPageRoute(
                         builder: (context) => const CoachMainScreen()),
                   );
+                });
+              });
+            } else if (state is KickAthleteSuccessState) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Success!',
+                          style: TextStyle(color: Colors.white)),
+                      content: const Text(
+                        'Athlete has been kicked.',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      backgroundColor: AppColors.successGreen,
+                    );
+                  },
+                );
+
+                Future.delayed(const Duration(milliseconds: 500), () {
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => AthletesScreen(
+                        coachDetails: widget
+                            .coachDetails), // Replace YourPage with your actual page widget
+                  ));
                 });
               });
             } else if (state is ProgramErrorState) {
@@ -256,6 +284,22 @@ class _AthletesScreenState extends State<AthletesScreen> {
                   ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildNoProgramHome(){
+    return Container(
+      height: 800,
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _topBarWidget(widget.coachDetails),
+          const Expanded(
+            child:Center(child: Text('Create a new program to unlock this screen.'))
+          ),
+        ],
       ),
     );
   }
@@ -395,7 +439,7 @@ class _AthletesScreenState extends State<AthletesScreen> {
               ),
             ),
           ],
-          value: selectedProgramName,
+          value: selectedProgramName.isEmpty ? 'new' : selectedProgramName,
           onChanged: (String? newValue) {
             if (newValue != selectedProgramName) {
               switch (newValue) {
@@ -667,7 +711,8 @@ class _AthletesScreenState extends State<AthletesScreen> {
       width: 100,
       child: ElevatedButton(
         onPressed: () {
-          // openKickDialog();
+          _programBloc.add(KickAthleteEvent(widget.coachDetails.username!,
+              selectedProgramName, selectedAthleteUsername!));
         },
         style: ElevatedButton.styleFrom(
           elevation: 5,

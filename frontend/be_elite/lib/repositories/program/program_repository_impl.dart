@@ -93,6 +93,23 @@ class ProgramRepositoryImpl implements ProgramRepository {
       throw Exception('Error fetching invites: ${response.statusCode}');
     }
   }
+  
+  @override
+  Future<void> kickAthlete(String coachUsername, String programName, String athleteUsername) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    final response = await _client.delete(
+      Uri.parse('$urlChrome/coach/${coachUsername}/${programName}/kick/$athleteUsername'),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${prefs.getString('authToken')}'
+      },
+    );
+
+    if (response.statusCode != 204) {
+      throw Exception('There was an error kicking the athlete.');
+    }
+  }
 
   // @override
   // Future<String> getProgramId(String programName, String coachUsername) async{

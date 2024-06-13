@@ -1,6 +1,7 @@
 package com.salesianos.triana.BeElite.service;
 
 import com.salesianos.triana.BeElite.dto.Block.AthleteBlockDto;
+import com.salesianos.triana.BeElite.dto.Program.InviteDto;
 import com.salesianos.triana.BeElite.dto.Session.AthleteSessionDto;
 import com.salesianos.triana.BeElite.dto.User.AddUser;
 import com.salesianos.triana.BeElite.exception.NotFoundException;
@@ -29,6 +30,7 @@ public class AthleteService {
     private final ProgramRepository programRepository;
     private final AthleteSessionRepository athleteSessionRepository;
     private final AthleteBlockRepository athleteBlockRepository;
+    private final InviteRepository inviteRepository;
 
     public Athlete createAthlete(AddUser addAthlete) {
 
@@ -118,8 +120,28 @@ public class AthleteService {
 
     public AthleteSession setSessionAsDone(AthleteSessionId id) {
         AthleteSession session = athleteSessionRepository.findById(id).orElseThrow(() -> new NotFoundException("athlete session"));
+        Athlete a = athleteRepository.findById(id.getAthlete_id()).orElseThrow(() -> new NotFoundException("athlete"));
         session.setCompleted(true);
+        a.setCompleted_sessions(a.getCompleted_sessions() + 1);
 
+        athleteRepository.save(a);
         return athleteSessionRepository.save(session);
+    }
+
+    public Invite acceptOrRejectInvite(InviteDto invite) {
+        Invite i = inviteRepository.findById(invite.inviteId()).orElseThrow(() -> new NotFoundException("invite"));
+        i.setStatus(InvitationStatus.valueOf(invite.status()));
+
+        if(i.getStatus().equalsIgnoreCase(InvitationStatus.ACCEPTED)){
+            Program p = programRepository.findById(i.getProgram().getId()).orElseThrow(() -> new NotFoundException("coach"));
+            Athlete a = athleteRepository.findById(i.getAthlete().getId()).orElseThrow(() -> new NotFoundException("athlete"));
+            p.getAthletes().add(a);
+            p.getInvitesSent().stream().filter(inv -> inv.getId() == invite.inviteId()).findFirst().get().setStatus(invite.status());
+            a.setProgram(p);
+            programRepository.save(p);
+            athleteRepository.save(a);
+        }
+
+        return inviteRepository.save(i);
     }
 }
