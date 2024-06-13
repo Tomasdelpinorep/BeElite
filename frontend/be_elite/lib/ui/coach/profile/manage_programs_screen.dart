@@ -1,6 +1,6 @@
 import 'package:be_elite/bloc/program/program_bloc.dart';
 import 'package:be_elite/models/Coach/coach_details.dart';
-import 'package:be_elite/models/Coach/program_dto.dart';
+import 'package:be_elite/models/Program/program_dto.dart';
 import 'package:be_elite/repositories/program/program_repository.dart';
 import 'package:be_elite/repositories/program/program_repository_impl.dart';
 import 'package:be_elite/ui/coach/programs/add_program_screen.dart';
@@ -10,7 +10,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class ManageProgramsScreen extends StatefulWidget {
   final List<ProgramDto> programs;
   final CoachDetails coachDetails;
-  const ManageProgramsScreen({super.key, required this.programs, required this.coachDetails});
+  const ManageProgramsScreen(
+      {super.key, required this.programs, required this.coachDetails});
 
   @override
   State<ManageProgramsScreen> createState() => _ManageProgramsScreenState();
@@ -78,7 +79,7 @@ class _ManageProgramsScreenState extends State<ManageProgramsScreen> {
               itemBuilder: (context, index) {
                 return Row(
                   children: [
-                    widget.programs[index].image!.isNotEmpty
+                    widget.programs[index].programPicUrl!.isNotEmpty
                         ? Container(
                             decoration: const BoxDecoration(boxShadow: [
                               BoxShadow(
@@ -88,7 +89,7 @@ class _ManageProgramsScreenState extends State<ManageProgramsScreen> {
                                   spreadRadius: 1)
                             ]),
                             child: Image.network(
-                              widget.programs[index].image!,
+                              widget.programs[index].programPicUrl!,
                               width: 125,
                               height: 75,
                               fit: BoxFit.cover,
@@ -112,7 +113,7 @@ class _ManageProgramsScreenState extends State<ManageProgramsScreen> {
                     const SizedBox(width: 25),
                     Expanded(
                       child: Text(
-                        widget.programs[index].program_name!,
+                        widget.programs[index].programName!,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 24,
@@ -126,7 +127,10 @@ class _ManageProgramsScreenState extends State<ManageProgramsScreen> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => CoachAddProgramScreen(program: widget.programs[index], coachDetails: widget.coachDetails,)));
+                                  builder: (context) => CoachAddProgramScreen(
+                                        program: widget.programs[index],
+                                        coachDetails: widget.coachDetails,
+                                      )));
                         }),
                     const SizedBox(width: 25),
                     GestureDetector(

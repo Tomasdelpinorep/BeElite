@@ -80,10 +80,10 @@ class EditSessionMethods {
 
   int getDayIndex(List<dynamic> span, String sessionDate) {
     for (int i = 0; i < span.length; i++) {
-    if (span[i].toLowerCase() == sessionDate.toLowerCase()) {
-      return i; 
+      if (span[i].toLowerCase() == sessionDate.toLowerCase()) {
+        return i;
+      }
     }
-  }
     return 0;
   }
 }

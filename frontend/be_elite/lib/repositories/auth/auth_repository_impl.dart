@@ -4,6 +4,7 @@ import 'package:be_elite/models/Auth/login_request.dart';
 import 'package:be_elite/models/Auth/login_response.dart';
 import 'package:be_elite/models/Auth/register_request.dart';
 import 'package:be_elite/repositories/auth/auth_repository.dart';
+import 'package:be_elite/variables.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -13,7 +14,7 @@ class AuthRepositoryImpl extends AuthRepository {
   @override
   Future<LoginResponse> login(LoginRequest loginRequest) async {
     final response = await _client.post(
-      Uri.parse("http://localhost:8080/auth/login"),
+      Uri.parse("${urlChrome}/auth/login"),
       headers: <String, String>{'Content-Type': 'application/json'},
       body: jsonEncode(loginRequest.toJson()),
     );
@@ -28,7 +29,7 @@ class AuthRepositoryImpl extends AuthRepository {
   @override
   Future<LoginResponse> register(RegisterRequest registerRequest) async {
     Uri uri;
-    uri = Uri.parse("http://localhost:8080/auth/register");
+    uri = Uri.parse("$urlChrome/auth/register");
 
     final response = await _client.post(
       uri,
@@ -48,7 +49,7 @@ class AuthRepositoryImpl extends AuthRepository {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     final response = await _client.post(
-        Uri.parse("http://localhost:8080/auth/validateToken"),
+        Uri.parse("$urlChrome/auth/validateToken"),
         headers: <String, String>{'Content-Type': 'application/json'},
         body: prefs.getString('authToken'));
 

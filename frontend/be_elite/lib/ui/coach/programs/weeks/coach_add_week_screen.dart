@@ -1,7 +1,7 @@
 import 'package:be_elite/bloc/program/program_bloc.dart';
 import 'package:be_elite/bloc/week/week_bloc.dart';
 import 'package:be_elite/models/Coach/coach_details.dart';
-import 'package:be_elite/models/Coach/program_dto.dart';
+import 'package:be_elite/models/Program/program_dto.dart';
 import 'package:be_elite/models/Week/post_week_dto.dart';
 import 'package:be_elite/ui/coach/coach_main_screen.dart';
 import 'package:intl/intl.dart';
@@ -306,7 +306,8 @@ class CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
   void _selectDateRange(BuildContext context) async {
     final initialDateRange = DateTimeRange(
       start: DateTime.now(),
-      end: DateTime.now().add(const Duration(days: 7)), // Initial range is 7 days
+      end: DateTime.now()
+          .add(const Duration(days: 7)), // Initial range is 7 days
     );
 
     final newDateRange = await showDateRangePicker(

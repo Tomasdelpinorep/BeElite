@@ -2,13 +2,15 @@ import 'package:be_elite/bloc/register/register_bloc.dart';
 import 'package:be_elite/repositories/auth/auth_repository.dart';
 import 'package:be_elite/repositories/auth/auth_repository_impl.dart';
 import 'package:be_elite/styles/app_colors.dart';
+import 'package:be_elite/ui/athlete/athlete_main_screen.dart';
+import 'package:be_elite/ui/coach/coach_main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class RegisterScreen extends StatefulWidget {
-  final bool isCoach;
+  final String userType;
 
-  const RegisterScreen({super.key, required this.isCoach});
+  const RegisterScreen({super.key, required this.userType});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -62,10 +64,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
               },
               listener: (context, state) {
                 if (state is RegisterSuccess) {
-                  if (widget.isCoach) {
-                    Navigator.pushReplacementNamed(context, '/coach');
+                  if (widget.userType == "coach") {
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            const CoachMainScreen(), // Replace YourPage with your actual page widget
+                      ),
+                    );
                   } else {
-                    Navigator.pushReplacementNamed(context, '/athlete');
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            const AthleteMainScreen(), // Replace YourPage with your actual page widget
+                      ),
+                    );
                   }
                 }
               },
@@ -165,7 +177,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         controller: emailTextController,
         style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
-            hintText: "Username",
+            hintText: "Email",
             hintStyle: const TextStyle(color: Colors.white54),
             enabledBorder: const UnderlineInputBorder(
               borderSide: BorderSide(color: Colors.white54), // Underline color
@@ -285,7 +297,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 email: emailTextController.text,
                 password: passwordTextController.text,
                 verifyPassword: verifyPasswordTextController.text,
-                isCoach: widget.isCoach));
+                userType: widget.userType));
           }
         },
         style: ElevatedButton.styleFrom(
@@ -294,7 +306,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.elliptical(5, 5)))),
         child: const Text(
-          "Login",
+          "Register",
           style: TextStyle(
               color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
         ),

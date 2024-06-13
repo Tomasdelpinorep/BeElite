@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'package:be_elite/models/Coach/program_dto.dart';
 import 'package:be_elite/models/Program/invite_dto.dart';
 import 'package:be_elite/models/Program/post_invite_dto.dart';
 import 'package:be_elite/models/Program/post_program_dto.dart';
+import 'package:be_elite/models/Program/program_dto.dart';
 import 'package:be_elite/repositories/program/program_repository.dart';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
@@ -18,26 +18,29 @@ class ProgramBloc extends Bloc<ProgramEvent, ProgramState> {
     on<CreateNewProgramEvent>(_createNewProgram);
     on<SendInviteEvent>(_sendInvite);
     on<GetInvitesSentEvent>(_getInvitesSent);
+    on<KickAthleteEvent>(_kickAthlete);
   }
 
-  FutureOr<void> _getProgramDto(GetProgramDtoEvent event, Emitter<ProgramState> emit) async{
-    try{
+  FutureOr<void> _getProgramDto(
+      GetProgramDtoEvent event, Emitter<ProgramState> emit) async {
+    try {
       final response = await programRepository.getProgramDto(event.programName);
 
       emit(GetProgramDtoSuccessState(response));
-    }on Exception catch(e){
+    } on Exception catch (e) {
       emit(ProgramErrorState(e.toString()));
     }
   }
 
-  FutureOr<void> _createNewProgram(CreateNewProgramEvent event, Emitter<ProgramState> emit) async{
+  FutureOr<void> _createNewProgram(
+      CreateNewProgramEvent event, Emitter<ProgramState> emit) async {
     emit(ProgramLoadingState());
 
-    try{
+    try {
       final response = await programRepository.createNewProgram(event.program);
 
       emit(CreateProgramSuccessState(response));
-    }on Exception catch(e){
+    } on Exception catch (e) {
       emit(ProgramErrorState(e.toString()));
     }
   }
@@ -52,26 +55,40 @@ class ProgramBloc extends Bloc<ProgramEvent, ProgramState> {
   //   }
   // }
 
-  FutureOr<void> _sendInvite(SendInviteEvent event, Emitter<ProgramState> emit) async{
+  FutureOr<void> _sendInvite(
+      SendInviteEvent event, Emitter<ProgramState> emit) async {
     emit(ProgramLoadingState());
 
-    try{
+    try {
       await programRepository.sendInvite(event.invite);
 
       emit(SendInviteSuccessState());
-    }on Exception catch(e){
+    } on Exception catch (e) {
       emit(ProgramErrorState(e.toString()));
     }
   }
 
-  FutureOr<void> _getInvitesSent(GetInvitesSentEvent event, Emitter<ProgramState> emit) async{
+  FutureOr<void> _getInvitesSent(
+      GetInvitesSentEvent event, Emitter<ProgramState> emit) async {
     emit(ProgramLoadingState());
 
-    try{
-      final response = await programRepository.getSentInvites(event.coachUsername, event.programName);
+    try {
+      final response = await programRepository.getSentInvites(
+          event.coachUsername, event.programName);
 
       emit(GetInvitesSentSuccessState(response));
-    }on Exception catch(e){
+    } on Exception catch (e) {
+      emit(ProgramErrorState(e.toString()));
+    }
+  }
+
+  FutureOr<void> _kickAthlete(
+      KickAthleteEvent event, Emitter<ProgramState> emit) async {
+    try {
+      await programRepository.kickAthlete(event.coachUsername, event.programName, event.athleteUsername);
+
+      emit(KickAthleteSuccessState());
+    } on Exception catch (e) {
       emit(ProgramErrorState(e.toString()));
     }
   }

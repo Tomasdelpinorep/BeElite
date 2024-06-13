@@ -14,5 +14,6 @@ abstract class CoachRepository {
 
   Future<WeekDto> saveEditedWeek(EditWeekDto editedWeek);
 
-  Future<void> deleteWeek(String coachUsername, String programName, String weekName, int weekNumber);  
+  Future<void> deleteWeek(String coachUsername, String programName,
+      String weekName, int weekNumber);
 }

@@ -45,4 +45,21 @@ public interface AthleteSessionRepository extends JpaRepository<AthleteSession, 
             "AND a.week_name = :#{#sessionId.week_id.week_name} " +
             "AND a.program_id = :#{#sessionId.week_id.program_id}", nativeQuery = true)
     List<AthleteSession> findBySessionId(SessionId sessionId);
+
+    @Query(value = "SELECT a_s.* FROM athlete_session a_s " +
+            "JOIN session s ON a_s.session_number = s.session_number " +
+            "AND a_s.week_number = s.week_number " +
+            "AND a_s.program_id = s.program_id " +
+            "WHERE a_s.athlete_id = :athleteId " +
+            "AND s.date >= CURRENT_DATE", nativeQuery = true)
+    List<AthleteSession> findUpcomingWorkoutsByUsername(UUID athleteId);
+
+    @Query(value = "SELECT a_s.* FROM athlete_session a_s " +
+            "JOIN session s ON a_s.session_number = s.session_number " +
+            "AND a_s.week_number = s.week_number " +
+            "AND a_s.program_id = s.program_id " +
+            "WHERE a_s.athlete_id = :athleteId " +
+            "AND s.date < CURRENT_DATE", nativeQuery = true)
+    List<AthleteSession> findPreviousWorkoutsByUsername(UUID athleteId);
+
 }

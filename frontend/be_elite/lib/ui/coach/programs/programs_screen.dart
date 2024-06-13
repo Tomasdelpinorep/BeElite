@@ -1,6 +1,6 @@
 import 'package:be_elite/bloc/Week/week_bloc.dart';
 import 'package:be_elite/models/Coach/coach_details.dart';
-import 'package:be_elite/models/Coach/program_dto.dart';
+import 'package:be_elite/models/Program/program_dto.dart';
 import 'package:be_elite/models/Week/content.dart';
 import 'package:be_elite/models/Week/week_dto.dart';
 import 'package:be_elite/repositories/coach/coach_repository.dart';
@@ -27,10 +27,10 @@ class ProgramsScreen extends StatefulWidget {
 }
 
 class ProgramsScreenState extends State<ProgramsScreen> {
-  late String dropDownValue;
+  String dropDownValue = '';
   late CoachRepository _coachRepository;
   late WeekBloc _weekBloc;
-  late String programName;
+  String programName = '';
   late WeekDto weekPage;
 
   @override
@@ -45,12 +45,14 @@ class ProgramsScreenState extends State<ProgramsScreen> {
   Future<void> _loadDropDownValue() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      dropDownValue = (prefs.getString('selectedProgramName') ??
-          widget.coachDetails.programs?.first.program_name)!;
-      programName = dropDownValue;
-    });
+      if( widget.coachDetails.programs!.isNotEmpty){
+        dropDownValue = (prefs.getString('selectedProgramName') ??
+        widget.coachDetails.programs?.first.programName)!;
 
-    _weekBloc.add(GetWeeksEvent(dropDownValue));
+        programName = dropDownValue;
+      }
+      _weekBloc.add(GetWeeksEvent(programName));
+    });
   }
 
   // saves the selected value to shared preferences
@@ -173,7 +175,8 @@ class ProgramsScreenState extends State<ProgramsScreen> {
             children: [
               CircularProfileAvatar(
                   imageUrl: coachDetails.profilePicUrl ??
-                      'https://i.imgur.com/jNNT4LE.png', radius: 40),
+                      'https://i.imgur.com/jNNT4LE.png',
+                  radius: 40),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(
@@ -229,14 +232,14 @@ class ProgramsScreenState extends State<ProgramsScreen> {
             // Existing programs
             ...programs.map((ProgramDto program) {
               return DropdownMenuItem<String>(
-                value: program.program_name,
+                value: program.programName,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
                     children: [
-                      program.image!.isNotEmpty
+                      program.programPicUrl!.isNotEmpty
                           ? Image.network(
-                              program.image!,
+                              program.programPicUrl!,
                               width: 50,
                               height: 50,
                               fit: BoxFit.cover,
@@ -249,7 +252,7 @@ class ProgramsScreenState extends State<ProgramsScreen> {
                             ),
                       const SizedBox(width: 25),
                       Text(
-                        program.program_name!,
+                        program.programName!,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 24,
@@ -260,7 +263,7 @@ class ProgramsScreenState extends State<ProgramsScreen> {
                   ),
                 ),
                 onTap: () {
-                  _weekBloc.add(GetWeeksEvent(program.program_name!));
+                  _weekBloc.add(GetWeeksEvent(program.programName!));
                 },
               );
             }),
@@ -284,7 +287,7 @@ class ProgramsScreenState extends State<ProgramsScreen> {
               ),
             ),
           ],
-          value: dropDownValue,
+          value: dropDownValue.isEmpty ? 'new' : dropDownValue,
           onChanged: (String? newValue) {
             if (newValue != dropDownValue) {
               switch (newValue) {
@@ -516,7 +519,9 @@ class ProgramsScreenState extends State<ProgramsScreen> {
                                                 ),
                                               )
                                             : Text(
-                                                    DateFormat('EEEE').format(DateTime.parse(session.date!)),
+                                                DateFormat('EEEE').format(
+                                                    DateTime.parse(
+                                                        session.date!)),
                                                 style: const TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.w100,

@@ -31,7 +31,7 @@ class _CoachMainScreenState extends State<CoachMainScreen> {
     super.initState();
   }
 
-  Future<void> loadIndex() async{
+  Future<void> loadIndex() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       myIndex = prefs.getInt('index') ?? 0;

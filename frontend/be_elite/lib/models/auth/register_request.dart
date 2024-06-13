@@ -4,7 +4,7 @@ class RegisterRequest {
   String? email;
   String? password;
   String? verifyPassword;
-  bool? isCoach;
+  String? userType;
 
   RegisterRequest({
     this.name,
@@ -12,7 +12,7 @@ class RegisterRequest {
     this.email,
     this.password,
     this.verifyPassword,
-    this.isCoach,
+    this.userType,
   });
 
   factory RegisterRequest.fromJson(Map<String, dynamic> json) {
@@ -22,7 +22,7 @@ class RegisterRequest {
       email: json['email'] as String?,
       password: json['password'] as String?,
       verifyPassword: json['verifyPassword'] as String?,
-      isCoach: json['isCoach'] as bool?,
+      userType: json['userType'] as String?,
     );
   }
 
@@ -32,6 +32,6 @@ class RegisterRequest {
         'email': email,
         'password': password,
         'verifyPassword': verifyPassword,
-        'isCoach': isCoach,
+        'userType': userType,
       };
 }

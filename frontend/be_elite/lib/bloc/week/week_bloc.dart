@@ -31,57 +31,63 @@ class WeekBloc extends Bloc<WeekEvent, WeekState> {
           prefs.getString('username')!,
           event.programName);
 
-      response != null ? emit(WeekSuccessState(response)) : emit(EmptyWeekListState());
+      response != null
+          ? emit(WeekSuccessState(response))
+          : emit(EmptyWeekListState());
     } on Exception catch (e) {
       emit(WeekErrorState(e.toString()));
     }
   }
 
-  FutureOr<void> _getWeekNames(GetWeekNamesEvent event, Emitter<WeekState> emit) async{
+  FutureOr<void> _getWeekNames(
+      GetWeekNamesEvent event, Emitter<WeekState> emit) async {
     emit(WeekLoadingState());
 
-    try{
+    try {
       final response = await coachRepository.getWeekNames(event.programName);
 
       emit(WeekNamesSuccessState(response));
-    }on Exception catch(e){
+    } on Exception catch (e) {
       emit(WeekErrorState(e.toString()));
     }
   }
 
-  FutureOr<void> _saveNewWeek(SaveNewWeekEvent event, Emitter<WeekState> emit) async{
+  FutureOr<void> _saveNewWeek(
+      SaveNewWeekEvent event, Emitter<WeekState> emit) async {
     emit(WeekLoadingState());
 
-    try{
+    try {
       final response = await coachRepository.saveNewWeek(event.newWeek);
 
       emit(SaveNewWeekSuccessState(response));
-    }on Exception catch(e){
+    } on Exception catch (e) {
       emit(WeekErrorState(e.toString()));
     }
   }
 
-  FutureOr<void> _saveEditedWeek(SaveEditedWeekEvent event, Emitter<WeekState> emit) async{
+  FutureOr<void> _saveEditedWeek(
+      SaveEditedWeekEvent event, Emitter<WeekState> emit) async {
     emit(WeekLoadingState());
 
-    try{
+    try {
       final response = await coachRepository.saveEditedWeek(event.editedWeek);
 
       emit(SaveNewWeekSuccessState(response));
-    }on Exception catch(e){
+    } on Exception catch (e) {
       emit(WeekErrorState(e.toString()));
     }
   }
 
-  FutureOr<void> _deleteWeek(DeleteWeekEvent event, Emitter<WeekState> emit) async{
+  FutureOr<void> _deleteWeek(
+      DeleteWeekEvent event, Emitter<WeekState> emit) async {
     emit(WeekLoadingState());
 
-    try{
-      await coachRepository.deleteWeek(event.coachUsername, event.programName, event.weekName, event.weekNumber);
+    try {
+      await coachRepository.deleteWeek(event.coachUsername, event.programName,
+          event.weekName, event.weekNumber);
       emit(DeleteWeekSuccessState());
-    }on Exception catch(e){
+    } on Exception catch (e) {
       emit(WeekErrorState(e.toString()));
     }
   }
 }
-

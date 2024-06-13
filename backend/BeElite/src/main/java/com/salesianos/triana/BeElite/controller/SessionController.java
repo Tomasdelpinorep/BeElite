@@ -158,7 +158,7 @@ public class SessionController {
         return PostSessionDto.of(s);
     }
 
-    @PostMapping("/{coachUsername}/{programName}/{weekName}/{weekNumber}/sessions/new")
+    @PostMapping("coach/{coachUsername}/{programName}/{weekName}/{weekNumber}/sessions/new")
     @Operation(summary = "Create a new session")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Session created",

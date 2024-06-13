@@ -32,15 +32,18 @@ class CoachDetailsBloc extends Bloc<CoachDetailsEvent, CoachDetailsState> {
     }
   }
 
-  FutureOr<void> _getProfileScreenStats(GetProfileScreenStatsEvent event, Emitter<CoachDetailsState> emit) async{
+  FutureOr<void> _getProfileScreenStats(
+      GetProfileScreenStatsEvent event, Emitter<CoachDetailsState> emit) async {
     emit(CoachDetailsLoadingState());
 
-    try{
-      final oldestAthlete = await userRepository.getOldestAthleteInProgram(event.coachUsername);
-      final totalSessionsCompleted = await userRepository.getTotalNumberOfSessionsCompleted(event.coachUsername);
+    try {
+      final oldestAthlete =
+          await userRepository.getOldestAthleteInProgram(event.coachUsername);
+      final totalSessionsCompleted = await userRepository
+          .getTotalNumberOfSessionsCompleted(event.coachUsername);
 
       emit(GetProfileStatsSuccessState(oldestAthlete, totalSessionsCompleted));
-    }on Exception catch(e){
+    } on Exception catch (e) {
       emit(GetProfileStatsErrorState(e.toString()));
     }
   }

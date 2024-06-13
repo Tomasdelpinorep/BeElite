@@ -42,17 +42,19 @@ class _ManageAccountScreenState extends State<ManageAccountScreen> {
     );
   }
 
-  Widget _blocManager(){
-    return Column(children: [
-      BlocConsumer<CoachDetailsBloc, CoachDetailsState>
-      (builder: (context, state){
-        return _buildHome();
-      },
-      listener: (context, state){})
-    ],);
+  Widget _blocManager() {
+    return Column(
+      children: [
+        BlocConsumer<CoachDetailsBloc, CoachDetailsState>(
+            builder: (context, state) {
+              return _buildHome();
+            },
+            listener: (context, state) {})
+      ],
+    );
   }
 
-  Widget _buildHome(){
+  Widget _buildHome() {
     return Column();
   }
 }

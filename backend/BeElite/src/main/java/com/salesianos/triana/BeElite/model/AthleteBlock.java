@@ -38,4 +38,5 @@ public class AthleteBlock {
     private Block block;
 
     private boolean isCompleted;
+    private String feedback;
 }

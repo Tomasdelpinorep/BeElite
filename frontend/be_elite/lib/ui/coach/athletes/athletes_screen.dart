@@ -5,10 +5,10 @@ import 'package:be_elite/misc/Method_Classes/athletes_screen_methods.dart';
 import 'package:be_elite/misc/Widgets/beElite_logo.dart';
 import 'package:be_elite/misc/Widgets/circular_avatar.dart';
 import 'package:be_elite/models/Coach/coach_details.dart';
-import 'package:be_elite/models/Coach/program_dto.dart';
 import 'package:be_elite/models/Coach/user_dto.dart';
 import 'package:be_elite/models/Program/invite_dto.dart';
 import 'package:be_elite/models/Program/post_invite_dto.dart';
+import 'package:be_elite/models/Program/program_dto.dart';
 import 'package:be_elite/models/Session/session_card_dto/session_card_dto.dart';
 import 'package:be_elite/repositories/athlete/athlete_repository.dart';
 import 'package:be_elite/repositories/athlete/athlete_repository_impl.dart';
@@ -35,7 +35,7 @@ class _AthletesScreenState extends State<AthletesScreen> {
   String? selectedAthleteUsername;
   List<SessionCardDto> athleteSessions = [];
 
-  late String selectedProgramName;
+  String selectedProgramName = '';
   late AthleteBloc _athleteBLoc;
   late AthleteRepository athleteRepository;
   late List<UserDto> athletes;
@@ -65,8 +65,10 @@ class _AthletesScreenState extends State<AthletesScreen> {
   Future<void> _loadDropDownValue() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      selectedProgramName = (prefs.getString('selectedProgramName') ??
-          widget.coachDetails.programs?.first.program_name)!;
+      if (widget.coachDetails.programs!.isNotEmpty) {
+        selectedProgramName = (prefs.getString('selectedProgramName') ??
+            widget.coachDetails.programs?.first.programName)!;
+      }
     });
 
     _athleteBLoc.add(GetAthletesByProgramEvent(
@@ -118,14 +120,16 @@ class _AthletesScreenState extends State<AthletesScreen> {
                   'Error fetching athletes for program with name: $selectedProgramName.');
             } else if (state is GetAthletesByProgramEmptyState) {
               athletes = [];
-              _programBloc.add(GetInvitesSentEvent(
-                  widget.coachDetails.username!, selectedProgramName));
+              if (selectedProgramName.isNotEmpty) {
+                _programBloc.add(GetInvitesSentEvent(
+                    widget.coachDetails.username!, selectedProgramName));
+              }
               return _buildEmptyHome();
             } else if (state is GetAthletesByProgramSuccessState) {
               athletes = state.athletes;
               return _buildHome();
             } else {
-              return const Placeholder();
+              return _buildNoProgramHome();
             }
           },
           listener: (context, state) {},
@@ -175,6 +179,31 @@ class _AthletesScreenState extends State<AthletesScreen> {
                     MaterialPageRoute(
                         builder: (context) => const CoachMainScreen()),
                   );
+                });
+              });
+            } else if (state is KickAthleteSuccessState) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Success!',
+                          style: TextStyle(color: Colors.white)),
+                      content: const Text(
+                        'Athlete has been kicked.',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      backgroundColor: AppColors.successGreen,
+                    );
+                  },
+                );
+
+                Future.delayed(const Duration(milliseconds: 500), () {
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => AthletesScreen(
+                        coachDetails: widget
+                            .coachDetails), // Replace YourPage with your actual page widget
+                  ));
                 });
               });
             } else if (state is ProgramErrorState) {
@@ -260,6 +289,22 @@ class _AthletesScreenState extends State<AthletesScreen> {
     );
   }
 
+  Widget _buildNoProgramHome() {
+    return Container(
+      height: 800,
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _topBarWidget(widget.coachDetails),
+          const Expanded(
+              child: Center(
+                  child: Text('Create a new program to unlock this screen.'))),
+        ],
+      ),
+    );
+  }
+
   Widget _buildEmptyHome() {
     return Container(
       height: 800,
@@ -297,7 +342,8 @@ class _AthletesScreenState extends State<AthletesScreen> {
             children: [
               CircularProfileAvatar(
                   imageUrl: coachDetails.profilePicUrl ??
-                      'https://i.imgur.com/jNNT4LE.png', radius: 40),
+                      'https://i.imgur.com/jNNT4LE.png',
+                  radius: 40),
               Expanded(
                 child: Padding(
                     padding: const EdgeInsets.only(
@@ -338,14 +384,14 @@ class _AthletesScreenState extends State<AthletesScreen> {
             // Existing programs
             ...programs.map((ProgramDto program) {
               return DropdownMenuItem<String>(
-                value: program.program_name,
+                value: program.programName,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
                     children: [
-                      program.image!.isNotEmpty
+                      program.programPicUrl!.isNotEmpty
                           ? Image.network(
-                              program.image!,
+                              program.programPicUrl!,
                               width: 50,
                               height: 50,
                               fit: BoxFit.cover,
@@ -358,7 +404,7 @@ class _AthletesScreenState extends State<AthletesScreen> {
                             ),
                       const SizedBox(width: 25),
                       Text(
-                        program.program_name!,
+                        program.programName!,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 24,
@@ -370,7 +416,7 @@ class _AthletesScreenState extends State<AthletesScreen> {
                 ),
                 onTap: () {
                   _athleteBLoc.add(GetAthletesByProgramEvent(
-                      program.program_name!, coachDetails.username!));
+                      program.programName!, coachDetails.username!));
                 },
               );
             }),
@@ -394,7 +440,7 @@ class _AthletesScreenState extends State<AthletesScreen> {
               ),
             ),
           ],
-          value: selectedProgramName,
+          value: selectedProgramName.isEmpty ? 'new' : selectedProgramName,
           onChanged: (String? newValue) {
             if (newValue != selectedProgramName) {
               switch (newValue) {
@@ -666,7 +712,8 @@ class _AthletesScreenState extends State<AthletesScreen> {
       width: 100,
       child: ElevatedButton(
         onPressed: () {
-          // openKickDialog();
+          _programBloc.add(KickAthleteEvent(widget.coachDetails.username!,
+              selectedProgramName, selectedAthleteUsername!));
         },
         style: ElevatedButton.styleFrom(
           elevation: 5,
@@ -800,13 +847,11 @@ class _AthletesScreenState extends State<AthletesScreen> {
                                                       boxShadow: [
                                                         BoxShadow(
                                                           color: Colors.black
-                                                              .withOpacity(
-                                                                  0.5),
+                                                              .withOpacity(0.5),
                                                           spreadRadius: 2,
                                                           blurRadius: 7,
-                                                          offset:
-                                                              const Offset(
-                                                                  0, 3),
+                                                          offset: const Offset(
+                                                              0, 3),
                                                         )
                                                       ],
                                                     ),
@@ -815,8 +860,7 @@ class _AthletesScreenState extends State<AthletesScreen> {
                                                     width: 20.0,
                                                     height: 20.0,
                                                     decoration: BoxDecoration(
-                                                      color:
-                                                          AppColors.errorRed,
+                                                      color: AppColors.errorRed,
                                                       shape: BoxShape.circle,
                                                       border: Border.all(
                                                           color: Colors.white,
@@ -824,13 +868,11 @@ class _AthletesScreenState extends State<AthletesScreen> {
                                                       boxShadow: [
                                                         BoxShadow(
                                                           color: Colors.black
-                                                              .withOpacity(
-                                                                  0.5),
+                                                              .withOpacity(0.5),
                                                           spreadRadius: 2,
                                                           blurRadius: 7,
-                                                          offset:
-                                                              const Offset(
-                                                                  0, 3),
+                                                          offset: const Offset(
+                                                              0, 3),
                                                         )
                                                       ],
                                                     ),
@@ -839,29 +881,30 @@ class _AthletesScreenState extends State<AthletesScreen> {
                                               athleteSessions[index]
                                                   .blocks![leftIndex]
                                                   .movement!,
-                                              style: const TextStyle(
-                                                  fontSize: 16),
+                                              style:
+                                                  const TextStyle(fontSize: 16),
                                             ),
                                           ],
                                         ),
                                       )
                                     : const SizedBox(),
-                            
+
                                 // If there's another block on the right, put the divider there
                                 // I think +1 should work but it doesn't, +2 works fine though :/
                                 athleteSessions[index].blocks!.length >
                                         blockIndex + 2
                                     ? const Padding(
-                                      padding: EdgeInsets.fromLTRB(8,0,8,8),
-                                      child: SizedBox(
-                                        height: 40,
-                                        child: VerticalDivider(
+                                        padding:
+                                            EdgeInsets.fromLTRB(8, 0, 8, 8),
+                                        child: SizedBox(
+                                          height: 40,
+                                          child: VerticalDivider(
                                             color: Colors.grey,
                                             thickness: 2.0,
                                             width: 10.0,
                                           ),
-                                      ),
-                                    )
+                                        ),
+                                      )
                                     : const SizedBox(),
                                 rightIndex <
                                         athleteSessions[index].blocks!.length
@@ -885,13 +928,11 @@ class _AthletesScreenState extends State<AthletesScreen> {
                                                       boxShadow: [
                                                         BoxShadow(
                                                           color: Colors.black
-                                                              .withOpacity(
-                                                                  0.5),
+                                                              .withOpacity(0.5),
                                                           spreadRadius: 2,
                                                           blurRadius: 7,
-                                                          offset:
-                                                              const Offset(
-                                                                  0, 3),
+                                                          offset: const Offset(
+                                                              0, 3),
                                                         )
                                                       ],
                                                     ),
@@ -900,8 +941,7 @@ class _AthletesScreenState extends State<AthletesScreen> {
                                                     width: 20.0,
                                                     height: 20.0,
                                                     decoration: BoxDecoration(
-                                                      color:
-                                                          AppColors.errorRed,
+                                                      color: AppColors.errorRed,
                                                       shape: BoxShape.circle,
                                                       border: Border.all(
                                                           color: Colors.white,
@@ -909,13 +949,11 @@ class _AthletesScreenState extends State<AthletesScreen> {
                                                       boxShadow: [
                                                         BoxShadow(
                                                           color: Colors.black
-                                                              .withOpacity(
-                                                                  0.5),
+                                                              .withOpacity(0.5),
                                                           spreadRadius: 2,
                                                           blurRadius: 7,
-                                                          offset:
-                                                              const Offset(
-                                                                  0, 3),
+                                                          offset: const Offset(
+                                                              0, 3),
                                                         )
                                                       ],
                                                     ),
@@ -924,8 +962,8 @@ class _AthletesScreenState extends State<AthletesScreen> {
                                               athleteSessions[index]
                                                   .blocks![rightIndex]
                                                   .movement!,
-                                              style: const TextStyle(
-                                                  fontSize: 16),
+                                              style:
+                                                  const TextStyle(fontSize: 16),
                                             ),
                                           ],
                                         ),

@@ -1,5 +1,5 @@
-import 'user_dto.dart';
-import 'program_dto.dart';
+import 'package:be_elite/models/Coach/user_dto.dart';
+import 'package:be_elite/models/Program/program_dto.dart';
 
 class CoachDetails {
   String? id;

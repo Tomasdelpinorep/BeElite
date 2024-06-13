@@ -180,4 +180,15 @@ public class ProgramService {
                 .file(ImageUtility.decompressImage(program.getProgramPic()))
                 .build();
     }
+
+    public void kickAthleteByUsername(String coachUsername, String programName, String athleteUsername){
+        Coach c = coachRepository.findByUsername(coachUsername).orElseThrow(() -> new NotFoundException("coach"));
+        Program p = programRepository.findByCoachAndProgramName(c.getId(), programName).orElseThrow(() -> new NotFoundException("program"));
+
+        Athlete athleteToKick = p.getAthletes().stream().filter(athlete -> athlete.getUsername().equalsIgnoreCase(athleteUsername)).findFirst().get();
+        athleteToKick.setProgram(null);
+        p.getAthletes().remove(athleteToKick);
+        programRepository.save(p);
+        athleteRepository.save(athleteToKick);
+    }
 }
