@@ -20,24 +20,26 @@ class ProgramBloc extends Bloc<ProgramEvent, ProgramState> {
     on<GetInvitesSentEvent>(_getInvitesSent);
   }
 
-  FutureOr<void> _getProgramDto(GetProgramDtoEvent event, Emitter<ProgramState> emit) async{
-    try{
+  FutureOr<void> _getProgramDto(
+      GetProgramDtoEvent event, Emitter<ProgramState> emit) async {
+    try {
       final response = await programRepository.getProgramDto(event.programName);
 
       emit(GetProgramDtoSuccessState(response));
-    }on Exception catch(e){
+    } on Exception catch (e) {
       emit(ProgramErrorState(e.toString()));
     }
   }
 
-  FutureOr<void> _createNewProgram(CreateNewProgramEvent event, Emitter<ProgramState> emit) async{
+  FutureOr<void> _createNewProgram(
+      CreateNewProgramEvent event, Emitter<ProgramState> emit) async {
     emit(ProgramLoadingState());
 
-    try{
+    try {
       final response = await programRepository.createNewProgram(event.program);
 
       emit(CreateProgramSuccessState(response));
-    }on Exception catch(e){
+    } on Exception catch (e) {
       emit(ProgramErrorState(e.toString()));
     }
   }
@@ -52,26 +54,29 @@ class ProgramBloc extends Bloc<ProgramEvent, ProgramState> {
   //   }
   // }
 
-  FutureOr<void> _sendInvite(SendInviteEvent event, Emitter<ProgramState> emit) async{
+  FutureOr<void> _sendInvite(
+      SendInviteEvent event, Emitter<ProgramState> emit) async {
     emit(ProgramLoadingState());
 
-    try{
+    try {
       await programRepository.sendInvite(event.invite);
 
       emit(SendInviteSuccessState());
-    }on Exception catch(e){
+    } on Exception catch (e) {
       emit(ProgramErrorState(e.toString()));
     }
   }
 
-  FutureOr<void> _getInvitesSent(GetInvitesSentEvent event, Emitter<ProgramState> emit) async{
+  FutureOr<void> _getInvitesSent(
+      GetInvitesSentEvent event, Emitter<ProgramState> emit) async {
     emit(ProgramLoadingState());
 
-    try{
-      final response = await programRepository.getSentInvites(event.coachUsername, event.programName);
+    try {
+      final response = await programRepository.getSentInvites(
+          event.coachUsername, event.programName);
 
       emit(GetInvitesSentSuccessState(response));
-    }on Exception catch(e){
+    } on Exception catch (e) {
       emit(ProgramErrorState(e.toString()));
     }
   }

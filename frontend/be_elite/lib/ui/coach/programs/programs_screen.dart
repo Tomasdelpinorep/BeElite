@@ -173,7 +173,8 @@ class ProgramsScreenState extends State<ProgramsScreen> {
             children: [
               CircularProfileAvatar(
                   imageUrl: coachDetails.profilePicUrl ??
-                      'https://i.imgur.com/jNNT4LE.png', radius: 40),
+                      'https://i.imgur.com/jNNT4LE.png',
+                  radius: 40),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(
@@ -516,7 +517,9 @@ class ProgramsScreenState extends State<ProgramsScreen> {
                                                 ),
                                               )
                                             : Text(
-                                                    DateFormat('EEEE').format(DateTime.parse(session.date!)),
+                                                DateFormat('EEEE').format(
+                                                    DateTime.parse(
+                                                        session.date!)),
                                                 style: const TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.w100,

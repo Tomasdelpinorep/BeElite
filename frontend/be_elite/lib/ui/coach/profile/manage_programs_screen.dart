@@ -10,7 +10,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class ManageProgramsScreen extends StatefulWidget {
   final List<ProgramDto> programs;
   final CoachDetails coachDetails;
-  const ManageProgramsScreen({super.key, required this.programs, required this.coachDetails});
+  const ManageProgramsScreen(
+      {super.key, required this.programs, required this.coachDetails});
 
   @override
   State<ManageProgramsScreen> createState() => _ManageProgramsScreenState();
@@ -126,7 +127,10 @@ class _ManageProgramsScreenState extends State<ManageProgramsScreen> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => CoachAddProgramScreen(program: widget.programs[index], coachDetails: widget.coachDetails,)));
+                                  builder: (context) => CoachAddProgramScreen(
+                                        program: widget.programs[index],
+                                        coachDetails: widget.coachDetails,
+                                      )));
                         }),
                     const SizedBox(width: 25),
                     GestureDetector(

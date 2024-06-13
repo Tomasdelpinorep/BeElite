@@ -297,7 +297,8 @@ class _AthletesScreenState extends State<AthletesScreen> {
             children: [
               CircularProfileAvatar(
                   imageUrl: coachDetails.profilePicUrl ??
-                      'https://i.imgur.com/jNNT4LE.png', radius: 40),
+                      'https://i.imgur.com/jNNT4LE.png',
+                  radius: 40),
               Expanded(
                 child: Padding(
                     padding: const EdgeInsets.only(
@@ -800,13 +801,11 @@ class _AthletesScreenState extends State<AthletesScreen> {
                                                       boxShadow: [
                                                         BoxShadow(
                                                           color: Colors.black
-                                                              .withOpacity(
-                                                                  0.5),
+                                                              .withOpacity(0.5),
                                                           spreadRadius: 2,
                                                           blurRadius: 7,
-                                                          offset:
-                                                              const Offset(
-                                                                  0, 3),
+                                                          offset: const Offset(
+                                                              0, 3),
                                                         )
                                                       ],
                                                     ),
@@ -815,8 +814,7 @@ class _AthletesScreenState extends State<AthletesScreen> {
                                                     width: 20.0,
                                                     height: 20.0,
                                                     decoration: BoxDecoration(
-                                                      color:
-                                                          AppColors.errorRed,
+                                                      color: AppColors.errorRed,
                                                       shape: BoxShape.circle,
                                                       border: Border.all(
                                                           color: Colors.white,
@@ -824,13 +822,11 @@ class _AthletesScreenState extends State<AthletesScreen> {
                                                       boxShadow: [
                                                         BoxShadow(
                                                           color: Colors.black
-                                                              .withOpacity(
-                                                                  0.5),
+                                                              .withOpacity(0.5),
                                                           spreadRadius: 2,
                                                           blurRadius: 7,
-                                                          offset:
-                                                              const Offset(
-                                                                  0, 3),
+                                                          offset: const Offset(
+                                                              0, 3),
                                                         )
                                                       ],
                                                     ),
@@ -839,29 +835,30 @@ class _AthletesScreenState extends State<AthletesScreen> {
                                               athleteSessions[index]
                                                   .blocks![leftIndex]
                                                   .movement!,
-                                              style: const TextStyle(
-                                                  fontSize: 16),
+                                              style:
+                                                  const TextStyle(fontSize: 16),
                                             ),
                                           ],
                                         ),
                                       )
                                     : const SizedBox(),
-                            
+
                                 // If there's another block on the right, put the divider there
                                 // I think +1 should work but it doesn't, +2 works fine though :/
                                 athleteSessions[index].blocks!.length >
                                         blockIndex + 2
                                     ? const Padding(
-                                      padding: EdgeInsets.fromLTRB(8,0,8,8),
-                                      child: SizedBox(
-                                        height: 40,
-                                        child: VerticalDivider(
+                                        padding:
+                                            EdgeInsets.fromLTRB(8, 0, 8, 8),
+                                        child: SizedBox(
+                                          height: 40,
+                                          child: VerticalDivider(
                                             color: Colors.grey,
                                             thickness: 2.0,
                                             width: 10.0,
                                           ),
-                                      ),
-                                    )
+                                        ),
+                                      )
                                     : const SizedBox(),
                                 rightIndex <
                                         athleteSessions[index].blocks!.length
@@ -885,13 +882,11 @@ class _AthletesScreenState extends State<AthletesScreen> {
                                                       boxShadow: [
                                                         BoxShadow(
                                                           color: Colors.black
-                                                              .withOpacity(
-                                                                  0.5),
+                                                              .withOpacity(0.5),
                                                           spreadRadius: 2,
                                                           blurRadius: 7,
-                                                          offset:
-                                                              const Offset(
-                                                                  0, 3),
+                                                          offset: const Offset(
+                                                              0, 3),
                                                         )
                                                       ],
                                                     ),
@@ -900,8 +895,7 @@ class _AthletesScreenState extends State<AthletesScreen> {
                                                     width: 20.0,
                                                     height: 20.0,
                                                     decoration: BoxDecoration(
-                                                      color:
-                                                          AppColors.errorRed,
+                                                      color: AppColors.errorRed,
                                                       shape: BoxShape.circle,
                                                       border: Border.all(
                                                           color: Colors.white,
@@ -909,13 +903,11 @@ class _AthletesScreenState extends State<AthletesScreen> {
                                                       boxShadow: [
                                                         BoxShadow(
                                                           color: Colors.black
-                                                              .withOpacity(
-                                                                  0.5),
+                                                              .withOpacity(0.5),
                                                           spreadRadius: 2,
                                                           blurRadius: 7,
-                                                          offset:
-                                                              const Offset(
-                                                                  0, 3),
+                                                          offset: const Offset(
+                                                              0, 3),
                                                         )
                                                       ],
                                                     ),
@@ -924,8 +916,8 @@ class _AthletesScreenState extends State<AthletesScreen> {
                                               athleteSessions[index]
                                                   .blocks![rightIndex]
                                                   .movement!,
-                                              style: const TextStyle(
-                                                  fontSize: 16),
+                                              style:
+                                                  const TextStyle(fontSize: 16),
                                             ),
                                           ],
                                         ),

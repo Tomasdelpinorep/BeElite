@@ -306,7 +306,8 @@ class CoachAddWeekScreenState extends State<CoachAddWeekScreen> {
   void _selectDateRange(BuildContext context) async {
     final initialDateRange = DateTimeRange(
       start: DateTime.now(),
-      end: DateTime.now().add(const Duration(days: 7)), // Initial range is 7 days
+      end: DateTime.now()
+          .add(const Duration(days: 7)), // Initial range is 7 days
     );
 
     final newDateRange = await showDateRangePicker(

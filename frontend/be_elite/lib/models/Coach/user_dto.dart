@@ -5,7 +5,12 @@ class UserDto {
   String? email;
   String? joinedProgramDate;
 
-  UserDto({this.username, this.name, this.profilePicUrl, this.email, this.joinedProgramDate});
+  UserDto(
+      {this.username,
+      this.name,
+      this.profilePicUrl,
+      this.email,
+      this.joinedProgramDate});
 
   factory UserDto.fromJson(Map<String, dynamic> json) => UserDto(
         username: json['username'] as String?,

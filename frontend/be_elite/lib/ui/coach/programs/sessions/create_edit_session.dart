@@ -390,12 +390,16 @@ class _CoachCreateOrEditSessionScreenState
           ? Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _deleteSetButton(blockIndex, getSumOfNumbersUpUntilIndex(setsPerBlock, blockIndex) - 1),
-                _addSetButton(blockIndex, getSumOfNumbersUpUntilIndex(setsPerBlock, blockIndex) - 1)
+                _deleteSetButton(blockIndex,
+                    getSumOfNumbersUpUntilIndex(setsPerBlock, blockIndex) - 1),
+                _addSetButton(blockIndex,
+                    getSumOfNumbersUpUntilIndex(setsPerBlock, blockIndex) - 1)
               ],
             )
           : Align(
-              alignment: Alignment.center, child: _addSetButton(blockIndex, getSumOfNumbersUpUntilIndex(setsPerBlock, blockIndex) - 1)),
+              alignment: Alignment.center,
+              child: _addSetButton(blockIndex,
+                  getSumOfNumbersUpUntilIndex(setsPerBlock, blockIndex) - 1)),
       const SizedBox(height: 30),
       _blockRestField(restBetweenSetsTextControllers[blockIndex]),
       const SizedBox(height: 30),
@@ -472,7 +476,7 @@ class _CoachCreateOrEditSessionScreenState
 
   Widget _newSetForm(int setNumber, int totalSetIndex, bool isNewBlock) {
     // Create controllers for each new set form
-    if(isNewBlock) {
+    if (isNewBlock) {
       numberOfSetsTextControllers.add(TextEditingController());
       numberOfRepsTextControllers.add(TextEditingController());
       percentageTextControllers.add(TextEditingController());
@@ -596,13 +600,13 @@ class _CoachCreateOrEditSessionScreenState
       ),
       onTap: () {
         setState(() {
-          numberOfSetsTextControllers
-              .insert(setIndex + 1, TextEditingController());
-          numberOfRepsTextControllers
-              .insert(setIndex + 1, TextEditingController());
-          percentageTextControllers
-              .insert(setIndex + 1, TextEditingController());
-          setsPerBlock[blockIndex] ++;
+          numberOfSetsTextControllers.insert(
+              setIndex + 1, TextEditingController());
+          numberOfRepsTextControllers.insert(
+              setIndex + 1, TextEditingController());
+          percentageTextControllers.insert(
+              setIndex + 1, TextEditingController());
+          setsPerBlock[blockIndex]++;
         });
       },
     );
@@ -627,14 +631,11 @@ class _CoachCreateOrEditSessionScreenState
       ),
       onTap: () {
         // Deletes the appropriate controller by counting the sets in each block up until the block that has had a set removed
-        // Since only the last set of the block can be removed, that's the correct one. -1 to get the actual position within the list. 
+        // Since only the last set of the block can be removed, that's the correct one. -1 to get the actual position within the list.
         setState(() {
-          numberOfSetsTextControllers
-              .removeAt(setIndex);
-          numberOfRepsTextControllers
-              .removeAt(setIndex);
-          percentageTextControllers
-              .removeAt(setIndex);
+          numberOfSetsTextControllers.removeAt(setIndex);
+          numberOfRepsTextControllers.removeAt(setIndex);
+          percentageTextControllers.removeAt(setIndex);
           setsPerBlock[blockIndex] -= 1;
         });
       },
@@ -896,9 +897,9 @@ class _CoachCreateOrEditSessionScreenState
         0, (int previousValue, int element) => previousValue + element);
   }
 
-  int getSumOfNumbersUpUntilIndex(List<int> numbers, int index){
+  int getSumOfNumbersUpUntilIndex(List<int> numbers, int index) {
     int counter = 0;
-    for(int i = 0; i <= index;i++){
+    for (int i = 0; i <= index; i++) {
       counter += numbers[i];
     }
     return counter;

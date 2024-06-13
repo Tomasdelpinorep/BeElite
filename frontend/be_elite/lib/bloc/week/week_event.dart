@@ -8,25 +8,26 @@ class GetWeeksEvent extends WeekEvent {
   GetWeeksEvent(this.programName);
 }
 
-class SaveNewWeekEvent extends WeekEvent{
+class SaveNewWeekEvent extends WeekEvent {
   final PostWeekDto newWeek;
   SaveNewWeekEvent(this.newWeek);
 }
 
-class GetWeekNamesEvent extends WeekEvent{
+class GetWeekNamesEvent extends WeekEvent {
   final String programName;
   GetWeekNamesEvent(this.programName);
 }
 
-class SaveEditedWeekEvent extends WeekEvent{
+class SaveEditedWeekEvent extends WeekEvent {
   final EditWeekDto editedWeek;
   SaveEditedWeekEvent(this.editedWeek);
 }
 
-class DeleteWeekEvent extends WeekEvent{
+class DeleteWeekEvent extends WeekEvent {
   final String coachUsername;
   final String programName;
   final String weekName;
   final int weekNumber;
-  DeleteWeekEvent(this.coachUsername, this.programName, this.weekName, this.weekNumber);
+  DeleteWeekEvent(
+      this.coachUsername, this.programName, this.weekName, this.weekNumber);
 }

@@ -10,5 +10,4 @@ class ProfileSreenMethods {
 
     return daysDifference;
   }
-  
 }

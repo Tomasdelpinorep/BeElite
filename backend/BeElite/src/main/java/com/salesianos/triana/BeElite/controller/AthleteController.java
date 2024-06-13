@@ -1,9 +1,15 @@
 package com.salesianos.triana.BeElite.controller;
 
+import com.salesianos.triana.BeElite.dto.Block.AthleteBlockDto;
+import com.salesianos.triana.BeElite.dto.Program.PostInviteDto;
+import com.salesianos.triana.BeElite.dto.Session.AthleteSessionDto;
 import com.salesianos.triana.BeElite.dto.User.AthleteDetailsDto;
 import com.salesianos.triana.BeElite.dto.User.UserDto;
 import com.salesianos.triana.BeElite.model.Athlete;
-import com.salesianos.triana.BeElite.model.Coach;
+import com.salesianos.triana.BeElite.model.AthleteBlock;
+import com.salesianos.triana.BeElite.model.AthleteSession;
+import com.salesianos.triana.BeElite.model.Composite_Ids.AthleteSessionId;
+import com.salesianos.triana.BeElite.model.Invite;
 import com.salesianos.triana.BeElite.service.AthleteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -21,10 +27,11 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 
+import java.net.URI;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -120,7 +127,7 @@ public class AthleteController {
 
     }
 
-    @GetMapping("/{coachUsername}/oldestAthlete")
+    @GetMapping("{coachUsername}/oldestAthlete")
     public UserDto getOldestAthleteInAllPrograms(@PathVariable String coachUsername) {
         Athlete a = athleteService.findOldestAthleteInProgram(coachUsername);
         return UserDto.of(a, a.getJoinedProgramDate());
@@ -130,5 +137,44 @@ public class AthleteController {
     public Page<UserDto> getAllAthletes(@PageableDefault(page = 0, size = 10) Pageable page){
         Page<Athlete> athletes = athleteService.getAllAthletes(page);
         return athletes.map(UserDto::of);
+    }
+
+    @GetMapping("athlete/{athleteUsername}/upcomingWorkouts")
+    public ResponseEntity<List<AthleteSessionDto>> getUpcomingWorkouts(@PathVariable String athleteUsername){
+        List<AthleteSessionDto> upcomingWorkouts = athleteService.getUpcomingWorkouts(athleteUsername);
+
+        if(upcomingWorkouts.isEmpty()) return ResponseEntity.notFound().build();
+
+        return ResponseEntity.ok(upcomingWorkouts);
+    }
+
+    @GetMapping("athlete/{athleteUsername}/previousWorkouts")
+    public ResponseEntity<List<AthleteSessionDto>> getPreviousWorkouts(@PathVariable String athleteUsername){
+        List<AthleteSessionDto> previousWorkouts = athleteService.getPreviousWorkouts(athleteUsername);
+
+        if(previousWorkouts.isEmpty()) return ResponseEntity.notFound().build();
+
+        return ResponseEntity.ok(previousWorkouts);
+    }
+
+    @PutMapping("athlete/saveBlock")
+    public ResponseEntity<AthleteBlockDto> saveAthleteBlock(@RequestBody AthleteBlockDto block) {
+        AthleteBlock a = athleteService.saveAthleteBlock(block);
+
+        return ResponseEntity.ok(AthleteBlockDto.of(a));
+    }
+
+    @PutMapping("athlete/session/update")
+    public ResponseEntity<AthleteSessionDto> getUpdatedAthleteSession(@RequestBody AthleteSessionId id) {
+        AthleteSession a = athleteService.getUpdatedAthleteSession(id);
+
+        return ResponseEntity.ok(AthleteSessionDto.of(a));
+    }
+
+    @PutMapping("athlete/session/setAsDone")
+    public ResponseEntity<AthleteSessionDto> setSessionAsDone(@RequestBody AthleteSessionId id) {
+        AthleteSession a = athleteService.setSessionAsDone(id);
+
+        return ResponseEntity.ok(AthleteSessionDto.of(a));
     }
 }

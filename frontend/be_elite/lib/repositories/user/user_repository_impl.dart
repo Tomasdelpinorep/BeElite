@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:be_elite/models/Coach/coach_details.dart';
 import 'package:be_elite/models/Coach/user_dto.dart';
 import 'package:be_elite/repositories/user/user_repository.dart';
@@ -9,6 +8,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class UserRepositoryImpl extends UserRepository {
   final Client _client = Client();
+
+  //************************************************** COACH **************************************************
 
   @override
   Future<CoachDetails> getCoachDetails(
@@ -29,7 +30,7 @@ class UserRepositoryImpl extends UserRepository {
   }
 
   @override
-  Future<UserDto> getOldestAthleteInProgram(String coachUsername) async{
+  Future<UserDto> getOldestAthleteInProgram(String coachUsername) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     final response = await _client.get(
@@ -40,15 +41,15 @@ class UserRepositoryImpl extends UserRepository {
       },
     );
 
-    if(response.statusCode == 200){
+    if (response.statusCode == 200) {
       return UserDto.fromJson(json.decode(response.body));
-    }else{
+    } else {
       throw Exception("Error getting athlete from program.");
     }
   }
-  
+
   @override
-  Future<int> getTotalNumberOfSessionsCompleted(String coachUsername) async{
+  Future<int> getTotalNumberOfSessionsCompleted(String coachUsername) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     final response = await _client.get(
@@ -59,10 +60,12 @@ class UserRepositoryImpl extends UserRepository {
       },
     );
 
-    if(response.statusCode == 200){
+    if (response.statusCode == 200) {
       return json.decode(response.body);
-    }else{
+    } else {
       throw Exception("Error getting number of completed sessions.");
     }
   }
+
+  //************************************************** ATHLETE **************************************************
 }
