@@ -69,6 +69,7 @@ class ProgramRepositoryImpl implements ProgramRepository {
   Future<List<InviteDto>> getSentInvites(
       String coachUsername, String programName) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    if(programName.isEmpty) return [];
 
     final response = await _client.get(
       Uri.parse('$urlChrome/coach/$coachUsername/$programName/invites'),

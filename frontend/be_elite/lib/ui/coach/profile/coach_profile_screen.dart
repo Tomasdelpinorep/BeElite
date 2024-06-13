@@ -8,6 +8,7 @@ import 'package:be_elite/repositories/user/user_repository_impl.dart';
 import 'package:be_elite/ui/coach/profile/coach_settins_screen.dart';
 import 'package:be_elite/ui/coach/profile/manage_account_screen.dart';
 import 'package:be_elite/ui/coach/profile/manage_programs_screen.dart';
+import 'package:be_elite/variables.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -87,7 +88,8 @@ class _CoachProfileScreenState extends State<CoachProfileScreen> {
         Padding(
           padding: const EdgeInsets.only(top: 50),
           child: CircularProfileAvatar(
-              imageUrl: coachDetails.profilePicUrl!, radius: 100),
+              imageUrl: coachDetails.profilePicUrl ?? defaultProfilePicUrl,
+              radius: 100),
         ),
         const SizedBox(height: 20),
         Text(coachDetails.name!, style: const TextStyle(fontSize: 24)),
@@ -98,11 +100,7 @@ class _CoachProfileScreenState extends State<CoachProfileScreen> {
           width: double.infinity,
           child: Wrap(
             alignment: WrapAlignment.spaceAround,
-            children: [
-              _profilePageOption(Icons.data_usage_rounded, 'Manage Programs'),
-              _profilePageOption(Icons.person, 'Account'),
-              _profilePageOption(Icons.settings, 'Settings')
-            ],
+            children: [],
           ),
         ),
         const SizedBox(height: 100),

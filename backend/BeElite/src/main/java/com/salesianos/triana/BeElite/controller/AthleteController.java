@@ -131,6 +131,9 @@ public class AthleteController {
     @GetMapping("{coachUsername}/oldestAthlete")
     public UserDto getOldestAthleteInAllPrograms(@PathVariable String coachUsername) {
         Athlete a = athleteService.findOldestAthleteInProgram(coachUsername);
+        if(a == null){
+            
+        }
         return UserDto.of(a, a.getJoinedProgramDate());
     }
 

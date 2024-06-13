@@ -17,6 +17,8 @@ class AthleteRepositoryImpl extends AthleteRepository {
   @override
   Future<List<UserDto>> getAthletesByProgram(
       String coachUsername, String programName) async {
+        if(programName.isEmpty) return List.empty();
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     final response = await _client.get(

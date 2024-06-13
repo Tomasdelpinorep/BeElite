@@ -65,11 +65,10 @@ class _AthletesScreenState extends State<AthletesScreen> {
   Future<void> _loadDropDownValue() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      if(widget.coachDetails.programs!.isNotEmpty){
+      if (widget.coachDetails.programs!.isNotEmpty) {
         selectedProgramName = (prefs.getString('selectedProgramName') ??
-          widget.coachDetails.programs?.first.programName)!;
+            widget.coachDetails.programs?.first.programName)!;
       }
-  
     });
 
     _athleteBLoc.add(GetAthletesByProgramEvent(
@@ -121,8 +120,10 @@ class _AthletesScreenState extends State<AthletesScreen> {
                   'Error fetching athletes for program with name: $selectedProgramName.');
             } else if (state is GetAthletesByProgramEmptyState) {
               athletes = [];
-              _programBloc.add(GetInvitesSentEvent(
-                  widget.coachDetails.username!, selectedProgramName));
+              if (selectedProgramName.isNotEmpty) {
+                _programBloc.add(GetInvitesSentEvent(
+                    widget.coachDetails.username!, selectedProgramName));
+              }
               return _buildEmptyHome();
             } else if (state is GetAthletesByProgramSuccessState) {
               athletes = state.athletes;
@@ -288,7 +289,7 @@ class _AthletesScreenState extends State<AthletesScreen> {
     );
   }
 
-  Widget _buildNoProgramHome(){
+  Widget _buildNoProgramHome() {
     return Container(
       height: 800,
       padding: const EdgeInsets.all(8.0),
@@ -297,8 +298,8 @@ class _AthletesScreenState extends State<AthletesScreen> {
         children: [
           _topBarWidget(widget.coachDetails),
           const Expanded(
-            child:Center(child: Text('Create a new program to unlock this screen.'))
-          ),
+              child: Center(
+                  child: Text('Create a new program to unlock this screen.'))),
         ],
       ),
     );
